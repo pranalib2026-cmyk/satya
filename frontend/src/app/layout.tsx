@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import "./globals.css";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 import { BackToTop } from "@/components/layout/back-to-top";
+import { AuthProvider } from "@/lib/auth-context";
 
 export const metadata: Metadata = {
   title: {
@@ -63,10 +65,18 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-full flex flex-col bg-[#f3ece1] text-[#2a1c12] font-sans antialiased selection:bg-[#2a1c12] selection:text-[#fffaf2]" suppressHydrationWarning>
-        <Navbar />
-        <main className="flex-1">{children}</main>
-        <Footer />
-        <BackToTop />
+        <AuthProvider>
+          <Suspense fallback={null}>
+            <Navbar />
+          </Suspense>
+          <main className="flex-1">{children}</main>
+          <Suspense fallback={null}>
+            <Footer />
+          </Suspense>
+          <Suspense fallback={null}>
+            <BackToTop />
+          </Suspense>
+        </AuthProvider>
       </body>
     </html>
   );

@@ -1,0 +1,127 @@
+/*
+ * Dashboard-scoped design layer.
+ *
+ * The reference app (Legal-1) uses Inter + Plus Jakarta Sans and a neutral
+ * surface scale. NyayaSetu keeps its warm-paper palette (defined in the root
+ * globals.css @theme block). This file only restates the reference's
+ * typography scale and motion, and aliases neutral utility classes to the
+ * existing theme tokens so no component hard-codes a colour.
+ *
+ * IMPORTANT: every selector is nested under `.dashboard-scope`, so the public
+ * landing page and all other routes are completely unaffected.
+ */
+
+@layer base {
+  .dashboard-scope {
+    --font-display: "General Sans", "Inter", ui-sans-serif, system-ui, sans-serif;
+  }
+
+  .dashboard-scope h1,
+  .dashboard-scope h2,
+  .dashboard-scope h3,
+  .dashboard-scope h4 {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+
+  .dashboard-scope p {
+    text-wrap: pretty;
+  }
+
+  .dashboard-scope :focus-visible {
+    outline: 2px solid var(--color-brand);
+    outline-offset: 2px;
+  }
+
+  .dashboard-scope ::selection {
+    background: color-mix(in srgb, var(--color-brand) 15%, transparent);
+  }
+}
+
+@layer utilities {
+  .dashboard-scope .animate-in-up {
+    animation: dashboard-in-up 0.35s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  }
+
+  .dashboard-scope .animate-fade {
+    animation: dashboard-fade 0.25s ease-out both;
+  }
+
+  .dashboard-scope .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .dashboard-scope .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .dashboard-scope .typing-dot {
+    display: inline-block;
+    width: 0.375rem;
+    height: 0.375rem;
+    border-radius: 9999px;
+    background-color: var(--color-muted);
+    animation: dashboard-bounce-dot 1.2s infinite ease-in-out;
+  }
+  .dashboard-scope .typing-dot:nth-child(2) {
+    animation-delay: 0.15s;
+  }
+  .dashboard-scope .typing-dot:nth-child(3) {
+    animation-delay: 0.3s;
+  }
+
+  .dashboard-scope .shadow-card {
+    box-shadow:
+      0 1px 2px rgb(42 28 18 / 0.04),
+      0 8px 24px -12px rgb(42 28 18 / 0.08);
+  }
+
+  .dashboard-scope .shadow-pop {
+    box-shadow: 0 12px 40px -12px rgb(42 28 18 / 0.18);
+  }
+}
+
+@keyframes dashboard-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes dashboard-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes dashboard-bounce-dot {
+  0%,
+  60%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.45;
+  }
+  30% {
+    transform: translateY(-4px);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-scope *,
+  .dashboard-scope *::before,
+  .dashboard-scope *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

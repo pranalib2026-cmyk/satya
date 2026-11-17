@@ -110,34 +110,34 @@ export function PracticesSlider() {
                       sizes="(max-width: 600px) 85vw, 420px"
                       className="object-cover object-center filter contrast-[1.03] transition-transform duration-700 group-hover:scale-105"
                     />
-                    {/* Atmospheric Dark Gradient Overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#24180f]/95 via-[#24180f]/45 to-[#24180f]/15" />
+                    {/* Atmospheric Multi-stop Dark Gradient Overlay for High Text Legibility */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#140b06] via-[#140b06]/85 via-50% to-[#140b06]/20 transition-opacity" />
                   </div>
 
                   {/* Top Badges */}
                   <div className="relative z-10 flex items-center justify-between">
-                    <span className="px-2.5 py-1 bg-[#fffaf2]/95 backdrop-blur-xs border border-[#e2d5c1] text-xs font-mono font-medium text-[#2a1c12] rounded-[1px]">
+                    <span className="px-2.5 py-1 bg-[#fffaf2]/95 backdrop-blur-xs border border-[#e2d5c1] text-xs font-mono font-medium text-[#2a1c12] rounded-[1px] shadow-xs">
                       {practice.num}
                     </span>
-                    <span className="px-3 py-1 bg-[#fffaf2]/95 backdrop-blur-xs border border-[#e2d5c1] text-xs font-mono font-medium text-[#2a1c12] rounded-[1px]">
+                    <span className="px-3 py-1 bg-[#fffaf2]/95 backdrop-blur-xs border border-[#e2d5c1] text-xs font-mono font-medium text-[#2a1c12] rounded-[1px] shadow-xs">
                       {practice.startingFee}
                     </span>
                   </div>
 
                   {/* Bottom Text Overlay */}
                   <div className="relative z-10 space-y-3 pt-12">
-                    <h3 className="font-serif text-[28px] sm:text-[32px] font-normal leading-[1.1] text-[#fffaf2] group-hover:text-[#d1a46a] transition-colors">
+                    <h3 className="font-serif text-[28px] sm:text-[32px] font-normal leading-[1.1] text-[#fffaf2] group-hover:text-[#d1a46a] transition-colors drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">
                       {practice.title}
                     </h3>
-                    <p className="text-[13.5px] sm:text-[14px] leading-[1.55] text-[#e2d5c1]/90">
+                    <p className="text-[13.5px] sm:text-[14px] leading-[1.55] text-[#f3ece1] drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)]">
                       {practice.tagline}
                     </p>
 
-                    <div className="pt-3 border-t border-white/20 flex items-center justify-between text-xs">
-                      <span className="text-[#d1a46a] font-medium font-sans truncate max-w-[200px]">
+                    <div className="pt-3 border-t border-white/25 flex items-center justify-between text-xs">
+                      <span className="text-[#d1a46a] font-medium font-sans truncate max-w-[210px] group-hover:text-[#f3d3a3] transition-colors">
                         {practice.partnerNames}
                       </span>
-                      <span className="text-white/60 font-mono text-[11px] truncate max-w-[150px] text-right">
+                      <span className="text-[#f3ece1]/85 font-mono text-[11px] truncate max-w-[160px] text-right">
                         {practice.feeType}
                       </span>
                     </div>

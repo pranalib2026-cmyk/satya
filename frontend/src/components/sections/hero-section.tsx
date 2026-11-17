@@ -134,7 +134,7 @@ export function HeroSection() {
               <div className="flex flex-wrap items-center gap-3 pt-1">
                 {/* Compound Primary Button: Get Legal Help */}
                 <Link
-                  href="/contact"
+                  href="/login"
                   className="group inline-flex items-center bg-[#2a1c12] text-[#fffaf2] hover:bg-[#9a6a35] transition-colors rounded-[2px] overflow-hidden shadow-xs"
                 >
                   <span className="px-4.5 py-2.5 sm:px-5 sm:py-3 text-[14px] font-semibold tracking-tight">

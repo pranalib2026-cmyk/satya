@@ -3,20 +3,34 @@
 
 :root {
   /* Exact tokens reverse-engineered from Ellery Kowal LLP */
-  --bg-primary: #f3ece1;         /* --token-b7851a8d Warm Cream Alabaster */
-  --bg-secondary: #ebe1d1;       /* --token-9b2b5204 Warm Sand */
-  --bg-border: #e2d5c1;          /* --token-dd2b74b5 Muted Stone Border */
-  --bg-border-hover: #cfbe9e;    /* Border on hover */
-  --bg-card: #fffaf2;            /* --token-e387a24e Bright Warm White Card */
-  --text-primary: #2a1c12;       /* --token-6b31e930 Deep Espresso Roast */
-  --text-secondary: #5b4a3b;     /* --token-5414fdf6 Muted Umber */
-  --text-muted: #85725f;         /* --token-70c5b10f Tertiary Warm Gray */
-  --accent-bronze: #9a6a35;      /* --token-c584fe1b Warm Bronze / Ochre */
-  --accent-dark-bronze: #7c5226; /* --token-adbfafe3 Deep Antique Bronze */
-  --accent-gold: #d1a46a;        /* --token-901d9747 Light Champagne Gold */
-  --bg-dark: #24180f;            /* --token-54bd8eaf Near-Black Espresso */
-  --bg-dark-card: #2f2116;       /* --token-bfe65a71 Charcoal Espresso */
-  --border-dark: #3f2c1f;        /* Dark container border */
+  --bg-primary: #f3ece1;
+  /* --token-b7851a8d Warm Cream Alabaster */
+  --bg-secondary: #ebe1d1;
+  /* --token-9b2b5204 Warm Sand */
+  --bg-border: #e2d5c1;
+  /* --token-dd2b74b5 Muted Stone Border */
+  --bg-border-hover: #cfbe9e;
+  /* Border on hover */
+  --bg-card: #fffaf2;
+  /* --token-e387a24e Bright Warm White Card */
+  --text-primary: #2a1c12;
+  /* --token-6b31e930 Deep Espresso Roast */
+  --text-secondary: #5b4a3b;
+  /* --token-5414fdf6 Muted Umber */
+  --text-muted: #85725f;
+  /* --token-70c5b10f Tertiary Warm Gray */
+  --accent-bronze: #9a6a35;
+  /* --token-c584fe1b Warm Bronze / Ochre */
+  --accent-dark-bronze: #7c5226;
+  /* --token-adbfafe3 Deep Antique Bronze */
+  --accent-gold: #d1a46a;
+  /* --token-901d9747 Light Champagne Gold */
+  --bg-dark: #24180f;
+  /* --token-54bd8eaf Near-Black Espresso */
+  --bg-dark-card: #2f2116;
+  /* --token-bfe65a71 Charcoal Espresso */
+  --border-dark: #3f2c1f;
+  /* Dark container border */
 }
 
 @theme inline {
@@ -35,77 +49,105 @@
   --color-dark-card: var(--bg-dark-card);
   --color-dark-border: var(--border-dark);
 
+  /* Portal & Citizen Dashboard Tokens (Aligned to NyayaSetu Warm Paper Theme) */
+  --color-ink: #2a1c12;
+  --color-ink-soft: #382618;
+  --color-body: #5b4a3b;
+  --color-muted: #85725f;
+  --color-line: #e2d5c1;
+
+  --color-brand: #9a6a35;
+  --color-brand-dark: #7c5226;
+  --color-brand-soft: #f4ecdf;
+  --color-brand-tint: #faf6f0;
+
+  --color-mint: #dceada;
+  --color-mint-soft: #f2f7f1;
+  --color-dot: #2e7d32;
+
+  --color-danger: #c0392b;
+  --color-danger-soft: #fdf2f0;
+  --color-warn: #b54708;
+  --color-warn-soft: #fff8e7;
+
   --font-serif: "Gambetta", Georgia, Cambria, "Times New Roman", serif;
   --font-sans: "General Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-mono: "Inter", monospace;
 }
 
-html {
-  scroll-behavior: smooth;
-  background-color: var(--bg-primary);
-  color: var(--text-primary);
-}
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+  }
 
-body {
-  background-color: var(--bg-primary);
-  color: var(--text-primary);
-  font-family: var(--font-sans);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  line-height: 1.6;
-}
+  body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    line-height: 1.6;
+  }
 
-/* Typography Scale */
-h1, .display-h1 {
-  font-family: var(--font-serif);
-  font-size: clamp(40px, 7vw, 105.6px);
-  line-height: 0.9;
-  letter-spacing: -0.045em;
-  font-weight: 400;
-  color: var(--text-primary);
-}
+  /* Typography Scale */
+  h1,
+  .display-h1 {
+    font-family: var(--font-serif);
+    font-size: clamp(40px, 7vw, 105.6px);
+    line-height: 0.9;
+    letter-spacing: -0.045em;
+    font-weight: 400;
+    color: var(--text-primary);
+  }
 
-h2, .section-h2 {
-  font-family: var(--font-serif);
-  font-size: clamp(32px, 5vw, 67.2px);
-  line-height: 0.98;
-  letter-spacing: -0.045em;
-  font-weight: 400;
-  color: var(--text-primary);
-}
+  h2,
+  .section-h2 {
+    font-family: var(--font-serif);
+    font-size: clamp(32px, 5vw, 67.2px);
+    line-height: 0.98;
+    letter-spacing: -0.045em;
+    font-weight: 400;
+    color: var(--text-primary);
+  }
 
-h3, .feature-h3 {
-  font-family: var(--font-serif);
-  font-size: clamp(24px, 3.5vw, 48px);
-  line-height: 1.05;
-  letter-spacing: -0.04em;
-  font-weight: 400;
-  color: var(--text-primary);
-}
+  h3,
+  .feature-h3 {
+    font-family: var(--font-serif);
+    font-size: clamp(24px, 3.5vw, 48px);
+    line-height: 1.05;
+    letter-spacing: -0.04em;
+    font-weight: 400;
+    color: var(--text-primary);
+  }
 
-h4, .card-h4 {
-  font-family: var(--font-serif);
-  font-size: clamp(20px, 2.5vw, 32px);
-  line-height: 1.15;
-  letter-spacing: -0.03em;
-  font-weight: 400;
-  color: var(--text-primary);
-}
+  h4,
+  .card-h4 {
+    font-family: var(--font-serif);
+    font-size: clamp(20px, 2.5vw, 32px);
+    line-height: 1.15;
+    letter-spacing: -0.03em;
+    font-weight: 400;
+    color: var(--text-primary);
+  }
 
-p, .body-editorial {
-  font-family: var(--font-sans);
-  font-size: 15px;
-  line-height: 1.65;
-  color: var(--text-secondary);
-}
+  p,
+  .body-editorial {
+    font-family: var(--font-sans);
+    font-size: 15px;
+    line-height: 1.65;
+    color: var(--text-secondary);
+  }
 
-.pull-quote {
-  font-family: var(--font-serif);
-  font-style: italic;
-  font-size: clamp(20px, 2.5vw, 28px);
-  line-height: 1.3;
-  letter-spacing: -0.02em;
-  color: var(--text-primary);
+  .pull-quote {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: clamp(20px, 2.5vw, 28px);
+    line-height: 1.3;
+    letter-spacing: -0.02em;
+    color: var(--text-primary);
+  }
 }
 
 .stamp-badge {
@@ -127,6 +169,49 @@ p, .body-editorial {
   border-top: 1px solid var(--bg-border);
 }
 
+/* Legal Portal component utilities matching Legal-1 structure */
+.card {
+  border-radius: 1rem;
+  border: 1px solid var(--color-line);
+  background-color: #fffaf2;
+  box-shadow: 0 1px 2px rgb(42 28 18 / 0.04), 0 8px 24px -12px rgb(42 28 18 / 0.08);
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  border-radius: 9999px;
+  padding: 0.25rem 0.625rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.field {
+  width: 100%;
+  border-radius: 0.75rem;
+  border: 1px solid var(--color-line);
+  background-color: #fffaf2;
+  padding: 0.625rem 0.875rem;
+  font-size: 15px;
+  color: var(--color-ink);
+  transition: all 150ms;
+}
+
+.field:focus {
+  border-color: var(--color-brand);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(154, 106, 53, 0.15);
+}
+
+.label {
+  margin-bottom: 0.375rem;
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
 ::selection {
   background-color: #2a1c12;
   color: #fffaf2;
@@ -136,6 +221,7 @@ p, .body-editorial {
 .hide-scrollbar::-webkit-scrollbar {
   display: none;
 }
+
 .hide-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;

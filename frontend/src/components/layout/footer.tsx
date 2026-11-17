@@ -1,8 +1,17 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Container } from "./container";
 import { practices } from "@/data/practices";
 
 export function Footer() {
+  const pathname = usePathname();
+
+  if (pathname === "/login" || pathname?.startsWith("/dashboard")) {
+    return null;
+  }
+
   return (
     <footer className="border-t border-[#3f2c1f] bg-[#24180f] text-[#f3ece1]">
       <Container size="xl" className="py-16 lg:py-24">
@@ -87,7 +96,7 @@ export function Footer() {
             </p>
             <div className="pt-4">
               <Link
-                href="/#conflict-check"
+                href="/login"
                 className="inline-block border border-[#d1a46a]/60 bg-[#2f2116] px-4 py-2.5 text-xs uppercase tracking-wider text-[#f3ece1] hover:bg-[#9a6a35] hover:border-[#9a6a35] transition-colors"
               >
                 Get Legal Help

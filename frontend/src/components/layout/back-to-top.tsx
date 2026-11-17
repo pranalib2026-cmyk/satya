@@ -3,9 +3,11 @@
 import * as React from "react";
 import { ArrowUp } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { usePathname } from "next/navigation";
 
 export function BackToTop() {
   const [isVisible, setIsVisible] = React.useState(false);
+  const pathname = usePathname();
 
   React.useEffect(() => {
     const handleScroll = () => {
@@ -26,6 +28,10 @@ export function BackToTop() {
       behavior: "smooth",
     });
   };
+
+  if (pathname === "/login" || pathname?.startsWith("/dashboard")) {
+    return null;
+  }
 
   return (
     <AnimatePresence>
