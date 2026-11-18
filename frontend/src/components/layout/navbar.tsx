@@ -38,6 +38,10 @@ export function Navbar() {
     };
   }, []);
 
+  if (pathname === "/login" || pathname?.startsWith("/dashboard")) {
+    return null;
+  }
+
   return (
     <>
       <header className="sticky top-0 z-40 w-full bg-[#f4efe6]/95 backdrop-blur-md transition-all">
@@ -159,7 +163,7 @@ export function Navbar() {
           {/* Action CTA Compound Button */}
           <div className="hidden sm:flex items-center space-x-3">
             <Link
-              href="/contact"
+              href="/login"
               className="group inline-flex items-center bg-[#2a1c12] text-[#fffaf2] hover:bg-[#9a6a35] transition-colors rounded-[2px] overflow-hidden shadow-xs cursor-pointer"
             >
               <span className="px-4 py-2.5 text-[14px] font-semibold tracking-tight">
@@ -221,7 +225,7 @@ export function Navbar() {
             ))}
             <div className="pt-4 border-t border-[#e2d5c1] space-y-2.5">
               <Link
-                href="/contact"
+                href="/login"
                 onClick={() => setIsOpen(false)}
                 className="group flex items-center justify-between bg-[#2a1c12] text-[#fffaf2] rounded-[2px] overflow-hidden"
               >

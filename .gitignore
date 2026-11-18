@@ -32,6 +32,7 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!**/.env.example
 
 # vercel
 .vercel
@@ -40,9 +41,13 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# markdown files
+# markdown files (keep project documentation and agent guides trackable)
 *.md
 !README.md
+!AGENTS.md
+!docs/**/*.md
+!backend/**/*.md
+!frontend/**/*.md
 
 # blender backups and checkpoints
 *.blend1
