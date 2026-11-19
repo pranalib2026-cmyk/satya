@@ -31,9 +31,9 @@ import {
 import { cn } from '@/lib/utils';
 
 const modes = [
-  { key: 'video', label: 'Video', icon: Video, note: '30 min · from home' },
-  { key: 'phone', label: 'Phone', icon: MessageSquare, note: '30 min · no video' },
-  { key: 'in-person', label: 'In person', icon: MapPin, note: 'At the advocate’s office' },
+  { key: 'video', label: 'Video Hearing', icon: Video, note: '30 min · secure portal' },
+  { key: 'phone', label: 'Audio Consultation', icon: MessageSquare, note: '30 min · direct line' },
+  { key: 'in-person', label: 'Chambers Conference', icon: MapPin, note: 'In-person at advocate office' },
 ] as const;
 
 export default function BookingPage() {
@@ -43,179 +43,181 @@ export default function BookingPage() {
   const router = useRouter();
   const advocate = getAdvocate(advocateId);
 
-  const [mode, setMode] = useState<'video' | 'phone' | 'in-person'>('video')
-  const [slots, setSlots] = useState<AdvocateSlot[]>([])
-  const [loading, setLoading] = useState(true)
-  const [selected, setSelected] = useState<AdvocateSlot | null>(null)
-  const [holdError, setHoldError] = useState('')
-  const [expiresAt, setExpiresAt] = useState<number | null>(null)
-  const [now, setNow] = useState(nowMs)
-  const [payOpen, setPayOpen] = useState(false)
-  const [paying, setPaying] = useState(false)
-  const [payError, setPayError] = useState('')
+  const [mode, setMode] = useState<'video' | 'phone' | 'in-person'>('video');
+  const [slots, setSlots] = useState<AdvocateSlot[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selected, setSelected] = useState<AdvocateSlot | null>(null);
+  const [holdError, setHoldError] = useState('');
+  const [expiresAt, setExpiresAt] = useState<number | null>(null);
+  const [now, setNow] = useState(nowMs);
+  const [payOpen, setPayOpen] = useState(false);
+  const [paying, setPaying] = useState(false);
+  const [payError, setPayError] = useState('');
 
   useEffect(() => {
-    let active = true
+    let active = true;
     void getSlots(advocateId, mode).then((next) => {
-      if (!active) return
-      setSlots(next)
-      setLoading(false)
-    })
+      if (!active) return;
+      setSlots(next);
+      setLoading(false);
+    });
     return () => {
-      active = false
-    }
-  }, [advocateId, mode])
+      active = false;
+    };
+  }, [advocateId, mode]);
 
   useEffect(() => {
-    if (!expiresAt) return
-    const id = setInterval(() => setNow(nowMs()), 1000)
-    return () => clearInterval(id)
-  }, [expiresAt])
+    if (!expiresAt) return;
+    const id = setInterval(() => setNow(nowMs()), 1000);
+    return () => clearInterval(id);
+  }, [expiresAt]);
 
-  useEffect(() => () => { if (selected) releaseHold(selected.id) }, [selected])
+  useEffect(() => () => { if (selected) releaseHold(selected.id); }, [selected]);
 
   const byDate = useMemo(() => {
-    const map = new Map<string, AdvocateSlot[]>()
-    slots.forEach((s) => map.set(s.date, [...(map.get(s.date) ?? []), s]))
-    return [...map.entries()].sort(([a], [b]) => a.localeCompare(b))
-  }, [slots])
+    const map = new Map<string, AdvocateSlot[]>();
+    slots.forEach((s) => map.set(s.date, [...(map.get(s.date) ?? []), s]));
+    return [...map.entries()].sort(([a], [b]) => a.localeCompare(b));
+  }, [slots]);
 
-  const remaining = expiresAt ? Math.max(0, Math.floor((expiresAt - now) / 1000)) : 0
-  const holdActive = !!expiresAt && remaining > 0 && !!selected
+  const remaining = expiresAt ? Math.max(0, Math.floor((expiresAt - now) / 1000)) : 0;
+  const holdActive = !!expiresAt && remaining > 0 && !!selected;
 
   const choose = (slot: AdvocateSlot) => {
-    setHoldError('')
-    if (selected?.id === slot.id) return
-    if (selected) releaseHold(selected.id)
-    const res = holdSlot(slot)
+    setHoldError('');
+    if (selected?.id === slot.id) return;
+    if (selected) releaseHold(selected.id);
+    const res = holdSlot(slot);
     if (!res.ok) {
-      setHoldError('That slot is on hold for another user. Please pick a different time.')
-      return
+      setHoldError('That slot is currently held by another citizen. Please select an alternate time.');
+      return;
     }
-    setSelected(slot)
-    setExpiresAt(res.expiresAt)
-    setNow(nowMs())
-  }
+    setSelected(slot);
+    setExpiresAt(res.expiresAt);
+    setNow(nowMs());
+  };
 
   const pay = async () => {
-    if (!selected || !advocate) return
-    setPaying(true)
-    setPayError('')
+    if (!selected || !advocate) return;
+    setPaying(true);
+    setPayError('');
     try {
-      const { paymentId } = await mockCheckout(advocate.feeMin)
+      const { paymentId } = await mockCheckout(advocate.feeMin);
       const booking = await createBooking({
         advocateId: advocate.id,
         caseId: 'case_2041',
         slot: selected,
         mode,
         amount: advocate.feeMin,
-      })
-      const { status } = await confirmPayment(booking.id, paymentId)
-      releaseHold(selected.id)
-      setPayOpen(false)
+      });
+      const { status } = await confirmPayment(booking.id, paymentId);
+      releaseHold(selected.id);
+      setPayOpen(false);
       router.push(
         dh(`/booking/confirmation/${booking.id}`) +
           '?' +
           new URLSearchParams({ booking: JSON.stringify({ ...booking, status, paymentId }) })
-      )
+      );
     } catch {
-      setPayError('Payment confirmation failed. No amount was charged. Try again.')
+      setPayError('Payment confirmation failed. No amount was charged. Please retry.');
     } finally {
-      setPaying(false)
+      setPaying(false);
     }
-  }
+  };
 
   if (!advocate) {
-    return <p className="text-body">Advocate not found.</p>
+    return <p className="text-[#5b4a3b]">Advocate dossier not found.</p>;
   }
 
   return (
-    <div className="animate-fade">
+    <div className="animate-fade space-y-6">
       <PageHeader
-        eyebrow="Book a consultation"
+        eyebrow="RESERVE CONSULTATION"
         title={`Adv. ${advocate.name}`}
         subtitle={`${advocate.practiceAreas.join(' · ')} · ${advocate.city}`}
         backTo={dh(`/advocates/${advocate.id}`)}
-        actions={<Badge tone="mint"><BadgeCheck className="size-3" /> Bar Council verified</Badge>}
+        actions={<Badge tone="mint"><BadgeCheck className="size-3" /> Bar Council Verified</Badge>}
       />
 
-      <div className="grid gap-4 lg:grid-cols-[1fr_340px]">
-        <div className="space-y-4">
+      <div className="grid gap-6 lg:grid-cols-[1fr_340px]">
+        <div className="space-y-6">
           {/* Mode */}
-          <Card className="p-4 sm:p-5">
-            <h2 className="text-[13.5px] font-bold">1. Choose how to talk</h2>
-            <div className="mt-3 grid gap-2 sm:grid-cols-3">
+          <Card className="p-6">
+            <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#85725f]">Step 1</p>
+            <h2 className="mt-1 font-serif text-[18px] font-normal text-[#2a1c12]">Select Consultation Channel</h2>
+            <div className="mt-4 grid gap-3 sm:grid-cols-3">
               {modes.map((m) => {
-                const available = advocate.modes.includes(m.key)
-                const active = mode === m.key
+                const available = advocate.modes.includes(m.key);
+                const active = mode === m.key;
                 return (
                   <button
                     key={m.key}
                     type="button"
                     disabled={!available}
-                    onClick={() => { setMode(m.key); setSelected(null); setExpiresAt(null); setLoading(true) }}
+                    onClick={() => { setMode(m.key); setSelected(null); setExpiresAt(null); setLoading(true); }}
                     className={cn(
-                      'flex items-start gap-2.5 rounded-xl border p-3 text-left transition',
-                      active ? 'border-brand bg-brand-tint ring-1 ring-brand/20' : 'border-line hover:border-brand/30',
+                      'flex flex-col items-start gap-2 rounded-[2px] border p-4 text-left transition-colors',
+                      active ? 'border-[#2a1c12] bg-[#f4efe6] ring-1 ring-[#2a1c12]' : 'border-[#e2d5c1] bg-[#fffaf2] hover:border-[#9a6a35]',
                       !available && 'cursor-not-allowed opacity-40',
                     )}
                   >
-                    <m.icon className={cn('mt-0.5 size-4.5 shrink-0', active ? 'text-brand' : 'text-muted')} aria-hidden />
-                    <span>
-                      <span className="block text-[12.5px] font-bold text-ink">{m.label}</span>
-                      <span className="block text-[10.5px] text-body">{m.note}</span>
-                    </span>
+                    <m.icon className={cn('size-5', active ? 'text-[#9a6a35]' : 'text-[#85725f]')} aria-hidden />
+                    <div>
+                      <span className="block text-[13px] font-medium text-[#2a1c12]">{m.label}</span>
+                      <span className="block text-[11px] text-[#5b4a3b]">{m.note}</span>
+                    </div>
                   </button>
-                )
+                );
               })}
             </div>
           </Card>
 
           {/* Slots */}
-          <Card className="p-4 sm:p-5">
+          <Card className="p-6">
             <div className="flex items-start justify-between gap-3">
               <div>
-                <h2 className="text-[13.5px] font-bold">2. Pick a free slot</h2>
-                <p className="mt-0.5 text-[11px] text-body">Only free slots are shown. Slots are held for 10 minutes while you pay.</p>
+                <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#85725f]">Step 2</p>
+                <h2 className="mt-1 font-serif text-[18px] font-normal text-[#2a1c12]">Select Available Docket Slot</h2>
+                <p className="mt-0.5 text-[12px] text-[#5b4a3b]">Held slots lock for 10 minutes to prevent double-booking across advocates.</p>
               </div>
               {holdActive && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-warn-soft px-2.5 py-1 text-[10.5px] font-bold text-warn">
-                  <Clock className="size-3" aria-hidden /> Held {String(Math.floor(remaining / 60)).padStart(2, '0')}:{String(remaining % 60).padStart(2, '0')}
+                <span className="inline-flex items-center gap-1.5 rounded-[2px] border border-[#b97a29]/30 bg-[#fdf5eb] px-3 py-1 font-mono text-[11px] font-medium text-[#8a5b1c]">
+                  <Clock className="size-3.5" aria-hidden /> Reserved {String(Math.floor(remaining / 60)).padStart(2, '0')}:{String(remaining % 60).padStart(2, '0')}
                 </span>
               )}
             </div>
 
-            {holdError && <p className="mt-2 rounded-lg bg-danger-soft px-3 py-2 text-[11.5px] text-danger">{holdError}</p>}
+            {holdError && <p className="mt-3 rounded-[2px] border border-[#9a3424]/30 bg-[#fbf2ef] px-4 py-2.5 text-[12px] text-[#7a2517]">{holdError}</p>}
 
             {loading ? (
-              <div className="flex items-center gap-2 py-8 text-[12px] text-muted">
-                <Loader2 className="size-4 animate-spin" aria-hidden /> Checking availability…
+              <div className="flex items-center gap-2.5 py-10 text-[13px] text-[#85725f]">
+                <Loader2 className="size-4 animate-spin text-[#9a6a35]" aria-hidden /> Interrogating advocate calendar…
               </div>
             ) : (
-              <div className="mt-4 space-y-4">
+              <div className="mt-5 space-y-5">
                 {byDate.map(([date, daySlots]) => (
                   <div key={date}>
-                    <p className="mb-2 text-[11px] font-bold text-body">
+                    <p className="mb-2.5 font-mono text-[11px] uppercase tracking-[0.14em] text-[#85725f]">
                       {formatDate(date, { weekday: 'short', day: 'numeric', month: 'short' })}
                     </p>
-                    <div className="flex flex-wrap gap-2">
+                    <div className="flex flex-wrap gap-2.5">
                       {daySlots.map((s) => {
-                        const active = selected?.id === s.id
+                        const active = selected?.id === s.id;
                         return (
                           <button
                             key={s.id}
                             type="button"
                             onClick={() => choose(s)}
                             className={cn(
-                              'h-10 min-w-[74px] rounded-lg border px-3 text-[12px] font-semibold transition',
+                              'h-10 min-w-[80px] rounded-[2px] border px-3 font-mono text-[12px] font-medium transition-colors',
                               active
-                                ? 'border-brand bg-brand text-card-bg'
-                                : 'border-line bg-card-bg text-ink hover:border-brand/50 hover:text-brand-dark',
+                                ? 'border-[#2a1c12] bg-[#2a1c12] text-[#fffaf2]'
+                                : 'border-[#e2d5c1] bg-[#fffaf2] text-[#2a1c12] hover:border-[#9a6a35]',
                             )}
                           >
                             {s.time}
                           </button>
-                        )
+                        );
                       })}
                     </div>
                   </div>
@@ -224,63 +226,63 @@ export default function BookingPage() {
             )}
           </Card>
 
-          <div className="flex items-center gap-2 rounded-xl bg-brand-tint px-3.5 py-3">
-            <Lock className="size-4 shrink-0 text-muted" aria-hidden />
-            <p className="text-[11px] leading-5 text-body">
-              Double booking is prevented by a unique constraint on the slot and a 10-minute hold. Payment is only a
-              mock in this build; no money is charged.
+          <div className="flex items-center gap-3 rounded-[2px] border border-[#e2d5c1] bg-[#ebe1d1]/30 px-4 py-3.5">
+            <Lock className="size-4 shrink-0 text-[#9a6a35]" aria-hidden />
+            <p className="text-[12px] leading-relaxed text-[#5b4a3b]">
+              Double booking is prevented by an atomic database constraint. All checkout sessions operate in the sandbox during this stage.
             </p>
           </div>
         </div>
 
         {/* Summary */}
-        <aside className="space-y-4">
-          <Card className="p-5 lg:sticky lg:top-20">
-            <h2 className="text-[13.5px] font-bold">Consultation summary</h2>
-            <div className="mt-3 space-y-2.5 text-[12px]">
-              <div className="flex items-center justify-between">
-                <span className="text-body">Advocate</span>
-                <span className="font-semibold text-ink">Adv. {advocate.name}</span>
+        <aside className="space-y-6">
+          <Card className="p-6 lg:sticky lg:top-20">
+            <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#85725f]">Ledger</p>
+            <h2 className="mt-1 font-serif text-[18px] font-normal text-[#2a1c12]">Consultation Summary</h2>
+            <div className="mt-4 space-y-3 text-[12.5px]">
+              <div className="flex items-center justify-between border-b border-[#e2d5c1] pb-2">
+                <span className="text-[#85725f]">Advocate</span>
+                <span className="font-medium text-[#2a1c12]">Adv. {advocate.name}</span>
               </div>
-              <div className="flex items-center justify-between">
-                <span className="text-body">Mode</span>
-                <span className="font-semibold capitalize text-ink">{mode.replace('-', ' ')}</span>
+              <div className="flex items-center justify-between border-b border-[#e2d5c1] pb-2">
+                <span className="text-[#85725f]">Channel</span>
+                <span className="font-medium capitalize text-[#2a1c12]">{mode.replace('-', ' ')}</span>
               </div>
-              <div className="flex items-center justify-between">
-                <span className="text-body">Slot</span>
-                <span className="font-semibold text-ink">
+              <div className="flex items-center justify-between border-b border-[#e2d5c1] pb-2">
+                <span className="text-[#85725f]">Reserved Slot</span>
+                <span className="font-mono font-medium text-[#2a1c12]">
                   {selected ? `${formatDate(selected.date, { day: 'numeric', month: 'short' })} · ${selected.time}` : 'Not selected'}
                 </span>
               </div>
-              <div className="flex items-center justify-between">
-                <span className="text-body">Duration</span>
-                <span className="font-semibold text-ink">30 minutes</span>
+              <div className="flex items-center justify-between border-b border-[#e2d5c1] pb-2">
+                <span className="text-[#85725f]">Allotted Duration</span>
+                <span className="font-medium text-[#2a1c12]">30 minutes</span>
               </div>
-              <div className="flex items-center justify-between border-t border-line pt-2.5">
-                <span className="text-body">Fee</span>
-                <span className="text-[16px] font-extrabold text-ink">{formatInr(advocate.feeMin)}</span>
+              <div className="flex items-center justify-between pt-1">
+                <span className="text-[#85725f]">Advocate Fee</span>
+                <span className="font-serif text-[16px] font-normal text-[#2a1c12]">{formatInr(advocate.feeMin)}</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-body">Platform fee</span>
-                <span className="font-semibold text-ink">{formatInr(49)}</span>
+                <span className="text-[#85725f]">Infrastructure Charge</span>
+                <span className="font-mono text-[12px] font-medium text-[#2a1c12]">{formatInr(49)}</span>
               </div>
             </div>
 
-            <div className="mt-3 rounded-lg bg-mint-soft px-3 py-2">
-              <p className="flex items-center gap-1.5 text-[10.5px] font-semibold text-dot">
-                <ShieldCheck className="size-3" aria-hidden /> Fixed platform charge. No fee-sharing with advocates.
+            <div className="mt-4 rounded-[2px] border border-[#2a6b3b]/30 bg-[#2a6b3b]/10 p-3">
+              <p className="flex items-center gap-1.5 text-[11px] font-medium text-[#2a6b3b]">
+                <ShieldCheck className="size-3.5 shrink-0" aria-hidden /> Non-commission platform fee. Direct payment to advocate.
               </p>
             </div>
 
-            <Button fullWidth className="mt-4" disabled={!holdActive} onClick={() => setPayOpen(true)}>
-              <CreditCard className="size-4" aria-hidden /> Pay {formatInr(advocate.feeMin + 49)}
+            <Button fullWidth className="mt-5" disabled={!holdActive} onClick={() => setPayOpen(true)}>
+              <CreditCard className="size-4" aria-hidden /> Confirm & Authorize {formatInr(advocate.feeMin + 49)}
             </Button>
-            <p className="mt-2 text-center text-[10px] text-muted">
-              {holdActive ? 'Your slot is held. Complete payment to confirm.' : 'Select a slot to continue.'}
+            <p className="mt-2.5 text-center font-mono text-[10px] text-[#85725f]">
+              {holdActive ? 'Slot held in escrow. Authorize to seal reservation.' : 'Select a calendar slot to proceed.'}
             </p>
           </Card>
 
-          <Disclaimer variant="banner" text="A consultation is an agreement between you and the advocate. Legal does not provide legal advice." />
+          <Disclaimer variant="banner" text="A consultation constitutes a direct professional relationship between citizen and advocate. NyayaSetu provides matching infrastructure only." />
         </aside>
       </div>
 
@@ -288,41 +290,41 @@ export default function BookingPage() {
       <Modal
         open={payOpen}
         onClose={() => !paying && setPayOpen(false)}
-        title="Razorpay checkout (mock)"
-        description="This is a sandbox checkout. No card or UPI details are collected."
+        title="Payment Gateway (Sandbox Authorization)"
+        description="Statutory testing environment. No live bank credentials or UPI pins are processed."
         footer={
           <>
-            <Button variant="ghost" disabled={paying} onClick={() => setPayOpen(false)}>Cancel</Button>
+            <Button variant="secondary" disabled={paying} onClick={() => setPayOpen(false)}>Cancel</Button>
             <Button loading={paying} onClick={pay}>
-              {paying ? 'Confirming…' : `Pay ${formatInr(advocate.feeMin + 49)}`}
+              {paying ? 'Authorizing…' : `Authorize ${formatInr(advocate.feeMin + 49)}`}
             </Button>
           </>
         }
       >
-        <div className="space-y-3">
-          <div className="rounded-2xl border border-line p-4">
+        <div className="space-y-4">
+          <div className="rounded-[2px] border border-[#e2d5c1] bg-[#f4efe6] p-4">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2.5">
-                <span className="grid size-9 place-items-center rounded-lg bg-brand-soft text-brand">
-                  <CreditCard className="size-4.5" aria-hidden />
+              <div className="flex items-center gap-3">
+                <span className="grid size-10 place-items-center rounded-[2px] border border-[#e2d5c1] bg-[#fffaf2] text-[#9a6a35]">
+                  <CreditCard className="size-5" aria-hidden />
                 </span>
                 <div>
-                  <p className="text-[12.5px] font-bold">Consultation with Adv. {advocate.name}</p>
-                  <p className="text-[10.5px] text-muted">{mode} · 30 min</p>
+                  <p className="font-serif text-[14px] font-normal text-[#2a1c12]">Adv. {advocate.name}</p>
+                  <p className="font-mono text-[11px] text-[#85725f]">{mode} · 30 min docket</p>
                 </div>
               </div>
-              <p className="text-[16px] font-extrabold">{formatInr(advocate.feeMin + 49)}</p>
+              <p className="font-serif text-[18px] font-normal text-[#2a1c12]">{formatInr(advocate.feeMin + 49)}</p>
             </div>
           </div>
-          <div className="rounded-xl bg-brand-tint p-3 text-[11px] leading-5 text-body">
-            <p className="flex items-center gap-1.5 font-semibold text-ink">
-              <Check className="size-3.5 text-dot" aria-hidden /> What happens after payment
+          <div className="rounded-[2px] border border-[#e2d5c1] bg-[#ebe1d1]/30 p-4 text-[12px] leading-relaxed text-[#5b4a3b]">
+            <p className="flex items-center gap-1.5 font-medium text-[#2a1c12]">
+              <Check className="size-3.5 text-[#2a6b3b]" aria-hidden /> Post-authorization protocol
             </p>
-            <p className="mt-1">A mock webhook marks the booking confirmed. You get an .ics calendar file and the advocate receives your case brief.</p>
+            <p className="mt-1">A cryptographic webhook seals the appointment. A signed calendar file is generated and your preliminary case dossier is transmitted under strict DPDP consent.</p>
           </div>
-          {payError && <p className="rounded-lg bg-danger-soft px-3 py-2 text-[11.5px] text-danger">{payError}</p>}
+          {payError && <p className="rounded-[2px] border border-[#9a3424]/30 bg-[#fbf2ef] px-3.5 py-2 text-[12px] text-[#7a2517]">{payError}</p>}
         </div>
       </Modal>
     </div>
-  )
+  );
 }

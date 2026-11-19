@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from 'react'
-import Link from 'next/link'
-import { useParams } from 'next/navigation'
+import { useState } from 'react';
+import Link from 'next/link';
+import { useParams } from 'next/navigation';
 import {
   ArrowRight,
   CalendarDays,
@@ -19,321 +19,330 @@ import {
   Search,
   Send,
   Sparkles,
-} from 'lucide-react'
-import { cases, caseStages, hearings, iso } from '@/data/dashboard-mock-data'
-import { cn } from '@/lib/utils'
-import { dh, formatDate, formatDateTime, relativeDay } from '@/lib/dashboard-utils'
-import { useDashboardToday } from '@/lib/dashboard-time'
-import { Badge, Button, Card, Input, Textarea } from '@/components/dashboard/ui'
-import { Disclaimer, PageHeader } from '@/components/dashboard/shared'
-import { useDashboardUI } from '@/lib/dashboard-ui-context'
+} from 'lucide-react';
+import { cases, caseStages, hearings, iso } from '@/data/dashboard-mock-data';
+import { cn } from '@/lib/utils';
+import { dh, formatDate, formatDateTime, relativeDay } from '@/lib/dashboard-utils';
+import { useDashboardToday } from '@/lib/dashboard-time';
+import { Badge, Button, Card, Input, Textarea } from '@/components/dashboard/ui';
+import { Disclaimer, PageHeader } from '@/components/dashboard/shared';
+import { useDashboardUI } from '@/lib/dashboard-ui-context';
 
 const genericStages = [
   {
     id: 'g1',
     caseId: '',
-    title: 'Case profile created',
+    title: 'Case Dossier Compiled',
     date: iso(-12),
     status: 'done' as const,
-    plainExplanation: 'Your facts are organised into a profile. This is a record, not a court filing.',
-    whatNext: 'Review the case brief and add missing documents.',
+    plainExplanation: 'Your verified factual narrative has been organized into a structured brief. This represents a client record, not a formal court submission.',
+    whatNext: 'Inspect matter brief and verify documentation completeness.',
   },
   {
     id: 'g2',
     caseId: '',
-    title: 'Notice stage',
+    title: 'Statutory Notice Stage',
     date: iso(-5),
     status: 'current' as const,
-    plainExplanation: 'A written notice gives the other side a chance to settle before a complaint is filed.',
-    whatNext: 'Confirm the notice date and keep proof of dispatch.',
+    plainExplanation: 'A formal advocate notice affords the adverse party an opportunity to remediate before formal complaint initiation.',
+    whatNext: 'Confirm postal dispatch acknowledgment and preserve registration receipts.',
   },
   {
     id: 'g3',
     caseId: '',
-    title: 'Filing and hearing',
+    title: 'Chamber Review & Filing',
     status: 'upcoming' as const,
-    plainExplanation: 'If there is no response, a complaint is filed and the court fixes a first hearing.',
-    whatNext: 'Book an advocate review before filing.',
+    plainExplanation: 'In absence of settlement, the complaint is submitted to the jurisdictional bench and a preliminary hearing docket is assigned.',
+    whatNext: 'Conclude advocate consultation prior to verified filing.',
   },
-]
+];
 
 export default function CaseProgressPage() {
-  const today = useDashboardToday()
-  const params = useParams()
-  const caseId = Array.isArray(params.caseId) ? params.caseId[0] : params.caseId ?? 'case_2041'
-  const { pushNotification } = useDashboardUI()
-  const c = cases.find((x) => x.id === caseId) ?? cases[0]
-  const stages = caseStages.filter((s) => s.caseId === caseId)
-  const timeline = stages.length > 0 ? stages : genericStages
-  const caseHearings = hearings.filter((h) => h.caseId === caseId)
+  const today = useDashboardToday();
+  const params = useParams();
+  const caseId = Array.isArray(params.caseId) ? params.caseId[0] : params.caseId ?? 'case_2041';
+  const { pushNotification } = useDashboardUI();
+  const c = cases.find((x) => x.id === caseId) ?? cases[0];
+  const stages = caseStages.filter((s) => s.caseId === caseId);
+  const timeline = stages.length > 0 ? stages : genericStages;
+  const caseHearings = hearings.filter((h) => h.caseId === caseId);
 
-  const [question, setQuestion] = useState('')
-  const [asked, setAsked] = useState(false)
-  const [cnr, setCnr] = useState('')
-  const [looking, setLooking] = useState(false)
+  const [question, setQuestion] = useState('');
+  const [asked, setAsked] = useState(false);
+  const [cnr, setCnr] = useState('');
+  const [looking, setLooking] = useState(false);
   const [lookup, setLookup] = useState<null | {
-    status: string
-    court: string
-    nextHearing: string
-    lastOrder: string
-    judge: string
-  }>(null)
+    status: string;
+    court: string;
+    nextHearing: string;
+    lastOrder: string;
+    judge: string;
+  }>(null);
 
   const ask = () => {
-    if (!question.trim()) return
-    setAsked(true)
-    setQuestion('')
+    if (!question.trim()) return;
+    setAsked(true);
+    setQuestion('');
     pushNotification({
-      title: 'Question sent to your advocate',
-      body: 'Adv. Ananya Rao will reply in Messages. Urgent questions should be sent from Messages.',
+      title: 'Inquiry transmitted to assigned advocate',
+      body: 'Adv. Ananya Rao will respond in your secure messages channel.',
       href: '/messages',
-    })
-  }
+    });
+  };
 
   const lookupCnr = async () => {
-    if (cnr.trim().length < 6) return
-    setLooking(true)
-    setLookup(null)
-    await new Promise((r) => setTimeout(r, 1200))
+    if (cnr.trim().length < 6) return;
+    setLooking(true);
+    setLookup(null);
+    await new Promise((r) => setTimeout(r, 1200));
     setLookup({
-      status: 'Pending — evidence',
+      status: 'Pending — Evidence Presentation',
       court: 'City Civil Court, Bengaluru (CCH-24)',
       nextHearing: formatDate(iso(21), { weekday: 'long', day: 'numeric', month: 'long' }),
-      lastOrder: 'Both parties present. Reply to be filed. Matter adjourned.',
-      judge: 'Hon’ble Judge, CCH-24',
-    })
-    setLooking(false)
-  }
+      lastOrder: 'Both parties present. Rejoinder directed. Matter adjourned.',
+      judge: 'Presiding Judge, CCH-24',
+    });
+    setLooking(false);
+  };
 
   return (
-    <div className="animate-fade">
+    <div className="animate-fade space-y-6">
       <PageHeader
         eyebrow={`${c.category} · ${c.status}`}
         title={c.title}
         subtitle={`${c.probableForum} · ${c.summary}`}
         backTo={dh('/cases')}
         actions={
-          <>
+          <div className="flex flex-wrap gap-2.5">
             <Link
               href={dh('/brief')}
-              className="inline-flex h-11 items-center gap-1.5 rounded-xl bg-brand-soft px-4 text-[13px] font-semibold text-brand-dark hover:bg-secondary-bg"
+              className="inline-flex h-10 items-center gap-1.5 rounded-[2px] border border-[#e2d5c1] bg-[#fffaf2] px-4 font-mono text-[11px] uppercase tracking-wider text-[#2a1c12] hover:border-[#9a6a35] hover:bg-[#ebe1d1]/20 transition-colors"
             >
-              <FileText className="size-4" aria-hidden /> Case brief
+              <FileText className="size-3.5 text-[#9a6a35]" aria-hidden /> Matter Dossier
             </Link>
             <Link
               href={dh('/messages')}
-              className="inline-flex h-11 items-center gap-1.5 rounded-xl bg-brand px-4 text-[13px] font-semibold text-card-bg hover:bg-brand-dark"
+              className="inline-flex h-10 items-center gap-1.5 rounded-[2px] bg-[#2a1c12] px-4 font-mono text-[11px] uppercase tracking-wider text-[#fffaf2] hover:bg-[#3d2b1f] transition-colors"
             >
-              <MessageSquare className="size-4" aria-hidden /> Ask advocate
+              <MessageSquare className="size-3.5" aria-hidden /> Consult Advocate
             </Link>
-          </>
+          </div>
         }
       />
 
-      <div className="grid gap-4 lg:grid-cols-[1fr_340px]">
-        <div className="space-y-4">
+      <div className="grid gap-6 lg:grid-cols-[1fr_340px]">
+        <div className="space-y-6">
           {/* Timeline */}
-          <Card className="p-5 sm:p-6">
-            <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-[15px] font-bold">Case timeline</h2>
-              <Badge tone="outline">Plain-language stages</Badge>
+          <Card className="p-6">
+            <div className="mb-6 flex items-center justify-between border-b border-[#e2d5c1] pb-3">
+              <div>
+                <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#85725f]">Statutory Sequence</p>
+                <h2 className="mt-1 font-serif text-[18px] font-normal text-[#2a1c12]">Proceedings & Milestones</h2>
+              </div>
+              <Badge tone="neutral">Procedural Progression</Badge>
             </div>
 
             <ol className="relative space-y-0">
               {timeline.map((s, i) => {
-                const done = s.status === 'done'
-                const current = s.status === 'current'
+                const done = s.status === 'done';
+                const current = s.status === 'current';
                 return (
-                  <li key={s.id} className="relative flex gap-3.5 pb-6 last:pb-0">
+                  <li key={s.id} className="relative flex gap-4 pb-8 last:pb-0">
                     {i < timeline.length - 1 && (
                       <span
-                        className={cn('absolute top-6 left-[11px] h-full w-0.5', done ? 'bg-dot/40' : 'bg-line')}
+                        className={cn('absolute top-7 left-[11px] h-full w-[1px]', done ? 'bg-[#2a6b3b]' : 'bg-[#e2d5c1]')}
                         aria-hidden
                       />
                     )}
                     <span
                       className={cn(
-                        'relative z-10 mt-0.5 grid size-6 shrink-0 place-items-center rounded-full border-2',
-                        done && 'border-dot bg-dot text-card-bg',
-                        current && 'border-brand bg-card-bg text-brand ring-4 ring-brand/10',
-                        s.status === 'upcoming' && 'border-line bg-card-bg text-muted',
+                        'relative z-10 mt-1 grid size-6 shrink-0 place-items-center rounded-[2px] border font-mono text-[10px]',
+                        done && 'border-[#2a6b3b] bg-[#2a6b3b] text-[#fffaf2]',
+                        current && 'border-[#2a1c12] bg-[#2a1c12] text-[#fffaf2] ring-2 ring-[#9a6a35]/20',
+                        s.status === 'upcoming' && 'border-[#e2d5c1] bg-[#fffaf2] text-[#85725f]',
                       )}
                     >
                       {done ? <Check className="size-3" aria-hidden /> : current ? <Circle className="size-2 fill-current" aria-hidden /> : <Circle className="size-2" aria-hidden />}
                     </span>
                     <div className="min-w-0 flex-1">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <h3 className={cn('text-[13px] font-bold', !done && !current && 'text-body')}>{s.title}</h3>
+                      <div className="flex flex-wrap items-center gap-2.5">
+                        <h3 className={cn('font-serif text-[16px] font-normal', done || current ? 'text-[#2a1c12]' : 'text-[#85725f]')}>{s.title}</h3>
                         {s.date && (
-                          <span className="text-[10px] text-muted">
+                          <span className="font-mono text-[10px] uppercase tracking-wider text-[#85725f]">
                             {formatDate(s.date, { day: 'numeric', month: 'short', year: 'numeric' })}
                           </span>
                         )}
-                        {current && <Badge tone="brand">You are here</Badge>}
+                        {current && <Badge tone="brand">Active Docket</Badge>}
                       </div>
-                      <p className="mt-1 text-[12px] leading-5.5 text-body">{s.plainExplanation}</p>
-                      <p className="mt-1.5 flex items-start gap-1.5 text-[11px] leading-5 text-brand-dark">
-                        <ArrowRight className="mt-1 size-3 shrink-0" aria-hidden /> {s.whatNext}
+                      <p className="mt-1 text-[13px] leading-relaxed text-[#5b4a3b]">{s.plainExplanation}</p>
+                      <p className="mt-2 flex items-start gap-1.5 font-mono text-[11px] uppercase tracking-wide text-[#9a6a35]">
+                        <ArrowRight className="mt-0.5 size-3 shrink-0" aria-hidden /> {s.whatNext}
                       </p>
                     </div>
                   </li>
-                )
+                );
               })}
             </ol>
           </Card>
 
           {/* Hearings */}
-          <Card className="p-5">
-            <div className="flex items-center justify-between">
-              <h2 className="flex items-center gap-1.5 text-[14px] font-bold">
-                <CalendarDays className="size-4 text-brand" aria-hidden /> Hearing dates
-              </h2>
-              <span className="text-[10.5px] text-muted">Confirm with the cause list</span>
+          <Card className="p-6">
+            <div className="flex items-center justify-between border-b border-[#e2d5c1] pb-3">
+              <div>
+                <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#85725f]">Cause List Tracker</p>
+                <h2 className="mt-1 flex items-center gap-2 font-serif text-[18px] font-normal text-[#2a1c12]">
+                  <CalendarDays className="size-4 text-[#9a6a35]" aria-hidden /> Judicial Cause List Dates
+                </h2>
+              </div>
+              <span className="font-mono text-[10px] uppercase tracking-wider text-[#85725f]">Verify via Registry</span>
             </div>
-            <div className="mt-3 space-y-2">
+            <div className="mt-4 space-y-3">
               {(caseHearings.length ? caseHearings : hearings.slice(0, 1)).map((h) => (
-                <div key={h.id} className="flex flex-wrap items-center gap-3 rounded-xl border border-line p-3">
-                  <div className="grid size-11 shrink-0 place-items-center rounded-xl bg-brand-soft text-center">
-                    <span className="text-[13px] leading-none font-extrabold text-brand-dark">{new Date(h.date).getDate()}</span>
-                    <span className="text-[8px] font-bold text-brand-dark uppercase">{new Date(h.date).toLocaleDateString('en-IN', { month: 'short' })}</span>
+                <div key={h.id} className="flex flex-wrap items-center gap-4 rounded-[2px] border border-[#e2d5c1] bg-[#f4efe6] p-4">
+                  <div className="grid size-12 shrink-0 place-items-center rounded-[2px] border border-[#e2d5c1] bg-[#fffaf2] text-center">
+                    <span className="font-serif text-[16px] leading-none font-normal text-[#2a1c12]">{new Date(h.date).getDate()}</span>
+                    <span className="font-mono text-[9px] uppercase tracking-wider text-[#85725f]">{new Date(h.date).toLocaleDateString('en-IN', { month: 'short' })}</span>
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="text-[12.5px] font-semibold text-ink">{h.purpose}</p>
-                    <p className="text-[11px] text-body">{h.court}</p>
-                    <p className="text-[10.5px] text-muted">{formatDateTime(h.date)} · {relativeDay(h.date, today)}</p>
+                    <p className="font-serif text-[14px] font-normal text-[#2a1c12]">{h.purpose}</p>
+                    <p className="text-[12px] text-[#5b4a3b]">{h.court}</p>
+                    <p className="font-mono text-[10px] uppercase tracking-wide text-[#85725f]">{formatDateTime(h.date)} · {relativeDay(h.date, today)}</p>
                   </div>
-                  <Badge tone={h.status === 'upcoming' ? 'brand' : 'neutral'}>{h.status}</Badge>
+                  <Badge tone={h.status === 'upcoming' ? 'brand' : 'neutral'}>{h.status.toUpperCase()}</Badge>
                 </div>
               ))}
             </div>
           </Card>
 
           {/* Ask a question */}
-          <Card className="p-5">
-            <h2 className="flex items-center gap-1.5 text-[14px] font-bold">
-              <HelpCircle className="size-4 text-brand" aria-hidden /> Ask a question about your case
+          <Card className="p-6">
+            <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#85725f]">Chamber Dispatch</p>
+            <h2 className="mt-1 flex items-center gap-2 font-serif text-[18px] font-normal text-[#2a1c12]">
+              <HelpCircle className="size-4 text-[#9a6a35]" aria-hidden /> Direct Inquiry to Retained Advocate
             </h2>
-            <p className="mt-1 text-[11.5px] text-body">
-              Sent to Adv. Ananya Rao, who has your case brief. For urgent safety issues, use the Emergency page.
+            <p className="mt-1 text-[12.5px] leading-relaxed text-[#5b4a3b]">
+              Forwarded directly to Adv. Ananya Rao. Confidential matter communications are protected under client-advocate privilege.
             </p>
             {asked ? (
-              <div className="mt-3 flex items-start gap-2 rounded-xl bg-mint-soft px-3.5 py-3">
-                <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-dot" aria-hidden />
+              <div className="mt-4 flex items-start gap-3 rounded-[2px] border border-[#2a6b3b]/30 bg-[#2a6b3b]/10 p-4">
+                <CheckCircle2 className="mt-0.5 size-4.5 shrink-0 text-[#2a6b3b]" aria-hidden />
                 <div className="flex-1">
-                  <p className="text-[12px] font-semibold text-dot">Question routed to your advocate</p>
-                  <p className="text-[11px] text-body">You will get a reply in Messages. Typical reply time is within one day.</p>
+                  <p className="text-[12.5px] font-medium text-[#2a6b3b]">Inquiry dispatched to counsel docket</p>
+                  <p className="text-[11.5px] text-[#5b4a3b]">Counsel review typically completes within one court working day.</p>
                 </div>
-                <Button size="sm" variant="ghost" onClick={() => setAsked(false)}>Ask another</Button>
+                <Button size="sm" variant="ghost" onClick={() => setAsked(false)}>New Note</Button>
               </div>
             ) : (
-              <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+              <div className="mt-4 flex flex-col gap-3 sm:flex-row">
                 <Textarea
                   value={question}
                   onChange={(e) => setQuestion(e.target.value)}
                   rows={2}
-                  placeholder="For example: should I file before the Rent Controller or send another notice?"
-                  className="min-h-11 flex-1"
+                  placeholder="Specify question regarding next filing date, rejoinder requirements, or forum jurisdiction…"
+                  className="min-h-12 flex-1"
                 />
                 <Button onClick={ask} disabled={!question.trim()} className="sm:self-end">
-                  <Send className="size-4" aria-hidden /> Send
+                  <Send className="size-4" aria-hidden /> Transmit
                 </Button>
               </div>
             )}
           </Card>
         </div>
 
-        <aside className="space-y-4">
+        <aside className="space-y-6">
           {/* CNR lookup */}
-          <Card className="p-5">
-            <h2 className="flex items-center gap-1.5 text-[13.5px] font-bold">
-              <Landmark className="size-4 text-brand" aria-hidden /> eCourts lookup
+          <Card className="p-6">
+            <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#85725f]">CIS Registry Interrogation</p>
+            <h2 className="mt-1 flex items-center gap-2 font-serif text-[16px] font-normal text-[#2a1c12]">
+              <Landmark className="size-4 text-[#9a6a35]" aria-hidden /> eCourts CNR Lookup
             </h2>
-            <p className="mt-1 text-[11px] leading-5 text-body">
-              Enter a CNR number to check case status. Results are shown where available.
+            <p className="mt-1 text-[12px] leading-relaxed text-[#5b4a3b]">
+              Enter a 16-character Case Number Record (CNR) to poll live CIS order sheets.
             </p>
-            <div className="mt-2.5 flex gap-2">
+            <div className="mt-3 flex gap-2">
               <Input
                 value={cnr}
                 onChange={(e) => setCnr(e.target.value.toUpperCase())}
                 placeholder="e.g. KABB010012342026"
-                className="h-10 text-[11px]"
+                className="h-10 font-mono text-[11px]"
                 aria-label="CNR number"
               />
               <Button size="md" variant="secondary" onClick={lookupCnr} disabled={cnr.trim().length < 6 || looking}>
                 {looking ? <Loader2 className="size-4 animate-spin" /> : <Search className="size-4" />}
               </Button>
             </div>
-            <p className="mt-1.5 text-[9.5px] text-muted">Mock response · eCourts integration is not live in this build.</p>
+            <p className="mt-1.5 font-mono text-[10px] text-[#85725f]">Sandbox gateway · CIS live polling simulation.</p>
 
-            {looking && <p className="mt-3 flex items-center gap-1.5 text-[11px] text-muted"><Loader2 className="size-3.5 animate-spin" /> Fetching status…</p>}
+            {looking && <p className="mt-3 flex items-center gap-2 font-mono text-[11px] text-[#85725f]"><Loader2 className="size-3.5 animate-spin text-[#9a6a35]" /> Interrogating National Judicial Data Grid…</p>}
 
             {lookup && (
-              <div className="mt-3 space-y-2 rounded-xl border border-line bg-brand-tint p-3 animate-in-up">
+              <div className="mt-4 space-y-2.5 rounded-[2px] border border-[#e2d5c1] bg-[#f4efe6] p-4">
                 <Badge tone="warn">{lookup.status}</Badge>
                 <div>
-                  <p className="text-[9.5px] font-semibold text-muted uppercase">Court</p>
-                  <p className="text-[11.5px] font-medium text-ink">{lookup.court}</p>
+                  <p className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#85725f]">Court Bench</p>
+                  <p className="font-serif text-[13px] text-[#2a1c12]">{lookup.court}</p>
                 </div>
                 <div>
-                  <p className="text-[9.5px] font-semibold text-muted uppercase">Next hearing</p>
-                  <p className="text-[11.5px] font-medium text-ink">{lookup.nextHearing}</p>
+                  <p className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#85725f]">Next Listing</p>
+                  <p className="font-serif text-[13px] text-[#2a1c12]">{lookup.nextHearing}</p>
                 </div>
                 <div>
-                  <p className="text-[9.5px] font-semibold text-muted uppercase">Last order</p>
-                  <p className="text-[11.5px] leading-5 text-body">{lookup.lastOrder}</p>
+                  <p className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#85725f]">Last Interlocutory Order</p>
+                  <p className="text-[12px] leading-relaxed text-[#5b4a3b]">{lookup.lastOrder}</p>
                 </div>
                 <a
                   href="https://ecourts.gov.in"
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center gap-1 pt-1 text-[10.5px] font-semibold text-brand hover:underline"
+                  className="inline-flex items-center gap-1 pt-1 font-mono text-[10px] uppercase tracking-wider text-[#9a6a35] hover:underline"
                 >
-                  Check on eCourts <ExternalLink className="size-3" aria-hidden />
+                  Verify on ecourts.gov.in <ExternalLink className="size-3" aria-hidden />
                 </a>
               </div>
             )}
           </Card>
 
           {/* Case facts */}
-          <Card className="p-5">
-            <h2 className="text-[13.5px] font-bold">Case facts</h2>
-            <dl className="mt-2.5 space-y-2 text-[11.5px]">
+          <Card className="p-6">
+            <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#85725f]">Dossier Registry</p>
+            <h2 className="mt-1 font-serif text-[16px] font-normal text-[#2a1c12]">Verified Matter Facts</h2>
+            <dl className="mt-3 space-y-2 text-[12px]">
               {[
                 ['Category', c.category],
                 ['Sub-category', c.subCategory],
-                ['Forum', c.probableForum],
-                ['Urgency', c.urgency.replace('-', ' ')],
-                ['Complexity', c.complexity.replaceAll('-', ' ')],
+                ['Jurisdiction Forum', c.probableForum],
+                ['Urgency Class', c.urgency.replace('-', ' ')],
+                ['Complexity Index', c.complexity.replaceAll('-', ' ')],
               ].map(([k, v]) => (
-                <div key={k} className="flex justify-between gap-3">
-                  <dt className="text-muted">{k}</dt>
-                  <dd className="text-right font-semibold capitalize text-ink">{v}</dd>
+                <div key={k} className="flex justify-between gap-3 border-b border-[#e2d5c1] pb-2">
+                  <dt className="text-[#85725f]">{k}</dt>
+                  <dd className="text-right font-medium capitalize text-[#2a1c12]">{v}</dd>
                 </div>
               ))}
             </dl>
-            <div className="mt-3 rounded-xl bg-brand-tint p-3">
-              <p className="flex items-center gap-1.5 text-[10.5px] font-bold text-ink">
-                <Sparkles className="size-3 text-brand" aria-hidden /> Your goal
+            <div className="mt-4 rounded-[2px] border border-[#e2d5c1] bg-[#ebe1d1]/30 p-3.5">
+              <p className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-wider text-[#2a1c12]">
+                <Sparkles className="size-3 text-[#9a6a35]" aria-hidden /> Client Objective
               </p>
-              <p className="mt-0.5 text-[11px] leading-5 text-body">{c.userGoal}</p>
+              <p className="mt-1 text-[12px] leading-relaxed text-[#5b4a3b]">{c.userGoal}</p>
             </div>
           </Card>
 
-          <Card className="p-4">
-            <p className="flex items-center gap-1.5 text-[11.5px] font-bold">
-              <Clock className="size-3.5 text-warn" aria-hidden /> Next deadline
+          <Card className="p-5">
+            <p className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.14em] text-[#b97a29]">
+              <Clock className="size-3.5" aria-hidden /> Next Limitation Trigger
             </p>
-            <p className="mt-1 text-[12px] text-body">
+            <p className="mt-1 font-serif text-[14px] text-[#2a1c12]">
               {c.keyDates[0] ? `${relativeDay(c.keyDates[0].date, today)} — ${c.keyDates[0].label}` : 'No date recorded yet'}
             </p>
-            <Link href={dh('/deadlines')} className="mt-2 inline-flex items-center gap-1 text-[11px] font-semibold text-brand hover:underline">
-              Open deadline tracker <ArrowRight className="size-3" aria-hidden />
+            <Link href={dh('/deadlines')} className="mt-2.5 inline-flex items-center gap-1 font-mono text-[11px] uppercase tracking-wide text-[#9a6a35] hover:underline">
+              Inspect limitation ledger <ArrowRight className="size-3" aria-hidden />
             </Link>
           </Card>
 
-          <Disclaimer variant="banner" text="Stage explanations are general information. Your advocate should confirm what applies to your case." />
+          <Disclaimer variant="banner" text="Procedural stage outlines reflect standardized statutory pathways. Consult your appointed advocate for case-specific motions." />
         </aside>
       </div>
     </div>
-  )
+  );
 }

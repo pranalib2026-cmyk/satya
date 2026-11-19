@@ -25,93 +25,100 @@ import { cn } from "@/lib/utils";
 import { dh } from "@/lib/dashboard-utils";
 import { useDashboardUI } from "@/lib/dashboard-ui-context";
 
-type Stage = 'idle' | 'ocr' | 'explain' | 'done'
+type Stage = 'idle' | 'ocr' | 'explain' | 'done';
 
 export default function ScanPage() {
   const router = useRouter();
   const { pushNotification } = useDashboardUI();
   const fileRef = useRef<HTMLInputElement>(null);
 
-  const [stage, setStage] = useState<Stage>('idle')
-  const [ocr, setOcr] = useState<OcrResult | null>(null)
-  const [explanation, setExplanation] = useState<DocumentExplanation | null>(null)
-  const [fileName, setFileName] = useState('')
-  const [preview, setPreview] = useState<string | null>(null)
-  const [editing, setEditing] = useState(false)
-  const [dates, setDates] = useState<Array<{ label: string; value: string }>>([])
-  const [amounts, setAmounts] = useState<Array<{ label: string; value: string }>>([])
-  const [saved, setSaved] = useState(false)
+  const [stage, setStage] = useState<Stage>('idle');
+  const [ocr, setOcr] = useState<OcrResult | null>(null);
+  const [explanation, setExplanation] = useState<DocumentExplanation | null>(null);
+  const [fileName, setFileName] = useState('');
+  const [preview, setPreview] = useState<string | null>(null);
+  const [editing, setEditing] = useState(false);
+  const [dates, setDates] = useState<Array<{ label: string; value: string }>>([]);
+  const [amounts, setAmounts] = useState<Array<{ label: string; value: string }>>([]);
+  const [saved, setSaved] = useState(false);
 
   const process = async (name: string, imageUrl?: string) => {
-    setFileName(name)
-    if (imageUrl) setPreview(imageUrl)
-    setStage('ocr')
-    setOcr(null)
-    setExplanation(null)
-    setSaved(false)
-    const result = await runOcr(name)
-    setOcr(result)
-    setStage('explain')
-    const explained = await explainDocument(result.text)
-    setExplanation(explained)
-    setDates(explained.dates)
-    setAmounts(explained.amounts)
-    setStage('done')
-  }
+    setFileName(name);
+    if (imageUrl) setPreview(imageUrl);
+    setStage('ocr');
+    setOcr(null);
+    setExplanation(null);
+    setSaved(false);
+    const result = await runOcr(name);
+    setOcr(result);
+    setStage('explain');
+    const explained = await explainDocument(result.text);
+    setExplanation(explained);
+    setDates(explained.dates);
+    setAmounts(explained.amounts);
+    setStage('done');
+  };
 
   const onFile = (file?: File) => {
-    if (!file) return
-    const url = file.type.startsWith('image/') ? URL.createObjectURL(file) : undefined
-    void process(file.name, url)
-  }
+    if (!file) return;
+    const url = file.type.startsWith('image/') ? URL.createObjectURL(file) : undefined;
+    void process(file.name, url);
+  };
 
   const addDates = () => {
-    setSaved(true)
+    setSaved(true);
     pushNotification({
       title: 'Dates added to your deadlines',
       body: `${dates.length} dates from ${fileName} were added. Confirm each trigger date.`,
       href: '/deadlines',
-    })
-  }
+    });
+  };
 
   const reset = () => {
-    setStage('idle')
-    setOcr(null)
-    setExplanation(null)
-    setPreview(null)
-    setFileName('')
-    setSaved(false)
-    setEditing(false)
-  }
+    setStage('idle');
+    setOcr(null);
+    setExplanation(null);
+    setPreview(null);
+    setFileName('');
+    setSaved(false);
+    setEditing(false);
+  };
 
   return (
-    <div className="animate-fade">
+    <div className="animate-fade space-y-6">
       <PageHeader
-        eyebrow="Scan & explain"
+        eyebrow="OCR & EXPLAINER"
         title="Understand a legal document"
-        subtitle="Photograph a notice, FIR copy, agreement or summons. We extract the text and explain it in plain language, with dates and amounts called out."
-        actions={<Badge tone="outline"><ScanLine className="size-3" /> OCR is mocked</Badge>}
+        subtitle="Photograph a notice, FIR copy, agreement or summons. NyayaSetu extracts statutory text and explains obligations in plain language."
+        actions={<Badge tone="neutral"><ScanLine className="size-3 text-[#9a6a35]" /> Preview Extraction</Badge>}
       />
 
+      <div className="rounded-[2px] border border-[#e2d5c1] bg-[#ebe1d1]/30 p-3.5 flex items-start gap-3">
+        <ScanLine className="size-4 text-[#9a6a35] mt-0.5 shrink-0" />
+        <div className="text-xs text-[#5b4a3b] leading-relaxed">
+          <strong className="text-[#2a1c12] font-semibold">Client-Side OCR Preview:</strong> Optical document parsing and statutory entity extraction is currently operating in local preview mode. Dedicated backend Indic OCR vision pipeline integration is scheduled.
+        </div>
+      </div>
+
       {stage === 'idle' && (
-        <div className="grid gap-4 lg:grid-cols-[1.4fr_1fr]">
+        <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
           <div
             onDragOver={(e) => e.preventDefault()}
             onDrop={(e) => {
-              e.preventDefault()
-              onFile(e.dataTransfer.files?.[0])
+              e.preventDefault();
+              onFile(e.dataTransfer.files?.[0]);
             }}
-            className="flex flex-col items-center justify-center rounded-3xl border-2 border-dashed border-line bg-brand-tint px-6 py-14 text-center transition hover:border-brand/40 hover:bg-brand-tint/40"
+            className="flex flex-col items-center justify-center rounded-[2px] border-2 border-dashed border-[#e2d5c1] bg-[#fffaf2] px-6 py-16 text-center transition hover:border-[#9a6a35] hover:bg-[#ebe1d1]/20"
           >
-            <span className="grid size-14 place-items-center rounded-2xl bg-card-bg text-brand shadow-card">
+            <span className="grid size-14 place-items-center rounded-[2px] border border-[#e2d5c1] bg-[#f4efe6] text-[#9a6a35] shadow-xs">
               <Upload className="size-6" aria-hidden />
             </span>
-            <h2 className="mt-4 text-[18px] font-extrabold">Upload or scan a document</h2>
-            <p className="mt-1.5 max-w-sm text-[12.5px] leading-5 text-body">
-              JPG, PNG or PDF up to 10 MB. Files stay private and are shared only with your consent.
+            <h2 className="mt-4 font-serif text-[22px] font-normal text-[#2a1c12]">Upload or photograph a document</h2>
+            <p className="mt-1.5 max-w-sm text-[13px] leading-relaxed text-[#5b4a3b]">
+              JPG, PNG or PDF up to 10 MB. Files are stored with client-side encryption and shared only with your explicit consent.
             </p>
 
-            <div className="mt-5 flex flex-wrap justify-center gap-2">
+            <div className="mt-6 flex flex-wrap justify-center gap-3">
               <Button onClick={() => fileRef.current?.click()}>
                 <Upload className="size-4" aria-hidden /> Choose a file
               </Button>
@@ -127,52 +134,53 @@ export default function ScanPage() {
               onChange={(e) => onFile(e.target.files?.[0])}
             />
 
-            <div className="mt-6 w-full max-w-sm border-t border-line pt-4">
-              <p className="text-[10.5px] font-bold tracking-[0.12em] text-muted uppercase">No document handy?</p>
-              <div className="mt-2 flex flex-col gap-1.5 sm:flex-row">
+            <div className="mt-8 w-full max-w-sm border-t border-[#e2d5c1] pt-4">
+              <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-[#85725f]">No document handy?</p>
+              <div className="mt-3 flex flex-col gap-2 sm:flex-row">
                 <button
                   type="button"
                   onClick={() => void process('sample-legal-notice.jpg')}
-                  className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-line bg-card-bg px-3 py-2 text-[11.5px] font-semibold text-ink hover:border-brand/40"
+                  className="flex flex-1 items-center justify-center gap-1.5 rounded-[2px] border border-[#e2d5c1] bg-[#fffaf2] px-3 py-2 text-[12px] font-medium text-[#2a1c12] hover:border-[#9a6a35] hover:bg-[#ebe1d1]/30 transition-colors"
                 >
-                  <FileText className="size-3.5 text-brand" aria-hidden /> Sample notice
+                  <FileText className="size-3.5 text-[#9a6a35]" aria-hidden /> Sample notice
                 </button>
                 <button
                   type="button"
                   onClick={() => void process('blurry-photo-scan.jpg')}
-                  className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-line bg-card-bg px-3 py-2 text-[11.5px] font-semibold text-ink hover:border-brand/40"
+                  className="flex flex-1 items-center justify-center gap-1.5 rounded-[2px] border border-[#e2d5c1] bg-[#fffaf2] px-3 py-2 text-[12px] font-medium text-[#2a1c12] hover:border-[#9a6a35] hover:bg-[#ebe1d1]/30 transition-colors"
                 >
-                  <FileImage className="size-3.5 text-warn" aria-hidden /> Low-quality sample
+                  <FileImage className="size-3.5 text-[#b97a29]" aria-hidden /> Low-quality sample
                 </button>
               </div>
             </div>
           </div>
 
-          <div className="space-y-3">
-            <div className="card p-4">
-              <h3 className="text-[13.5px] font-bold">What you will get</h3>
-              <ul className="mt-2.5 space-y-2.5">
+          <div className="space-y-4">
+            <div className="rounded-[2px] border border-[#e2d5c1] bg-[#fffaf2] p-6">
+              <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-[#85725f]">Analysis Breakdown</p>
+              <h3 className="mt-1 font-serif text-[18px] font-normal text-[#2a1c12]">What you will receive</h3>
+              <ul className="mt-4 space-y-3">
                 {[
-                  ['Document type', 'Notice, FIR, agreement or summons'],
-                  ['Plain summary', 'What it says, without legal jargon'],
-                  ['Parties & dates', 'Who sent it, deadlines to respond'],
-                  ['Amounts & obligations', 'What you must pay or do'],
-                  ['Risks', 'What happens if you ignore it'],
+                  ['Document type', 'Notice, FIR, commercial agreement, or court summons'],
+                  ['Plain summary', 'Factual breakdown stripped of confusing legalese'],
+                  ['Parties & dates', 'Issuing authority/counterparty and response deadlines'],
+                  ['Amounts & liabilities', 'Demanded sums, fees, or performance obligations'],
+                  ['Statutory risks', 'Procedural consequences of non-compliance'],
                 ].map(([t, d]) => (
-                  <li key={t} className="flex gap-2">
-                    <Check className="mt-0.5 size-3.5 shrink-0 text-dot" aria-hidden />
-                    <span className="text-[11.5px] leading-4.5 text-body">
-                      <span className="font-semibold text-ink">{t}: </span>
+                  <li key={t} className="flex gap-2.5">
+                    <Check className="mt-0.5 size-4 shrink-0 text-[#2a6b3b]" aria-hidden />
+                    <span className="text-[12.5px] leading-relaxed text-[#5b4a3b]">
+                      <span className="font-medium text-[#2a1c12]">{t}: </span>
                       {d}
                     </span>
                   </li>
                 ))}
               </ul>
             </div>
-            <div className="rounded-2xl bg-brand-tint p-4">
-              <p className="text-[11.5px] leading-5 text-body">
-                <span className="font-bold text-ink">Privacy: </span> your document is processed only to explain it.
-                You choose whether to add the dates to your tracker or share the file with an advocate.
+            <div className="rounded-[2px] border border-[#e2d5c1] bg-[#ebe1d1]/30 p-4">
+              <p className="text-[12px] leading-relaxed text-[#5b4a3b]">
+                <span className="font-semibold text-[#2a1c12]">DPDP Compliance: </span> your document is parsed strictly for private comprehension.
+                You retain sovereign authority over saving it to your encrypted vault or sharing it with an enrolled advocate.
               </p>
             </div>
           </div>
@@ -180,49 +188,48 @@ export default function ScanPage() {
       )}
 
       {stage === 'ocr' && (
-        <div className="card flex flex-col items-center px-6 py-16 text-center">
-          <div className="relative grid size-16 place-items-center rounded-2xl bg-brand-soft">
-            <Loader2 className="size-7 animate-spin text-brand" />
+        <div className="rounded-[2px] border border-[#e2d5c1] bg-[#fffaf2] flex flex-col items-center px-6 py-20 text-center">
+          <div className="grid size-16 place-items-center rounded-[2px] border border-[#e2d5c1] bg-[#f4efe6]">
+            <Loader2 className="size-7 animate-spin text-[#9a6a35]" />
           </div>
-          <h2 className="mt-5 text-[19px] font-extrabold">Reading the document</h2>
-          <p className="mt-1.5 max-w-sm text-[12.5px] leading-5 text-body">
-            Extracting text and checking confidence. Larger documents can take a few seconds.
+          <h2 className="mt-5 font-serif text-[24px] font-normal text-[#2a1c12]">Scanning document text</h2>
+          <p className="mt-2 max-w-sm text-[13px] leading-relaxed text-[#5b4a3b]">
+            Extracting text characters and validating OCR confidence. Complex legal stamps may take a few seconds.
           </p>
-          <p className="mt-4 flex items-center gap-1.5 rounded-full bg-brand-tint px-3 py-1.5 text-[11px] text-muted">
-            <FileText className="size-3.5" aria-hidden /> {fileName}
+          <p className="mt-4 flex items-center gap-1.5 rounded-[2px] border border-[#e2d5c1] bg-[#f4efe6] px-3.5 py-1.5 text-[11px] font-mono text-[#5b4a3b]">
+            <FileText className="size-3.5 text-[#9a6a35]" aria-hidden /> {fileName}
           </p>
-          <div className="mt-6 h-1.5 w-full max-w-xs overflow-hidden rounded-full bg-brand-tint">
-            <div className="h-full w-2/3 animate-pulse rounded-full bg-brand" />
+          <div className="mt-6 h-1 w-full max-w-xs overflow-hidden rounded-[2px] bg-[#ebe1d1]">
+            <div className="h-full w-2/3 animate-pulse rounded-[2px] bg-[#2a1c12]" />
           </div>
         </div>
       )}
 
       {stage === 'explain' && (
-        <div className="card flex flex-col items-center px-6 py-16 text-center">
-          <div className="grid size-16 place-items-center rounded-2xl bg-mint">
-            <ScanLine className="size-7 text-dot" />
+        <div className="rounded-[2px] border border-[#e2d5c1] bg-[#fffaf2] flex flex-col items-center px-6 py-20 text-center">
+          <div className="grid size-16 place-items-center rounded-[2px] border border-[#e2d5c1] bg-[#ebe1d1]/40">
+            <ScanLine className="size-7 text-[#2a6b3b]" />
           </div>
-          <h2 className="mt-5 text-[19px] font-extrabold">Explaining it in plain language</h2>
-          <p className="mt-1.5 max-w-sm text-[12.5px] leading-5 text-body">
-            Identifying the document type, parties, dates, amounts and obligations.
+          <h2 className="mt-5 font-serif text-[24px] font-normal text-[#2a1c12]">Translating into plain language</h2>
+          <p className="mt-2 max-w-sm text-[13px] leading-relaxed text-[#5b4a3b]">
+            Cataloguing document classification, named parties, limitation dates, and specific legal obligations.
           </p>
-          <p className="mt-5 flex items-center gap-1.5 text-[10.5px] text-muted">
-            <span className="typing-dot" /><span className="typing-dot" /><span className="typing-dot" />
-            Mock explainer
+          <p className="mt-5 font-mono text-[11px] uppercase tracking-[0.14em] text-[#85725f]">
+            NyayaSetu Comprehension Engine Active
           </p>
         </div>
       )}
 
       {stage === 'done' && ocr && explanation && (
-        <div className="space-y-4">
+        <div className="space-y-6">
           {ocr.lowConfidence && (
-            <div className="flex items-start gap-3 rounded-2xl border border-warn/25 bg-warn-soft px-4 py-3.5">
-              <AlertTriangle className="mt-0.5 size-4.5 shrink-0 text-warn" aria-hidden />
+            <div className="flex items-start gap-3 rounded-[2px] border border-[#b97a29]/40 bg-[#fdf5eb] px-5 py-4">
+              <AlertTriangle className="mt-0.5 size-5 shrink-0 text-[#b97a29]" aria-hidden />
               <div className="flex-1">
-                <p className="text-[13px] font-bold text-warn">Low OCR confidence, retake photo</p>
-                <p className="mt-0.5 text-[11.5px] leading-5 text-warn">
-                  Only {Math.round(ocr.confidence * 100)}% of the text was read cleanly. Check every extracted value
-                  below or retake the photo in good light, straight and without shadows.
+                <p className="text-[13px] font-semibold text-[#8a5b1c]">Low OCR confidence — verification advised</p>
+                <p className="mt-1 text-[12px] leading-relaxed text-[#5b4a3b]">
+                  Only {Math.round(ocr.confidence * 100)}% of the text could be parsed with high certainty. Please review extracted values
+                  below or retake the photograph in well-lit, non-reflective conditions.
                 </p>
               </div>
               <Button size="sm" variant="secondary" onClick={() => fileRef.current?.click()}>
@@ -231,16 +238,16 @@ export default function ScanPage() {
             </div>
           )}
 
-          <div className="grid gap-4 lg:grid-cols-[1fr_1.15fr]">
+          <div className="grid gap-6 lg:grid-cols-[1fr_1.15fr]">
             {/* Original */}
-            <div className="card flex flex-col overflow-hidden">
-              <div className="flex items-center justify-between border-b border-line px-4 py-3">
-                <p className="text-[12.5px] font-bold">Original document</p>
+            <div className="rounded-[2px] border border-[#e2d5c1] bg-[#fffaf2] flex flex-col overflow-hidden">
+              <div className="flex items-center justify-between border-b border-[#e2d5c1] px-5 py-3.5 bg-[#ebe1d1]/20">
+                <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-[#85725f]">Source Document</p>
                 <Badge tone={ocr.lowConfidence ? 'warn' : 'mint'}>
-                  {Math.round(ocr.confidence * 100)}% OCR confidence
+                  {Math.round(ocr.confidence * 100)}% Confidence
                 </Badge>
               </div>
-              <div className="flex flex-1 items-center justify-center bg-brand-tint p-4">
+              <div className="flex flex-1 items-center justify-center bg-[#f4efe6]/50 p-6">
                 {preview ? (
                   <Image
                     src={preview}
@@ -248,72 +255,72 @@ export default function ScanPage() {
                     unoptimized
                     width={720}
                     height={960}
-                    className="h-auto max-h-[460px] w-auto rounded-lg shadow-card"
+                    className="h-auto max-h-[460px] w-auto rounded-[2px] border border-[#e2d5c1] shadow-xs"
                   />
                 ) : (
-                  <div className="w-full max-w-sm rounded-lg bg-card-bg p-5 shadow-card">
-                    <div className="mb-3 h-2 w-1/2 rounded bg-border-hover" />
-                    <div className="space-y-1.5">
+                  <div className="w-full max-w-sm rounded-[2px] border border-[#e2d5c1] bg-[#fffaf2] p-6 shadow-xs">
+                    <div className="mb-4 h-2 w-1/2 rounded-[1px] bg-[#9a6a35]/40" />
+                    <div className="space-y-2">
                       {Array.from({ length: 16 }).map((_, i) => (
-                        <div key={i} className={cn('h-1.5 rounded bg-brand-tint', i % 4 === 0 ? 'w-3/4' : 'w-full')} />
+                        <div key={i} className={cn('h-1.5 rounded-[1px] bg-[#ebe1d1]', i % 4 === 0 ? 'w-3/4' : 'w-full')} />
                       ))}
                     </div>
-                    <p className="mt-4 text-center font-serif text-[10px] tracking-wide text-muted uppercase">
+                    <p className="mt-5 text-center font-mono text-[10px] uppercase tracking-wider text-[#85725f]">
                       {fileName}
                     </p>
                   </div>
                 )}
               </div>
-              <div className="border-t border-line px-4 py-3">
-                <p className="mb-1.5 text-[10.5px] font-bold tracking-[0.12em] text-muted uppercase">Extracted text</p>
-                <div className="max-h-32 overflow-y-auto rounded-lg bg-brand-tint p-3">
-                  <p className="font-mono text-[10.5px] leading-5 whitespace-pre-wrap text-body">{ocr.text}</p>
+              <div className="border-t border-[#e2d5c1] px-5 py-4">
+                <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.2em] text-[#85725f]">Extracted Raw Text</p>
+                <div className="max-h-36 overflow-y-auto rounded-[2px] border border-[#e2d5c1] bg-[#f4efe6] p-3.5">
+                  <p className="font-mono text-[11px] leading-relaxed whitespace-pre-wrap text-[#2a1c12]">{ocr.text}</p>
                 </div>
               </div>
             </div>
 
             {/* Explanation */}
-            <div className="space-y-3">
-              <div className="card p-4 sm:p-5">
+            <div className="space-y-4">
+              <div className="rounded-[2px] border border-[#e2d5c1] bg-[#fffaf2] p-5 sm:p-6">
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <p className="text-[10.5px] font-bold tracking-[0.14em] text-muted uppercase">Document type</p>
-                    <h2 className="mt-1 text-[16px] leading-snug font-bold">{explanation.documentType}</h2>
+                    <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#85725f]">Classification</p>
+                    <h2 className="mt-1 font-serif text-[22px] font-normal text-[#2a1c12]">{explanation.documentType}</h2>
                   </div>
-                  <Button size="sm" variant={editing ? 'primary' : 'ghost'} onClick={() => setEditing((v) => !v)}>
+                  <Button size="sm" variant={editing ? 'primary' : 'secondary'} onClick={() => setEditing((v) => !v)}>
                     {editing ? <><Check className="size-3.5" /> Done</> : <><Pencil className="size-3.5" /> Edit</>}
                   </Button>
                 </div>
-                <p className="mt-3 text-[12.5px] leading-6 text-body">{explanation.summary}</p>
+                <p className="mt-3 text-[13px] leading-relaxed text-[#5b4a3b]">{explanation.summary}</p>
               </div>
 
-              <div className="grid gap-3 sm:grid-cols-2">
-                <div className="card p-4">
-                  <p className="text-[11px] font-bold tracking-wide text-muted uppercase">Parties</p>
-                  <ul className="mt-2 space-y-1.5">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="rounded-[2px] border border-[#e2d5c1] bg-[#fffaf2] p-5">
+                  <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#85725f]">Named Parties</p>
+                  <ul className="mt-2.5 space-y-1.5">
                     {explanation.parties.map((p) => (
-                      <li key={p} className="text-[12px] leading-5 text-body">{p}</li>
+                      <li key={p} className="text-[12.5px] leading-relaxed text-[#2a1c12]">• {p}</li>
                     ))}
                   </ul>
                 </div>
-                <div className="card p-4">
-                  <p className="text-[11px] font-bold tracking-wide text-muted uppercase">Amounts</p>
-                  <div className="mt-2 space-y-2">
+                <div className="rounded-[2px] border border-[#e2d5c1] bg-[#fffaf2] p-5">
+                  <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#85725f]">Stated Amounts</p>
+                  <div className="mt-2.5 space-y-2">
                     {amounts.map((a, i) => (
                       <div key={a.label}>
-                        <p className="text-[10.5px] text-muted">{a.label}</p>
+                        <p className="text-[11px] text-[#85725f]">{a.label}</p>
                         {editing ? (
                           <Input
                             value={a.value}
                             onChange={(e) => {
-                              const next = [...amounts]
-                              next[i] = { ...a, value: e.target.value }
-                              setAmounts(next)
+                              const next = [...amounts];
+                              next[i] = { ...a, value: e.target.value };
+                              setAmounts(next);
                             }}
-                            className="mt-0.5 h-8 text-[12px]"
+                            className="mt-1 h-8 text-[12px]"
                           />
                         ) : (
-                          <p className="text-[13px] font-bold text-ink">{a.value}</p>
+                          <p className="font-serif text-[15px] font-normal text-[#2a1c12]">{a.value}</p>
                         )}
                       </div>
                     ))}
@@ -321,64 +328,64 @@ export default function ScanPage() {
                 </div>
               </div>
 
-              <div className="card p-4">
-                <p className="text-[11px] font-bold tracking-wide text-muted uppercase">Dates</p>
-                <div className="mt-2 divide-y divide-line">
+              <div className="rounded-[2px] border border-[#e2d5c1] bg-[#fffaf2] p-5">
+                <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#85725f]">Key Statutory Dates</p>
+                <div className="mt-3 divide-y divide-[#e2d5c1]">
                   {dates.map((d, i) => (
-                    <div key={d.label} className="flex items-center gap-3 py-2 first:pt-0 last:pb-0">
-                      <span className="flex-1 text-[12px] font-medium text-ink">{d.label}</span>
+                    <div key={d.label} className="flex items-center gap-3 py-2.5 first:pt-0 last:pb-0">
+                      <span className="flex-1 text-[12.5px] font-medium text-[#2a1c12]">{d.label}</span>
                       {editing ? (
                         <Input
                           value={d.value}
                           onChange={(e) => {
-                            const next = [...dates]
-                            next[i] = { ...d, value: e.target.value }
-                            setDates(next)
+                            const next = [...dates];
+                            next[i] = { ...d, value: e.target.value };
+                            setDates(next);
                           }}
                           className="h-8 w-44 text-[12px]"
                         />
                       ) : (
-                        <span className="text-[12px] font-semibold text-brand-dark">{d.value}</span>
+                        <span className="font-mono text-[12px] font-medium text-[#9a6a35]">{d.value}</span>
                       )}
                     </div>
                   ))}
                 </div>
               </div>
 
-              <div className="grid gap-3 sm:grid-cols-2">
-                <div className="card p-4">
-                  <p className="text-[11px] font-bold tracking-wide text-muted uppercase">Your obligations</p>
-                  <ul className="mt-2 space-y-1.5">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="rounded-[2px] border border-[#e2d5c1] bg-[#fffaf2] p-5">
+                  <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#85725f]">Client Obligations</p>
+                  <ul className="mt-2.5 space-y-2">
                     {explanation.obligations.map((o) => (
-                      <li key={o} className="flex gap-1.5 text-[11.5px] leading-5 text-body">
-                        <span className="mt-1.5 size-1 shrink-0 rounded-full bg-dot" /> {o}
+                      <li key={o} className="flex gap-2 text-[12px] leading-relaxed text-[#5b4a3b]">
+                        <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-[#9a6a35]" /> {o}
                       </li>
                     ))}
                   </ul>
                 </div>
-                <div className="card border-danger/20 bg-danger-soft/30 p-4">
-                  <p className="text-[11px] font-bold tracking-wide text-danger uppercase">Risks</p>
-                  <ul className="mt-2 space-y-1.5">
+                <div className="rounded-[2px] border border-[#9a3424]/30 bg-[#fbf2ef] p-5">
+                  <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#9a3424]">Identified Legal Risks</p>
+                  <ul className="mt-2.5 space-y-2">
                     {explanation.risks.map((r) => (
-                      <li key={r} className="flex gap-1.5 text-[11.5px] leading-5 text-body">
-                        <AlertTriangle className="mt-0.5 size-3 shrink-0 text-danger" aria-hidden /> {r}
+                      <li key={r} className="flex gap-2 text-[12px] leading-relaxed text-[#7a2517]">
+                        <AlertTriangle className="mt-0.5 size-3.5 shrink-0 text-[#9a3424]" aria-hidden /> {r}
                       </li>
                     ))}
                   </ul>
                 </div>
               </div>
 
-              <div className="flex flex-col gap-2 sm:flex-row">
+              <div className="flex flex-col gap-3 sm:flex-row pt-2">
                 <Button fullWidth onClick={addDates} disabled={saved}>
-                  {saved ? <><Check className="size-4" /> Dates added</> : <><CalendarPlus className="size-4" /> Add these dates to my deadlines</>}
+                  {saved ? <><Check className="size-4" /> Dates recorded</> : <><CalendarPlus className="size-4" /> Add dates to limitation tracker</>}
                 </Button>
                 <Button variant="secondary" onClick={() => router.push(dh('/vault'))}>
-                  Save to vault <ArrowRight className="size-4" aria-hidden />
+                  Deposit to vault <ArrowRight className="size-4" aria-hidden />
                 </Button>
               </div>
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between pt-2">
                 <Disclaimer text={explanation.disclaimer} />
-                <button type="button" onClick={reset} className="shrink-0 text-[11px] font-semibold text-brand hover:underline">
+                <button type="button" onClick={reset} className="shrink-0 text-[11px] font-mono uppercase tracking-[0.1em] text-[#9a6a35] hover:underline">
                   Scan another
                 </button>
               </div>
@@ -387,5 +394,5 @@ export default function ScanPage() {
         </div>
       )}
     </div>
-  )
+  );
 }

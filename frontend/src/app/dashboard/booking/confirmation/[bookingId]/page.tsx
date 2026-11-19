@@ -23,7 +23,7 @@ import { Disclaimer } from '@/components/dashboard/shared';
 
 export default function BookingConfirmationPage() {
   return (
-    <Suspense fallback={<p className="text-body">Loading booking…</p>}>
+    <Suspense fallback={<p className="text-[#5b4a3b]">Retrieving appointment receipt…</p>}>
       <BookingConfirmationContent />
     </Suspense>
   );
@@ -51,92 +51,93 @@ function BookingConfirmationContent() {
   }, [booking, bookingId]);
 
   if (!booking) {
-    return <p className="text-body">Booking not found.</p>;
+    return <p className="text-[#5b4a3b]">Appointment record not found.</p>;
   }
 
   return (
-    <div className="mx-auto max-w-2xl animate-fade">
-      <div className="mb-6 text-center">
-        <span className="mx-auto grid size-16 place-items-center rounded-3xl bg-mint">
-          <CheckCircle2 className="size-8 text-dot" aria-hidden />
+    <div className="mx-auto max-w-2xl animate-fade space-y-6">
+      <div className="text-center">
+        <span className="mx-auto grid size-16 place-items-center rounded-[2px] border border-[#2a6b3b]/30 bg-[#2a6b3b]/10 text-[#2a6b3b]">
+          <CheckCircle2 className="size-8" aria-hidden />
         </span>
-        <h1 className="mt-4 text-[26px] font-extrabold sm:text-[30px]">Consultation confirmed</h1>
-        <p className="mt-2 text-[13.5px] leading-6 text-body">
-          Your slot is booked with Adv. {booking.advocateName}. A calendar file and the case brief have been prepared.
+        <p className="mt-4 font-mono text-[10px] uppercase tracking-[0.2em] text-[#85725f]">Official Record of Booking</p>
+        <h1 className="mt-1 font-serif text-[32px] sm:text-[36px] font-normal text-[#2a1c12]">Consultation Sealed</h1>
+        <p className="mt-2 text-[14px] leading-relaxed text-[#5b4a3b]">
+          Docket slot reserved with Adv. {booking.advocateName}. Your preliminary matter dossier has been prepared for transmission.
         </p>
-        <div className="mt-3 flex justify-center gap-2">
-          <Badge tone="mint"><CheckCircle2 className="size-3" /> {booking.status.replace('_', ' ')}</Badge>
-          <Badge tone="outline">Ref {booking.id}</Badge>
+        <div className="mt-4 flex justify-center gap-2.5">
+          <Badge tone="mint"><CheckCircle2 className="size-3" /> {booking.status.replace('_', ' ').toUpperCase()}</Badge>
+          <Badge tone="neutral">REF #{booking.id}</Badge>
         </div>
       </div>
 
       <Card className="overflow-hidden">
-        <div className="border-b border-line bg-brand-tint px-5 py-4">
-          <p className="text-[10.5px] font-bold tracking-[0.12em] text-muted uppercase">Appointment</p>
-          <div className="mt-1.5 flex flex-wrap items-center gap-x-5 gap-y-1 text-[13px]">
-            <span className="inline-flex items-center gap-1.5 font-semibold text-ink">
-              <CalendarPlus className="size-4 text-brand" aria-hidden />
+        <div className="border-b border-[#e2d5c1] bg-[#ebe1d1]/20 px-6 py-4">
+          <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#85725f]">Docket Details</p>
+          <div className="mt-2 flex flex-wrap items-center gap-x-6 gap-y-2 text-[13px]">
+            <span className="inline-flex items-center gap-2 font-medium text-[#2a1c12]">
+              <CalendarPlus className="size-4 text-[#9a6a35]" aria-hidden />
               {formatDate(booking.date, { weekday: 'long', day: 'numeric', month: 'long' })}
             </span>
-            <span className="inline-flex items-center gap-1.5 text-body">
-              <Clock className="size-4" aria-hidden /> {booking.time} · 30 minutes
+            <span className="inline-flex items-center gap-1.5 text-[#5b4a3b]">
+              <Clock className="size-4 text-[#85725f]" aria-hidden /> {booking.time} · 30 min
             </span>
-            <span className="inline-flex items-center gap-1.5 text-body capitalize">
-              <Video className="size-4" aria-hidden /> {booking.mode.replace('-', ' ')}
+            <span className="inline-flex items-center gap-1.5 font-medium capitalize text-[#5b4a3b]">
+              <Video className="size-4 text-[#85725f]" aria-hidden /> {booking.mode.replace('-', ' ')}
             </span>
           </div>
         </div>
 
-        <div className="grid gap-3 p-5 sm:grid-cols-2">
+        <div className="grid gap-4 p-6 sm:grid-cols-2">
           {[
-            ['Advocate', `Adv. ${booking.advocateName}`],
-            ['Amount paid', formatInr(booking.amount)],
-            ['Payment reference', booking.paymentId ?? 'pay_mock_pending'],
-            ['Case brief', 'Shared with your consent'],
+            ['Appointed Advocate', `Adv. ${booking.advocateName}`],
+            ['Authorized Fee', formatInr(booking.amount)],
+            ['Gateway Reference', booking.paymentId ?? 'pay_sandbox_confirmed'],
+            ['Matter Dossier', 'Secured under DPDP consent'],
           ].map(([label, value]) => (
-            <div key={label} className="rounded-xl bg-brand-tint px-3 py-2.5">
-              <p className="text-[10px] font-semibold text-muted uppercase">{label}</p>
-              <p className="mt-0.5 text-[12.5px] font-semibold text-ink">{value}</p>
+            <div key={label} className="rounded-[2px] border border-[#e2d5c1] bg-[#f4efe6] px-4 py-3">
+              <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-[#85725f]">{label}</p>
+              <p className="mt-1 font-serif text-[15px] font-normal text-[#2a1c12]">{value}</p>
             </div>
           ))}
         </div>
 
-        <div className="flex flex-col gap-2 border-t border-line p-4 sm:flex-row">
+        <div className="flex flex-col gap-3 border-t border-[#e2d5c1] p-6 sm:flex-row">
           <Button fullWidth onClick={() => downloadIcs(booking)}>
-            <Download className="size-4" aria-hidden /> Download .ics calendar file
+            <Download className="size-4" aria-hidden /> Download .ics Calendar File
           </Button>
           <Button fullWidth variant="secondary" onClick={() => router.push(dh('/messages'))}>
-            <MessageSquare className="size-4" aria-hidden /> Message advocate
+            <MessageSquare className="size-4" aria-hidden /> Enter Messages Channel
           </Button>
         </div>
       </Card>
 
-      <div className="mt-4 rounded-2xl border border-line p-4">
-        <p className="flex items-center gap-1.5 text-[12px] font-bold">
-          <ShieldCheck className="size-4 text-dot" aria-hidden /> What happens next
+      <div className="rounded-[2px] border border-[#e2d5c1] bg-[#fffaf2] p-6">
+        <p className="flex items-center gap-2 font-serif text-[15px] font-normal text-[#2a1c12]">
+          <ShieldCheck className="size-4 text-[#2a6b3b]" aria-hidden /> Procedural Steps Ahead
         </p>
-        <ol className="mt-2 space-y-1.5">
+        <ol className="mt-3 space-y-2.5">
           {[
-            'The advocate reviews your brief and can ask for more information.',
-            'You will get a reminder 24 hours and 1 hour before the consultation.',
-            'Join from Messages. Phone consultations use a masked number.',
-            'After the consultation, you can leave feedback if the booking is marked completed.',
+            'The advocate scrutinizes your submitted facts and may request clarifying documents.',
+            'Cryptographic reminders will dispatch 24 hours and 1 hour prior to hearing time.',
+            'Join directly through the encrypted portal. Telephonic consultations route through a masked relay.',
+            'Following conclusion of proceedings, a formal evaluation receipt may be recorded.',
           ].map((s, i) => (
-            <li key={s} className="flex gap-2 text-[11.5px] leading-5 text-body">
-              <span className="grid size-4 shrink-0 place-items-center rounded-full bg-brand-soft text-[9px] font-bold text-brand-dark">{i + 1}</span>
+            <li key={s} className="flex gap-2.5 text-[12px] leading-relaxed text-[#5b4a3b]">
+              <span className="grid size-4 shrink-0 place-items-center rounded-[2px] border border-[#e2d5c1] bg-[#f4efe6] font-mono text-[9px] font-medium text-[#2a1c12]">{i + 1}</span>
               {s}
             </li>
           ))}
         </ol>
       </div>
 
-      <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-4 pt-2">
         <Disclaimer />
-        <div className="flex gap-2">
-          <Button size="sm" variant="ghost" onClick={() => router.push(dh('/bookings'))}>My bookings</Button>
-          <Button size="sm" variant="secondary" onClick={() => router.push(dh('/dashboard'))}>Back to home</Button>
+        <div className="flex gap-2.5">
+          <Button size="sm" variant="secondary" onClick={() => router.push(dh('/bookings'))}>Consultation Register</Button>
+          <Button size="sm" variant="primary" onClick={() => router.push(dh('/dashboard'))}>Return to Chamber</Button>
         </div>
       </div>
     </div>
-  )
+  );
 }

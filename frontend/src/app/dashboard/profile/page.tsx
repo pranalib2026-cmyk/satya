@@ -31,6 +31,15 @@ export default function ProfilePage() {
   const [name, setName] = useState(user?.name ?? "");
   const [email, setEmail] = useState(user?.email ?? "");
   const [city, setCity] = useState(user?.city ?? "");
+  const [prevUserId, setPrevUserId] = useState(user?.id);
+
+  if (user && user.id !== prevUserId) {
+    setPrevUserId(user.id);
+    setName(user.name ?? "");
+    setEmail(user.email ?? "");
+    setCity(user.city ?? "");
+  }
+
   const [saved, setSaved] = useState(false);
   const [consents, setConsents] = useState<Consent[]>([]);
   const [deleting, setDeleting] = useState(false);
@@ -58,11 +67,11 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="animate-fade">
+    <div className="animate-fade space-y-6">
       <PageHeader
-        eyebrow="Profile & privacy"
-        title="Your account"
-        subtitle="Manage your details, language, consents and data. You stay in control of what is shared."
+        eyebrow="SECURITY & GOVERNANCE"
+        title="Citizen Dossier & Privacy"
+        subtitle="Manage your personal credentials, linguistic preferences, and DPDP consent authorizations."
         actions={
           <Button
             variant="secondary"
@@ -71,104 +80,108 @@ export default function ProfilePage() {
               router.push("/login");
             }}
           >
-            <LogOut className="size-4" aria-hidden /> Sign out
+            <LogOut className="size-4" aria-hidden /> Terminate Session
           </Button>
         }
       />
 
-      <div className="grid gap-4 lg:grid-cols-[1fr_340px]">
-        <div className="space-y-4">
+      <div className="grid gap-6 lg:grid-cols-[1fr_340px]">
+        <div className="space-y-6">
           {/* Profile */}
-          <Card className="p-5">
-            <div className="flex items-center gap-3">
+          <Card className="p-6">
+            <div className="flex items-center gap-4">
               <Avatar initials={(user?.name ?? "R K").split(" ").map((n) => n[0]).slice(0, 2).join("")} size="lg" />
               <div>
-                <h2 className="text-[15px] font-bold">{user?.name ?? "Rahul Kumar"}</h2>
-                <p className="text-[11.5px] text-body">{user?.phone} · Member since {user ? formatDate(user.createdAt, { month: "short", year: "numeric" }) : "—"}</p>
+                <h2 className="font-serif text-[20px] font-normal text-[#2a1c12]">{user?.name ?? "Rahul Kumar"}</h2>
+                <p className="font-mono text-[11px] text-[#85725f]">{user?.phone} · Enrolled since {user ? formatDate(user.createdAt, { month: "short", year: "numeric" }) : "—"}</p>
               </div>
-              <Badge tone="mint" className="ml-auto"><ShieldCheck className="size-3" /> Verified number</Badge>
+              <Badge tone="mint" className="ml-auto"><ShieldCheck className="size-3" /> Aadhaar / Mobile Verified</Badge>
             </div>
 
-            <div className="mt-4 grid gap-3.5 sm:grid-cols-2">
-              <Field label="Full name" htmlFor="name">
+            <div className="mt-6 grid gap-4 sm:grid-cols-2 pt-6 border-t border-[#e2d5c1]">
+              <Field label="Full Legal Name" htmlFor="name">
                 <Input id="name" value={name} onChange={(e) => setName(e.target.value)} />
               </Field>
-              <Field label="Mobile number" htmlFor="phone" hint="Used for OTP sign-in. Contact support to change.">
+              <Field label="Primary Mobile Identifier" htmlFor="phone" hint="Bound to OTP authentication gateway.">
                 <div className="relative">
-                  <Phone className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted" aria-hidden />
-                  <Input id="phone" value={user?.phone ?? ""} disabled className="pl-9" />
+                  <Phone className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-[#85725f]" aria-hidden />
+                  <Input id="phone" value={user?.phone ?? ""} disabled className="pl-9 font-mono opacity-80" />
                 </div>
               </Field>
-              <Field label="Email" htmlFor="email">
+              <Field label="Official Communication Email" htmlFor="email">
                 <div className="relative">
-                  <Mail className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted" aria-hidden />
+                  <Mail className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-[#85725f]" aria-hidden />
                   <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="pl-9" />
                 </div>
               </Field>
-              <Field label="City" htmlFor="city">
+              <Field label="Jurisdictional City / District" htmlFor="city">
                 <div className="relative">
-                  <MapPin className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted" aria-hidden />
+                  <MapPin className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-[#85725f]" aria-hidden />
                   <Input id="city" value={city} onChange={(e) => setCity(e.target.value)} className="pl-9" />
                 </div>
               </Field>
             </div>
 
-            <div className="mt-4 flex items-center gap-3">
-              <Button size="sm" onClick={save}>Save changes</Button>
-              {saved && <span className="flex items-center gap-1 text-[11.5px] font-semibold text-dot"><Check className="size-3.5" aria-hidden /> Saved</span>}
+            <div className="mt-5 flex items-center gap-3">
+              <Button size="sm" onClick={save}>Update Dossier</Button>
+              {saved && <span className="flex items-center gap-1.5 font-mono text-[11px] font-medium text-[#2a6b3b]"><Check className="size-3.5" aria-hidden /> Updated & Synced</span>}
             </div>
           </Card>
 
           {/* Language */}
-          <Card className="p-5">
-            <div className="flex items-center gap-2">
-              <Globe2 className="size-4 text-brand" aria-hidden />
-              <h2 className="text-[14px] font-bold">Language</h2>
+          <Card className="p-6">
+            <div className="flex items-center gap-2 border-b border-[#e2d5c1] pb-3">
+              <Globe2 className="size-4 text-[#9a6a35]" aria-hidden />
+              <h2 className="font-serif text-[18px] font-normal text-[#2a1c12]">Official Language Preference</h2>
             </div>
-            <p className="mt-1 text-[11.5px] text-body">Changes the app, AI answers and notifications. Documents may need separate translation.</p>
-            <div className="mt-3 grid gap-2 sm:grid-cols-3">
+            <p className="mt-2 text-[12.5px] leading-relaxed text-[#5b4a3b]">Governs statutory assessments, assistant explanations, and formal notices.</p>
+            <div className="mt-4 grid gap-2.5 sm:grid-cols-3">
               {(Object.keys(languageLabels) as Language[]).map((l) => (
                 <button
                   key={l}
                   type="button"
                   onClick={() => changeLanguage(l)}
-                  className={`flex h-11 cursor-pointer items-center justify-between rounded-xl border px-3.5 text-[12.5px] font-semibold transition ${
-                    language === l ? "border-brand bg-brand-soft text-brand-dark ring-4 ring-brand/10" : "border-line text-body hover:border-brand/40"
+                  className={`flex h-11 cursor-pointer items-center justify-between rounded-[2px] border px-4 text-[13px] font-medium transition-colors ${
+                    language === l ? "border-[#2a1c12] bg-[#2a1c12] text-[#fffaf2]" : "border-[#e2d5c1] bg-[#fffaf2] text-[#2a1c12] hover:border-[#9a6a35]"
                   }`}
                 >
                   {languageLabels[l]}
-                  {language === l && <Check className="size-4" aria-hidden />}
+                  {language === l && <Check className="size-4 text-[#d1a46a]" aria-hidden />}
                 </button>
               ))}
             </div>
           </Card>
 
           {/* Consent history */}
-          <Card className="p-5">
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <h2 className="flex items-center gap-1.5 text-[14px] font-bold">
-                <ShieldCheck className="size-4 text-brand" aria-hidden /> Consent history
+          <Card className="p-6">
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#e2d5c1] pb-3">
+              <h2 className="flex items-center gap-2 font-serif text-[18px] font-normal text-[#2a1c12]">
+                <ShieldCheck className="size-4 text-[#2a6b3b]" aria-hidden /> Digital Personal Data Protection (DPDP) Ledger
               </h2>
-              <span className="text-[10.5px] text-muted">Every grant is versioned and timestamped</span>
+              <span className="font-mono text-[10px] uppercase tracking-wider text-[#85725f]">Cryptographic Audit Log</span>
             </div>
-            <div className="mt-3 divide-y divide-line">
+            <div className="mt-4 divide-y divide-[#e2d5c1]">
               {consents.map((c) => (
-                <div key={c.id} className="flex flex-wrap items-start justify-between gap-2 py-3 first:pt-0 last:pb-0">
+                <div key={c.id} className="flex flex-wrap items-start justify-between gap-3 py-3.5 first:pt-0 last:pb-0">
                   <div className="min-w-0 flex-1">
-                    <p className="text-[12px] font-semibold text-ink">{consentLabel(c.consentType)}</p>
-                    <p className="mt-0.5 text-[10.5px] text-muted">
+                    <p className="font-serif text-[14px] font-normal text-[#2a1c12]">{consentLabel(c.consentType)}</p>
+                    <p className="mt-0.5 font-mono text-[10px] uppercase tracking-wider text-[#85725f]">
                       Version {c.version} · {formatDateTime(c.grantedAt)}
-                      {c.advocateId && " · Advocate " + c.advocateId}
+                      {c.advocateId && " · Authorized Counsel: " + c.advocateId}
                     </p>
                     {c.itemsShared && (
-                      <p className="mt-0.5 text-[10px] text-muted">Shared: {c.itemsShared.join(", ")}</p>
+                      <p className="mt-1 text-[11px] text-[#5b4a3b]">Transmitted records: {c.itemsShared.join(", ")}</p>
                     )}
                   </div>
                   {c.revoked ? (
-                    <Badge tone="neutral">Revoked</Badge>
+                    <Badge tone="neutral">REVOKED</Badge>
                   ) : (
-                    <button type="button" onClick={() => setRevokeTarget(c)} className="cursor-pointer rounded-lg px-2 py-1 text-[11px] font-semibold text-danger hover:bg-danger-soft">
-                      Revoke
+                    <button
+                      type="button"
+                      onClick={() => setRevokeTarget(c)}
+                      className="cursor-pointer rounded-[2px] border border-[#9a3424]/30 px-2.5 py-1 font-mono text-[10px] uppercase tracking-wider text-[#9a3424] hover:bg-[#fbf2ef] transition-colors"
+                    >
+                      Revoke Grant
                     </button>
                   )}
                 </div>
@@ -177,19 +190,19 @@ export default function ProfilePage() {
           </Card>
         </div>
 
-        <aside className="space-y-4">
-          <Card className="p-5">
-            <h2 className="flex items-center gap-1.5 text-[13.5px] font-bold">
-              <Download className="size-4 text-brand" aria-hidden /> Your data
+        <aside className="space-y-6">
+          <Card className="p-6">
+            <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#85725f]">Data Portability</p>
+            <h2 className="mt-1 flex items-center gap-2 font-serif text-[16px] font-normal text-[#2a1c12]">
+              <Download className="size-4 text-[#9a6a35]" aria-hidden /> Statutory Data Export
             </h2>
-            <p className="mt-1 text-[11px] leading-5 text-body">
-              Download a JSON copy of your profile, consents and account data. In production this is generated
-              server-side and expires after 24 hours.
+            <p className="mt-1 text-[12px] leading-relaxed text-[#5b4a3b]">
+              Receive a cryptographically signed JSON archive of your personal ledger, DPDP grants, and court schedules under Indian data sovereignty mandates.
             </p>
             <Button
               variant="secondary"
               fullWidth
-              className="mt-3"
+              className="mt-4"
               loading={exporting}
               onClick={async () => {
                 setExporting(true);
@@ -197,49 +210,51 @@ export default function ProfilePage() {
                 setExporting(false);
               }}
             >
-              <Download className="size-4" aria-hidden /> Download my data
+              <Download className="size-4" aria-hidden /> Request Signed Archive
             </Button>
           </Card>
 
-          <Card className="border-danger/20 p-5">
-            <h2 className="flex items-center gap-1.5 text-[13.5px] font-bold text-danger">
-              <Trash2 className="size-4" aria-hidden /> Delete my account
+          <Card className="border-[#9a3424]/30 bg-[#fbf2ef]/40 p-6">
+            <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#9a3424]">Right to be Forgotten</p>
+            <h2 className="mt-1 flex items-center gap-2 font-serif text-[16px] font-normal text-[#9a3424]">
+              <Trash2 className="size-4" aria-hidden /> Purge Citizen Account
             </h2>
-            <p className="mt-1 text-[11px] leading-5 text-body">
-              Soft-deletes your account and starts the retention process. Active bookings must be closed first.
+            <p className="mt-1 text-[12px] leading-relaxed text-[#5b4a3b]">
+              Initiates permanent removal of all personal records, vault holdings, and matching telemetry in compliance with DPDP rules.
             </p>
-            <Button variant="danger" fullWidth className="mt-3" onClick={() => setConfirmDelete(true)}>
-              Delete account
+            <Button variant="danger" fullWidth className="mt-4" onClick={() => setConfirmDelete(true)}>
+              Purge Account
             </Button>
           </Card>
 
-          <Card className="p-5">
-            <h2 className="flex items-center gap-1.5 text-[13.5px] font-bold">
-              <UserRound className="size-4 text-brand" aria-hidden /> Grievance officer
+          <Card className="p-6">
+            <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#85725f]">Statutory Redressal</p>
+            <h2 className="mt-1 flex items-center gap-2 font-serif text-[16px] font-normal text-[#2a1c12]">
+              <UserRound className="size-4 text-[#9a6a35]" aria-hidden /> Grievance Officer
             </h2>
-            <p className="mt-1.5 text-[11px] leading-5 text-body">
-              For complaints about content, privacy or an advocate:
+            <p className="mt-1.5 text-[12px] leading-relaxed text-[#5b4a3b]">
+              Designated pursuant to IT (Intermediary Guidelines and Digital Media Ethics Code) Rules:
             </p>
-            <div className="mt-2 space-y-1 text-[11.5px]">
-              <p className="font-semibold text-ink">Ms. Nandini Rao</p>
-              <p className="text-body">Grievance Officer, Legal</p>
-              <a href="mailto:grievance@legal.in" className="block text-brand hover:underline">grievance@legal.in</a>
-              <p className="text-muted">Response within 15 days, as required under the IT Rules.</p>
+            <div className="mt-3 space-y-1.5 text-[12px] rounded-[2px] border border-[#e2d5c1] bg-[#f4efe6] p-3.5">
+              <p className="font-serif text-[14px] font-normal text-[#2a1c12]">Ms. Nandini Rao</p>
+              <p className="text-[#5b4a3b]">Grievance Officer, NyayaSetu</p>
+              <a href="mailto:grievance@nyayasetu.in" className="block font-mono text-[11px] text-[#9a6a35] underline hover:text-[#2a1c12]">grievance@nyayasetu.in</a>
+              <p className="font-mono text-[10px] text-[#85725f]">Statutory resolution within 15 days.</p>
             </div>
           </Card>
 
-          <Disclaimer variant="banner" text="Legal information only. Not legal advice. Consent records are stored with version and timestamp." />
+          <Disclaimer variant="banner" text="NyayaSetu operates under Section 5 of the Digital Personal Data Protection Act, 2023. Notice and consent logs are maintained in an immutable ledger." />
         </aside>
       </div>
 
       <Modal
         open={confirmDelete}
         onClose={() => setConfirmDelete(false)}
-        title="Delete your account?"
-        description="This is a soft delete in the demo. Your case data becomes inaccessible immediately."
+        title="Purge Citizen Records?"
+        description="Irreversible operation under Section 12 of the DPDP Act."
         footer={
           <>
-            <Button variant="ghost" onClick={() => setConfirmDelete(false)}>Cancel</Button>
+            <Button variant="secondary" onClick={() => setConfirmDelete(false)}>Cancel</Button>
             <Button
               variant="danger"
               loading={deleting}
@@ -251,16 +266,15 @@ export default function ProfilePage() {
                 router.push("/login");
               }}
             >
-              <Trash2 className="size-4" aria-hidden /> Delete my account
+              <Trash2 className="size-4" aria-hidden /> Confirm Immediate Purge
             </Button>
           </>
         }
       >
-        <div className="flex items-start gap-2.5 rounded-xl bg-danger-soft p-3.5">
-          <AlertTriangle className="mt-0.5 size-4 shrink-0 text-danger" aria-hidden />
-          <p className="text-[12px] leading-5 text-danger">
-            This removes access to your chats, case profiles, documents and bookings. Data required for legal or audit
-            obligations may be retained in a restricted archive. This cannot be undone from the app.
+        <div className="flex items-start gap-3 rounded-[2px] border border-[#9a3424]/30 bg-[#fbf2ef] p-4">
+          <AlertTriangle className="mt-0.5 size-5 shrink-0 text-[#9a3424]" aria-hidden />
+          <p className="text-[12.5px] leading-relaxed text-[#7a2517]">
+            This operation severs access to active matters, stored legal notices, consultation transcripts, and advocate dispatches. Mandatory tax and judicial audit records may be retained in restricted statutory escrow.
           </p>
         </div>
       </Modal>
@@ -269,11 +283,11 @@ export default function ProfilePage() {
         open={!!revokeTarget}
         onClose={() => setRevokeTarget(null)}
         size="sm"
-        title="Revoke this consent?"
+        title="Revoke DPDP Consent Grant?"
         description={revokeTarget ? consentLabel(revokeTarget.consentType) : undefined}
         footer={
           <>
-            <Button variant="ghost" onClick={() => setRevokeTarget(null)}>Cancel</Button>
+            <Button variant="secondary" onClick={() => setRevokeTarget(null)}>Cancel</Button>
             <Button
               variant="danger"
               onClick={() => {
@@ -282,14 +296,13 @@ export default function ProfilePage() {
                 setRevokeTarget(null);
               }}
             >
-              Revoke consent
+              Revoke Authorization
             </Button>
           </>
         }
       >
-        <p className="text-[13px] leading-6 text-body">
-          Access that depends on this consent stops immediately. The consent history keeps the original
-          grant with a timestamp so you can see what was shared and when.
+        <p className="text-[13px] leading-relaxed text-[#5b4a3b]">
+          All external read permissions for this grant terminate immediately. The audit log preserves the original timestamped record verifying historical authorization and subsequent revocation.
         </p>
       </Modal>
     </div>

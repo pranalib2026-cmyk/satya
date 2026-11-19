@@ -13,7 +13,7 @@
 
 @layer base {
   .dashboard-scope {
-    --font-display: "General Sans", "Inter", ui-sans-serif, system-ui, sans-serif;
+    --font-display: "Gambetta", Georgia, Cambria, "Times New Roman", serif;
   }
 
   .dashboard-scope h1,
@@ -21,7 +21,9 @@
   .dashboard-scope h3,
   .dashboard-scope h4 {
     font-family: var(--font-display);
-    letter-spacing: -0.02em;
+    letter-spacing: -0.03em;
+    font-weight: 400;
+    color: var(--text-primary);
     text-wrap: balance;
   }
 

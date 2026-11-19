@@ -28,40 +28,40 @@ import { PageHeader } from "@/components/dashboard/shared";
 export default function MessagesPage() {
   const router = useRouter();
   const today = useDashboardToday();
-  const [threads, setThreads] = useState<Thread[]>([])
-  const [activeId, setActiveId] = useState<string | null>(null)
-  const [messages, setMessages] = useState<AdvocateChatMessage[]>([])
-  const [input, setInput] = useState('')
-  const [attachOpen, setAttachOpen] = useState(false)
-  const [safetyOpen, setSafetyOpen] = useState<'report' | 'block' | null>(null)
-  const [callNotice, setCallNotice] = useState('')
-  const [query, setQuery] = useState('')
-  const [typing, setTyping] = useState(false)
-  const listRef = useRef<HTMLDivElement>(null)
+  const [threads, setThreads] = useState<Thread[]>([]);
+  const [activeId, setActiveId] = useState<string | null>(null);
+  const [messages, setMessages] = useState<AdvocateChatMessage[]>([]);
+  const [input, setInput] = useState('');
+  const [attachOpen, setAttachOpen] = useState(false);
+  const [safetyOpen, setSafetyOpen] = useState<'report' | 'block' | null>(null);
+  const [callNotice, setCallNotice] = useState('');
+  const [query, setQuery] = useState('');
+  const [typing, setTyping] = useState(false);
+  const listRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     void listThreads().then((t) => {
-      setThreads(t)
-      if (window.matchMedia('(min-width: 1024px)').matches) setActiveId(t[0]?.id ?? null)
-    })
-  }, [])
+      setThreads(t);
+      if (window.matchMedia('(min-width: 1024px)').matches) setActiveId(t[0]?.id ?? null);
+    });
+  }, []);
 
   useEffect(() => {
-    if (activeId) void getThreadMessages(activeId).then(setMessages)
-  }, [activeId])
+    if (activeId) void getThreadMessages(activeId).then(setMessages);
+  }, [activeId]);
 
   useEffect(() => {
-    const el = listRef.current
-    if (el) el.scrollTop = el.scrollHeight
-  }, [messages, typing])
+    const el = listRef.current;
+    if (el) el.scrollTop = el.scrollHeight;
+  }, [messages, typing]);
 
-  const active = threads.find((t) => t.id === activeId)
+  const active = threads.find((t) => t.id === activeId);
 
   const send = async (attachmentName?: string) => {
-    const text = attachmentName ? `Sharing a document: ${attachmentName}` : input.trim()
-    if (!text || !activeId) return
-    setInput('')
-    setAttachOpen(false)
+    const text = attachmentName ? `Sharing a document: ${attachmentName}` : input.trim();
+    if (!text || !activeId) return;
+    setInput('');
+    setAttachOpen(false);
     const optimistic: AdvocateChatMessage = {
       id: `tmp_${Date.now()}`,
       threadId: activeId,
@@ -69,59 +69,71 @@ export default function MessagesPage() {
       text,
       attachmentName,
       at: new Date().toISOString(),
-    }
-    setMessages((m) => [...m, optimistic])
-    setTyping(true)
-    const [sent, reply] = await sendMessage(activeId, text, attachmentName)
-    setMessages((m) => [...m.filter((x) => x.id !== optimistic.id), sent])
+    };
+    setMessages((m) => [...m, optimistic]);
+    setTyping(true);
+    const [sent, reply] = await sendMessage(activeId, text, attachmentName);
+    setMessages((m) => [...m.filter((x) => x.id !== optimistic.id), sent]);
     setTimeout(() => {
-      setTyping(false)
-      setMessages((m) => [...m, reply])
-    }, 700)
-  }
+      setTyping(false);
+      setMessages((m) => [...m, reply]);
+    }, 700);
+  };
 
-  const filteredThreads = threads.filter((t) => t.advocateName.toLowerCase().includes(query.toLowerCase()))
+  const filteredThreads = threads.filter((t) => t.advocateName.toLowerCase().includes(query.toLowerCase()));
 
   return (
-    <div className="animate-fade">
+    <div className="animate-fade space-y-6">
       <PageHeader
-        eyebrow="Secure messaging"
-        title="Messages"
-        subtitle="Talk to your advocate without sharing your phone number. Files are shared from your vault with consent."
-        actions={<Badge tone="mint"><Lock className="size-3" /> Encrypted · mock</Badge>}
+        eyebrow="CHAMBERS DISPATCH"
+        title="Secure Communications"
+        subtitle="Confidential exchange channel between citizen and enrolled advocate. Vault records are transmitted strictly under explicit DPDP consent."
+        actions={<Badge tone="neutral"><Lock className="size-3 text-[#9a6a35]" /> End-to-End Privileged (Demo Relay)</Badge>}
       />
 
-      <div className="card grid h-[calc(100dvh-260px)] min-h-[520px] overflow-hidden lg:h-[calc(100dvh-320px)] lg:grid-cols-[320px_1fr]">
+      <div className="rounded-[2px] border border-[#e2d5c1] bg-[#ebe1d1]/30 p-3.5 flex items-start gap-3">
+        <MessageSquare className="size-4 text-[#9a6a35] mt-0.5 shrink-0" />
+        <div className="text-xs text-[#5b4a3b] leading-relaxed">
+          <strong className="text-[#2a1c12] font-semibold">Consultation Relay (Demo Mode):</strong> Peer direct chat operates in local relay pending dedicated backend persistent message channel. Consultation requests and appointments are synchronized with the backend docket.
+        </div>
+      </div>
+
+      <div className="rounded-[2px] border border-[#e2d5c1] bg-[#fffaf2] grid h-[calc(100dvh-260px)] min-h-[520px] overflow-hidden lg:h-[calc(100dvh-320px)] lg:grid-cols-[320px_1fr]">
         {/* Thread list */}
-        <aside className={cn('flex min-w-0 flex-col border-r border-line', activeId && 'hidden lg:flex')}>
-          <div className="border-b border-line p-3">
+        <aside className={cn('flex min-w-0 flex-col border-r border-[#e2d5c1] bg-[#fffaf2]', activeId && 'hidden lg:flex')}>
+          <div className="border-b border-[#e2d5c1] p-3.5 bg-[#ebe1d1]/20">
             <div className="relative">
-              <Search className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted" aria-hidden />
-              <Input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search conversations" className="h-9 pl-9 text-[12px]" />
+              <Search className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-[#85725f]" aria-hidden />
+              <Input
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search advocate threads…"
+                className="h-9 pl-9 text-[12px] bg-[#fffaf2]"
+              />
             </div>
           </div>
-          <div className="flex-1 overflow-y-auto">
+          <div className="flex-1 overflow-y-auto divide-y divide-[#e2d5c1]">
             {filteredThreads.map((t) => (
               <button
                 key={t.id}
                 type="button"
                 onClick={() => setActiveId(t.id)}
                 className={cn(
-                  'flex w-full min-w-0 gap-3 border-b border-line/70 p-3 text-left transition hover:bg-brand-tint',
-                  activeId === t.id && 'bg-brand-tint/60',
+                  'flex w-full min-w-0 gap-3 p-3.5 text-left transition-colors',
+                  activeId === t.id ? 'bg-[#ebe1d1]/40 border-l-2 border-l-[#2a1c12]' : 'hover:bg-[#ebe1d1]/20',
                 )}
               >
                 <Avatar initials={t.initials} size="md" online={t.online} />
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center justify-between gap-2">
-                    <p className="truncate text-[12.5px] font-bold text-ink">Adv. {t.advocateName}</p>
-                    <span className="shrink-0 text-[9.5px] text-muted">{relativeDay(t.lastAt, today)}</span>
+                    <p className="truncate font-serif text-[14px] font-normal text-[#2a1c12]">Adv. {t.advocateName}</p>
+                    <span className="shrink-0 font-mono text-[9px] uppercase tracking-wider text-[#85725f]">{relativeDay(t.lastAt, today)}</span>
                   </div>
-                  <p className={cn('mt-0.5 truncate text-[11px]', t.unread > 0 ? 'font-semibold text-ink' : 'text-body')}>
+                  <p className={cn('mt-0.5 truncate text-[12px]', t.unread > 0 ? 'font-medium text-[#2a1c12]' : 'text-[#5b4a3b]')}>
                     {t.lastMessage}
                   </p>
                   {t.unread > 0 && activeId !== t.id && (
-                    <span className="mt-1 inline-grid h-4 min-w-4 place-items-center rounded-full bg-brand px-1 text-[9px] font-bold text-card-bg">
+                    <span className="mt-1.5 inline-grid h-4 min-w-4 place-items-center rounded-[2px] bg-[#2a1c12] px-1 font-mono text-[9px] font-medium text-[#fffaf2]">
                       {t.unread}
                     </span>
                   )}
@@ -129,133 +141,139 @@ export default function MessagesPage() {
               </button>
             ))}
           </div>
-          <div className="border-t border-line p-3">
-            <p className="flex items-start gap-1.5 text-[10px] leading-4 text-muted">
-              <ShieldCheck className="mt-0.5 size-3 shrink-0 text-dot" aria-hidden />
-              Messages are visible to the advocate and our grievance team on report. Never share OTPs.
+          <div className="border-t border-[#e2d5c1] p-3.5 bg-[#ebe1d1]/10">
+            <p className="flex items-start gap-2 font-mono text-[10px] leading-relaxed text-[#85725f]">
+              <ShieldCheck className="mt-0.5 size-3.5 shrink-0 text-[#2a6b3b]" aria-hidden />
+              Privileged channel under BCI rules. Never transmit passwords or financial OTPs.
             </p>
           </div>
         </aside>
 
         {/* Conversation */}
         {!active ? (
-          <div className="hidden flex-col items-center justify-center text-center lg:flex">
-            <MessageSquare className="size-8 text-muted" aria-hidden />
-            <p className="mt-2 text-[13px] font-semibold">Select a conversation</p>
+          <div className="hidden flex-col items-center justify-center text-center lg:flex p-6">
+            <MessageSquare className="size-8 text-[#85725f]" aria-hidden />
+            <h3 className="mt-3 font-serif text-[18px] font-normal text-[#2a1c12]">Select a Chambers Thread</h3>
+            <p className="mt-1 font-mono text-[11px] text-[#85725f]">Select an enrolled advocate from the roll on the left to review communication.</p>
           </div>
         ) : (
           <section className="flex min-w-0 flex-col">
-            <div className="flex items-center gap-2.5 border-b border-line px-3 py-2.5">
-              <button type="button" onClick={() => setActiveId(null)} className="grid size-8 place-items-center rounded-lg text-body hover:bg-brand-tint lg:hidden" aria-label="Back to conversations">
+            <div className="flex items-center gap-3 border-b border-[#e2d5c1] px-4 py-3 bg-[#ebe1d1]/20">
+              <button type="button" onClick={() => setActiveId(null)} className="grid size-8 place-items-center rounded-[2px] border border-[#e2d5c1] text-[#2a1c12] hover:bg-[#fffaf2] lg:hidden" aria-label="Back to conversations">
                 <ArrowLeft className="size-4" />
               </button>
               <Avatar initials={active.initials} size="sm" online={active.online} />
               <div className="min-w-0 flex-1">
-                <p className="truncate text-[12.5px] font-bold">Adv. {active.advocateName}</p>
-                <p className="flex items-center gap-1 text-[10px] text-muted">
-                  <span className={cn('size-1.5 rounded-full', active.online ? 'bg-dot' : 'bg-border-hover')} aria-hidden />
-                  {active.online ? 'Online now' : 'Usually replies within a day'} · live via WebSocket (mock)
+                <h3 className="truncate font-serif text-[15px] font-normal text-[#2a1c12]">Adv. {active.advocateName}</h3>
+                <p className="flex items-center gap-1.5 font-mono text-[10px] text-[#85725f]">
+                  <span className={cn('size-1.5 rounded-full', active.online ? 'bg-[#2a6b3b]' : 'bg-[#85725f]')} aria-hidden />
+                  {active.online ? 'Chambers Active' : 'Typically replies within 1 court day'} · Live Protocol
                 </p>
               </div>
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-1.5">
                 <button
                   type="button"
                   onClick={async () => {
-                    const res = await callMaskedNumber(active.id)
-                    setCallNotice(res.message)
+                    const res = await callMaskedNumber(active.id);
+                    setCallNotice(res.message);
                   }}
-                  className="grid size-8 place-items-center rounded-lg text-body hover:bg-brand-tint hover:text-ink"
+                  className="grid size-8 place-items-center rounded-[2px] border border-[#e2d5c1] bg-[#fffaf2] text-[#2a1c12] hover:border-[#9a6a35] transition-colors"
                   aria-label="Call via masked number"
                   title="Call via masked number"
                 >
-                  <PhoneCall className="size-4" />
+                  <PhoneCall className="size-3.5 text-[#9a6a35]" />
                 </button>
                 <button
                   type="button"
                   onClick={() => router.push(dh('/booking/adv_1'))}
-                  className="hidden size-8 place-items-center rounded-lg text-body hover:bg-brand-tint hover:text-ink sm:grid"
-                  aria-label="Book a video consultation"
+                  className="hidden size-8 place-items-center rounded-[2px] border border-[#e2d5c1] bg-[#fffaf2] text-[#2a1c12] hover:border-[#9a6a35] transition-colors sm:grid"
+                  aria-label="Book a consultation"
                   title="Book a consultation"
                 >
-                  <Video className="size-4" />
+                  <Video className="size-3.5 text-[#9a6a35]" />
                 </button>
-                <div className="relative">
-                  <button
-                    type="button"
-                    onClick={() => setSafetyOpen('report')}
-                    className="grid size-8 place-items-center rounded-lg text-body hover:bg-brand-tint hover:text-ink"
-                    aria-label="Report or block"
-                  >
-                    <MoreVertical className="size-4" />
-                  </button>
-                </div>
+                <button
+                  type="button"
+                  onClick={() => setSafetyOpen('report')}
+                  className="grid size-8 place-items-center rounded-[2px] border border-[#e2d5c1] bg-[#fffaf2] text-[#85725f] hover:text-[#2a1c12] transition-colors"
+                  aria-label="Report or block"
+                >
+                  <MoreVertical className="size-3.5" />
+                </button>
               </div>
             </div>
 
             {callNotice && (
-              <div className="flex items-center justify-between gap-2 border-b border-line bg-mint-soft px-3 py-2 text-[11px] font-medium text-dot">
+              <div className="flex items-center justify-between gap-2 border-b border-[#2a6b3b]/30 bg-[#2a6b3b]/10 px-4 py-2 font-mono text-[11px] font-medium text-[#2a6b3b]">
                 {callNotice}
-                <button type="button" onClick={() => setCallNotice('')} className="text-[10px] underline">Dismiss</button>
+                <button type="button" onClick={() => setCallNotice('')} className="text-[10px] uppercase tracking-wider underline hover:text-[#2a1c12]">Dismiss</button>
               </div>
             )}
 
-            <div ref={listRef} className="flex-1 space-y-3 overflow-y-auto bg-brand-tint px-3 py-4">
-              <p className="text-center text-[9.5px] font-medium text-muted">
-                Conversation started from your {active.id === 'th_1' ? 'tenancy' : 'case'} matter · masked numbers
+            <div ref={listRef} className="flex-1 space-y-4 overflow-y-auto bg-[#f4efe6]/60 p-4 sm:p-6">
+              <p className="text-center font-mono text-[10px] uppercase tracking-[0.14em] text-[#85725f]">
+                Privileged communication initiated · Docket #{active.id === 'th_1' ? 'case_2041' : 'case_2042'}
               </p>
               {messages.map((m) => {
-                const mine = m.from === 'user'
+                const mine = m.from === 'user';
                 return (
                   <div key={m.id} className={cn('flex', mine ? 'justify-end' : 'justify-start')}>
                     <div className={cn('max-w-[82%]', mine && 'text-right')}>
                       <div
                         className={cn(
-                          'inline-block rounded-2xl px-3.5 py-2.5 text-left text-[12.5px] leading-5 whitespace-pre-wrap',
-                          mine ? 'rounded-br-md bg-brand text-card-bg' : 'rounded-bl-md border border-line bg-card-bg text-ink',
+                          'inline-block rounded-[2px] px-4 py-3 text-left text-[13px] leading-relaxed whitespace-pre-wrap',
+                          mine
+                            ? 'bg-[#2a1c12] text-[#fffaf2]'
+                            : 'border border-[#e2d5c1] bg-[#fffaf2] text-[#2a1c12]',
                         )}
                       >
                         {m.attachmentName && (
-                          <span className={cn('mb-1 flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-[11px] font-semibold', mine ? 'bg-card-bg/15' : 'bg-brand-soft text-brand-dark')}>
+                          <span className={cn('mb-2 flex items-center gap-1.5 rounded-[2px] px-2.5 py-1.5 font-mono text-[11px]', mine ? 'bg-white/10 text-[#fffaf2]' : 'border border-[#e2d5c1] bg-[#f4efe6] text-[#9a6a35]')}>
                             <Paperclip className="size-3" aria-hidden /> {m.attachmentName}
                           </span>
                         )}
                         {m.text}
                       </div>
-                      <p className="mt-1 text-[9px] text-muted">{formatDateTime(m.at)} {mine && '· Delivered'}</p>
+                      <p className="mt-1 font-mono text-[9px] uppercase tracking-wider text-[#85725f]">{formatDateTime(m.at)} {mine && '· DELIVERED'}</p>
                     </div>
                   </div>
-                )
+                );
               })}
               {typing && (
                 <div className="flex justify-start">
-                  <div className="rounded-2xl rounded-bl-md border border-line bg-card-bg px-3 py-2">
-                    <span className="typing-dot" /><span className="typing-dot" /><span className="typing-dot" />
+                  <div className="rounded-[2px] border border-[#e2d5c1] bg-[#fffaf2] px-3.5 py-2">
+                    <span className="font-mono text-[11px] text-[#85725f]">Advocate is typing…</span>
                   </div>
                 </div>
               )}
             </div>
 
-            <div className="border-t border-line p-2.5">
+            <div className="border-t border-[#e2d5c1] p-3 bg-[#fffaf2]">
               <form
-                onSubmit={(e) => { e.preventDefault(); void send() }}
-                className="flex items-center gap-1.5 rounded-xl border border-line p-1 focus-within:border-brand/50 focus-within:ring-4 focus-within:ring-brand/10"
+                onSubmit={(e) => { e.preventDefault(); void send(); }}
+                className="flex items-center gap-2 rounded-[2px] border border-[#e2d5c1] p-1.5 bg-[#f4efe6] focus-within:border-[#9a6a35]"
               >
-                <button type="button" onClick={() => setAttachOpen(true)} className="grid size-9 shrink-0 place-items-center rounded-lg text-muted hover:bg-brand-tint hover:text-ink" aria-label="Attach a document from your vault">
+                <button
+                  type="button"
+                  onClick={() => setAttachOpen(true)}
+                  className="grid size-9 shrink-0 place-items-center rounded-[2px] text-[#85725f] hover:bg-[#fffaf2] hover:text-[#2a1c12] transition-colors"
+                  aria-label="Attach a document from your vault"
+                >
                   <Paperclip className="size-4" />
                 </button>
                 <input
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  placeholder="Write a message…"
+                  placeholder="Record an inquiry or update for retained counsel…"
                   aria-label="Message"
-                  className="h-9 min-w-0 flex-1 bg-transparent px-1 text-[12.5px] focus:outline-none"
+                  className="h-9 min-w-0 flex-1 bg-transparent px-2 text-[13px] text-[#2a1c12] focus:outline-none placeholder:text-[#85725f]"
                 />
-                <Button type="submit" size="sm" className="size-9 !rounded-lg !px-0" disabled={!input.trim()} aria-label="Send">
+                <Button type="submit" size="sm" className="size-9 !rounded-[2px] !p-0" disabled={!input.trim()} aria-label="Send">
                   <Send className="size-4" aria-hidden />
                 </Button>
               </form>
-              <p className="mt-1.5 px-1 pr-14 text-[9.5px] text-muted lg:pr-1">
-                Do not share bank details, OTPs or passwords. Call is routed through a masked number.
+              <p className="mt-2 px-1 text-[10px] font-mono text-[#85725f]">
+                Client-advocate privileged exchange. Call connections utilize secure telephonic relays.
               </p>
             </div>
           </section>
@@ -266,21 +284,21 @@ export default function MessagesPage() {
       <Modal
         open={attachOpen}
         onClose={() => setAttachOpen(false)}
-        title="Attach from vault"
-        description="The advocate can view the file for 7 days. You can revoke access from the vault."
+        title="Attach Vault Document"
+        description="Grants temporary 7-day cryptographic read authority to counsel. Revocable at any moment from your vault."
       >
-        <div className="space-y-2">
+        <div className="space-y-2.5">
           {documents.slice(0, 5).map((d) => (
             <button
               key={d.id}
               type="button"
               onClick={() => void send(d.name)}
-              className="flex w-full items-center gap-2.5 rounded-xl border border-line p-3 text-left transition hover:border-brand/40 hover:bg-brand-tint/40"
+              className="flex w-full items-center gap-3 rounded-[2px] border border-[#e2d5c1] bg-[#fffaf2] p-3.5 text-left transition hover:border-[#9a6a35] hover:bg-[#ebe1d1]/30"
             >
-              <Paperclip className="size-4 shrink-0 text-brand" aria-hidden />
+              <Paperclip className="size-4 shrink-0 text-[#9a6a35]" aria-hidden />
               <span className="min-w-0 flex-1">
-                <span className="block truncate text-[12px] font-semibold">{d.name}</span>
-                <span className="text-[10px] text-muted">{d.caseTitle}</span>
+                <span className="block truncate font-serif text-[13px] font-normal text-[#2a1c12]">{d.name}</span>
+                <span className="font-mono text-[10px] text-[#85725f]">{d.caseTitle}</span>
               </span>
             </button>
           ))}
@@ -291,40 +309,40 @@ export default function MessagesPage() {
       <Modal
         open={!!safetyOpen}
         onClose={() => setSafetyOpen(null)}
-        title={safetyOpen === 'block' ? 'Block this advocate' : 'Report a problem'}
-        description="Our grievance team reviews every report. Blocking stops new messages."
+        title={safetyOpen === 'block' ? 'Bar Counsel Communications' : 'File Compliance Notice'}
+        description="NyayaSetu grievance desk inspects all procedural irregularities. Blocking immediately severs inbound dispatches."
         footer={
           <>
-            <Button variant="ghost" onClick={() => setSafetyOpen(null)}>Cancel</Button>
+            <Button variant="secondary" onClick={() => setSafetyOpen(null)}>Cancel</Button>
             <Button
               variant="danger"
               onClick={async () => {
-                if (!active) return
-                if (safetyOpen === 'report') await reportUser(active.id, 'User reported from messages')
-                if (safetyOpen === 'block') await blockAdvocate(active.id)
-                setSafetyOpen(null)
+                if (!active) return;
+                if (safetyOpen === 'report') await reportUser(active.id, 'User reported from messages');
+                if (safetyOpen === 'block') await blockAdvocate(active.id);
+                setSafetyOpen(null);
               }}
             >
-              {safetyOpen === 'block' ? <><Ban className="size-4" /> Block</> : <><Flag className="size-4" /> Submit report</>}
+              {safetyOpen === 'block' ? <><Ban className="size-4" /> Block Counsel</> : <><Flag className="size-4" /> Submit Report</>}
             </Button>
           </>
         }
       >
-        <div className="space-y-3">
-          <p className="text-[12.5px] leading-5 text-body">
+        <div className="space-y-4">
+          <p className="text-[13px] leading-relaxed text-[#5b4a3b]">
             {safetyOpen === 'block'
-              ? 'You will no longer receive messages from this advocate. Existing bookings are not cancelled.'
-              : 'Reports are confidential. For an emergency, call 112 instead of reporting here.'}
+              ? 'You will terminate message delivery from this advocate. Prior calendar bookings and court docket entries remain registered in your archive.'
+              : 'Grievance notices remain strictly confidential between citizen and the administrative review committee. For emergency physical danger, dial 112 immediately.'}
           </p>
           {safetyOpen === 'report' && (
-            <div className="flex justify-center">
-              <button type="button" onClick={() => setSafetyOpen('block')} className="text-[11px] font-semibold text-danger hover:underline">
-                I want to block this advocate instead
+            <div className="flex justify-center pt-2">
+              <button type="button" onClick={() => setSafetyOpen('block')} className="font-mono text-[11px] uppercase tracking-wider text-[#9a3424] hover:underline">
+                Proceed to block this advocate instead
               </button>
             </div>
           )}
         </div>
       </Modal>
     </div>
-  )
+  );
 }

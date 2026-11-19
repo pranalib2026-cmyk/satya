@@ -21,16 +21,16 @@ import { PageHeader, Disclaimer } from "@/components/dashboard/shared";
 import { dh } from "@/lib/dashboard-utils";
 
 const actions = [
-  { key: "arrest", label: "Someone is being arrested", icon: ShieldAlert },
-  { key: "domestic_violence", label: "Domestic violence", icon: Siren },
-  { key: "harassment", label: "Harassment or stalking", icon: Phone },
-  { key: "threat", label: "A threat to safety", icon: Siren },
+  { key: "arrest", label: "Impending or Active Arrest", icon: ShieldAlert },
+  { key: "domestic_violence", label: "Domestic Violence & Safety Threat", icon: Siren },
+  { key: "harassment", label: "Stalking, Harassment & Extortion", icon: Phone },
+  { key: "threat", label: "Imminent Physical Harm or Coercion", icon: Siren },
 ] as const;
 
 const helplines = [
-  { number: "112", label: "Emergency police", desc: "Immediate danger, arrest, violence", tone: "danger" },
-  { number: "181", label: "Women helpline", desc: "Domestic violence, safety", tone: "warn" },
-  { number: "15100", label: "Free legal aid", desc: "DLSA / NALSA helpline", tone: "mint" },
+  { number: "112", label: "National Emergency Service", desc: "Immediate police, fire, or ambulance dispatch", tone: "danger" },
+  { number: "181", label: "Women in Distress Helpline", desc: "24/7 emergency response & safety refuge", tone: "warn" },
+  { number: "15100", label: "NALSA Free Legal Aid", desc: "Statutory state legal services authority", tone: "mint" },
 ] as const;
 
 export default function EmergencyPage() {
@@ -39,112 +39,119 @@ export default function EmergencyPage() {
   const info = selected ? emergencyRights[selected] : null;
 
   return (
-    <div className="animate-fade">
+    <div className="animate-fade space-y-6">
       <PageHeader
-        eyebrow="Emergency"
-        title="Get help now"
-        subtitle="This page works without any AI call and is designed for a slow connection. If there is immediate danger, call 112 first."
+        eyebrow="HIGH-PRIORITY CIVIC SAFEGUARD"
+        title="Emergency Legal First-Response"
+        subtitle="Zero-latency statutory information operating offline without LLM dependencies. In immediate physical danger, dial 112 prior to administrative review."
         backTo={dh("/")}
         actions={
           <Badge tone="mint">
-            <WifiOff className="size-3" /> Works on low bandwidth
+            <WifiOff className="size-3 text-[#2a6b3b]" /> Low-Bandwidth 2G Optimized
           </Badge>
         }
       />
 
       {/* Helplines first, always visible */}
-      <section aria-label="Emergency helplines" className="grid gap-3 sm:grid-cols-3">
+      <section aria-label="Emergency statutory helplines" className="grid gap-4 sm:grid-cols-3">
         {helplines.map((h) => (
           <a
             key={h.number}
             href={`tel:${h.number}`}
             className={cn(
-              "group flex items-center gap-3.5 rounded-2xl border p-4 transition hover:-translate-y-0.5 hover:shadow-pop",
-              h.tone === "danger" && "border-danger/25 bg-danger-soft",
-              h.tone === "warn" && "border-warn/25 bg-warn-soft",
-              h.tone === "mint" && "border-dot/25 bg-mint-soft"
+              "group flex items-center gap-4 rounded-[2px] border p-5 transition-all hover:border-[#2a1c12]",
+              h.tone === "danger" && "border-[#9a3424]/40 bg-[#fbf2ef]",
+              h.tone === "warn" && "border-[#b97a29]/40 bg-[#fdf5eb]",
+              h.tone === "mint" && "border-[#2a6b3b]/40 bg-[#f0f7f2]"
             )}
           >
             <span
               className={cn(
-                "grid size-12 shrink-0 place-items-center rounded-2xl text-card-bg",
-                h.tone === "danger" && "bg-danger",
-                h.tone === "warn" && "bg-warn",
-                h.tone === "mint" && "bg-dot"
+                "grid size-12 shrink-0 place-items-center rounded-[2px] text-[#fffaf2]",
+                h.tone === "danger" && "bg-[#9a3424]",
+                h.tone === "warn" && "bg-[#b97a29]",
+                h.tone === "mint" && "bg-[#2a6b3b]"
               )}
             >
               <Phone className="size-5" aria-hidden />
             </span>
             <span className="min-w-0">
-              <span className="block text-[21px] leading-tight font-extrabold">{h.number}</span>
-              <span className="block text-[12px] font-semibold text-ink">{h.label}</span>
-              <span className="block text-[10.5px] text-body">{h.desc}</span>
+              <span className="block font-serif text-[26px] leading-tight font-normal text-[#2a1c12]">{h.number}</span>
+              <span className="block font-medium text-[13px] text-[#2a1c12]">{h.label}</span>
+              <span className="block text-[11px] text-[#5b4a3b]">{h.desc}</span>
             </span>
-            <span className="ml-auto hidden text-[10px] font-bold text-body group-hover:block sm:block">TAP TO CALL</span>
+            <span className="ml-auto hidden font-mono text-[9px] uppercase tracking-wider text-[#85725f] group-hover:text-[#2a1c12] sm:block">DIAL</span>
           </a>
         ))}
       </section>
 
-      <div className="mt-5 grid gap-4 lg:grid-cols-[1fr_340px]">
-        <section className="card p-5 sm:p-6">
+      <div className="grid gap-6 lg:grid-cols-[1fr_340px]">
+        <section className="rounded-[2px] border border-[#e2d5c1] bg-[#fffaf2] p-6 sm:p-8">
           {!info ? (
             <>
-              <h2 className="text-[17px] font-extrabold">What is happening?</h2>
-              <p className="mt-1 text-[12.5px] text-body">Choose the closest situation. This is not a legal intake and nothing is sent to an AI.</p>
-              <div className="mt-4 grid gap-2.5 sm:grid-cols-2">
+              <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#85725f]">Situation Assessment</p>
+              <h2 className="mt-1 font-serif text-[22px] font-normal text-[#2a1c12]">What is the nature of the situation?</h2>
+              <p className="mt-1.5 text-[13px] leading-relaxed text-[#5b4a3b]">
+                Select the nearest category. All responses are parsed deterministically from verified Indian criminal and civic statutes.
+              </p>
+              <div className="mt-6 grid gap-3 sm:grid-cols-2">
                 {actions.map((a) => (
                   <button
                     key={a.key}
                     type="button"
                     onClick={() => setSelected(a.key)}
-                    className="flex min-h-[64px] cursor-pointer items-center gap-3 rounded-xl border border-line p-4 text-left transition hover:border-danger/40 hover:bg-danger-soft/40"
+                    className="flex min-h-[72px] cursor-pointer items-center gap-4 rounded-[2px] border border-[#e2d5c1] bg-[#f4efe6] p-4 text-left transition hover:border-[#9a3424] hover:bg-[#fbf2ef]"
                   >
-                    <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-danger-soft text-danger">
-                      <a.icon className="size-4.5" aria-hidden />
+                    <span className="grid size-10 shrink-0 place-items-center rounded-[2px] border border-[#e2d5c1] bg-[#fffaf2] text-[#9a3424]">
+                      <a.icon className="size-5" aria-hidden />
                     </span>
-                    <span className="flex-1 text-[13px] font-semibold text-ink">{a.label}</span>
-                    <ArrowRight className="size-4 text-muted" aria-hidden />
+                    <span className="flex-1 font-serif text-[14px] font-normal text-[#2a1c12]">{a.label}</span>
+                    <ArrowRight className="size-4 text-[#85725f]" aria-hidden />
                   </button>
                 ))}
               </div>
-              <div className="mt-4 flex items-start gap-2 rounded-xl bg-brand-tint p-3.5">
-                <Siren className="mt-0.5 size-4 shrink-0 text-danger" aria-hidden />
-                <p className="text-[11.5px] leading-5 text-body">
-                  If someone’s life is in danger, do not read further. Call <a href="tel:112" className="font-bold text-danger underline">112</a> now.
+              <div className="mt-6 flex items-start gap-3 rounded-[2px] border border-[#9a3424]/30 bg-[#fbf2ef] p-4">
+                <Siren className="mt-0.5 size-4.5 shrink-0 text-[#9a3424]" aria-hidden />
+                <p className="text-[12px] leading-relaxed text-[#7a2517]">
+                  If immediate violence is unfolding, dismiss this browser and dial <a href="tel:112" className="font-bold underline">112</a> without delay.
                 </p>
               </div>
             </>
           ) : (
             <>
-              <button type="button" onClick={() => setSelected(null)} className="mb-3 inline-flex cursor-pointer items-center gap-1 text-[12px] font-semibold text-body hover:text-ink">
-                <ArrowLeft className="size-3.5" aria-hidden /> Choose another situation
+              <button
+                type="button"
+                onClick={() => setSelected(null)}
+                className="mb-4 inline-flex cursor-pointer items-center gap-1.5 font-mono text-[11px] uppercase tracking-wider text-[#85725f] hover:text-[#2a1c12]"
+              >
+                <ArrowLeft className="size-3.5" aria-hidden /> Re-select situation
               </button>
-              <div className="rounded-2xl bg-danger-soft p-4">
-                <h2 className="text-[19px] font-extrabold text-danger">{info.title}</h2>
-                <p className="mt-1 text-[12.5px] leading-5.5 text-danger/90">{info.summary}</p>
+              <div className="rounded-[2px] border border-[#9a3424]/30 bg-[#fbf2ef] p-5">
+                <h2 className="font-serif text-[22px] font-normal text-[#7a2517]">{info.title}</h2>
+                <p className="mt-1.5 text-[13px] leading-relaxed text-[#7a2517]">{info.summary}</p>
               </div>
 
-              <div className="mt-4 grid gap-4 sm:grid-cols-2">
+              <div className="mt-6 grid gap-6 sm:grid-cols-2">
                 <div>
-                  <h3 className="flex items-center gap-1.5 text-[12.5px] font-bold">
-                    <BadgeCheck className="size-4 text-dot" aria-hidden /> Your rights
+                  <h3 className="flex items-center gap-2 font-serif text-[16px] font-normal text-[#2a1c12]">
+                    <BadgeCheck className="size-4 text-[#2a6b3b]" aria-hidden /> Fundamental Rights
                   </h3>
-                  <ul className="mt-2 space-y-2">
+                  <ul className="mt-3 space-y-2.5">
                     {info.rights.map((r) => (
-                      <li key={r} className="flex gap-2 text-[11.5px] leading-5 text-body">
-                        <span className="mt-1.5 size-1 shrink-0 rounded-full bg-danger" aria-hidden /> {r}
+                      <li key={r} className="flex gap-2.5 text-[12.5px] leading-relaxed text-[#5b4a3b]">
+                        <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-[#9a3424]" aria-hidden /> {r}
                       </li>
                     ))}
                   </ul>
                 </div>
                 <div>
-                  <h3 className="flex items-center gap-1.5 text-[12.5px] font-bold">
-                    <Siren className="size-4 text-danger" aria-hidden /> First steps
+                  <h3 className="flex items-center gap-2 font-serif text-[16px] font-normal text-[#2a1c12]">
+                    <Siren className="size-4 text-[#9a3424]" aria-hidden /> Immediate Protocol
                   </h3>
-                  <ol className="mt-2 space-y-2">
+                  <ol className="mt-3 space-y-2.5">
                     {info.firstSteps.map((s, i) => (
-                      <li key={s} className="flex gap-2 text-[11.5px] leading-5 text-body">
-                        <span className="grid size-4 shrink-0 place-items-center rounded-full bg-danger text-[9px] font-bold text-card-bg">{i + 1}</span>
+                      <li key={s} className="flex gap-2.5 text-[12.5px] leading-relaxed text-[#5b4a3b]">
+                        <span className="grid size-4 shrink-0 place-items-center rounded-[2px] bg-[#2a1c12] font-mono text-[9px] font-medium text-[#fffaf2]">{i + 1}</span>
                         {s}
                       </li>
                     ))}
@@ -152,76 +159,76 @@ export default function EmergencyPage() {
                 </div>
               </div>
 
-              <div className="mt-5 flex flex-col gap-2 border-t border-line pt-4 sm:flex-row">
+              <div className="mt-6 flex flex-col gap-3 border-t border-[#e2d5c1] pt-6 sm:flex-row">
                 <a
                   href={`tel:${info.helpline}`}
-                  className="inline-flex h-12 flex-1 items-center justify-center gap-2 rounded-xl bg-danger text-[13px] font-bold text-card-bg transition hover:bg-brand-dark"
+                  className="inline-flex h-11 flex-1 items-center justify-center gap-2 rounded-[2px] bg-[#9a3424] font-mono text-[11px] uppercase tracking-wider text-[#fffaf2] transition hover:bg-[#7a2517]"
                 >
-                  <Phone className="size-4" aria-hidden /> Call {info.helpline} now
+                  <Phone className="size-4" aria-hidden /> Dial {info.helpline} Immediately
                 </a>
                 <Link
                   href={dh("/advocates")}
-                  className="inline-flex h-12 flex-1 items-center justify-center gap-2 rounded-xl bg-brand text-[13px] font-bold text-card-bg transition hover:bg-brand-dark"
+                  className="inline-flex h-11 flex-1 items-center justify-center gap-2 rounded-[2px] bg-[#2a1c12] font-mono text-[11px] uppercase tracking-wider text-[#fffaf2] transition hover:bg-[#3d2b1f]"
                 >
-                  <Scale className="size-4" aria-hidden /> Connect an advocate urgently
+                  <Scale className="size-4" aria-hidden /> Urgent Advocate Consult
                 </Link>
               </div>
               <button
                 type="button"
                 onClick={() => router.push(dh("/triage"))}
-                className="mt-2 inline-flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-xl border border-line py-2.5 text-[11.5px] font-semibold text-body hover:bg-brand-tint"
+                className="mt-3 inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-[2px] border border-[#e2d5c1] bg-[#fffaf2] py-2.5 font-mono text-[11px] uppercase tracking-wider text-[#5b4a3b] hover:border-[#9a6a35] hover:text-[#2a1c12] transition-colors"
               >
-                <Handshake className="size-3.5" aria-hidden /> Contact legal aid instead
+                <Handshake className="size-4 text-[#9a6a35]" aria-hidden /> Access Free Legal Aid (DLSA) Pathway
               </button>
             </>
           )}
         </section>
 
-        <aside className="space-y-4">
-          <div className="rounded-2xl border border-danger/20 bg-danger-soft p-4">
-            <p className="flex items-center gap-1.5 text-[12px] font-bold text-danger">
-              <Siren className="size-4" aria-hidden /> If you are in danger
+        <aside className="space-y-6">
+          <div className="rounded-[2px] border border-[#9a3424]/40 bg-[#fbf2ef] p-6">
+            <p className="flex items-center gap-2 font-serif text-[16px] font-normal text-[#7a2517]">
+              <Siren className="size-4" aria-hidden /> Immediate Threat Protocol
             </p>
-            <p className="mt-1.5 text-[11.5px] leading-5 text-danger/90">
-              Call 112. You can also walk into the nearest police station or ask a protection officer for help. Keep
-              your phone charged and share your location with a trusted person.
+            <p className="mt-2 text-[12px] leading-relaxed text-[#7a2517]">
+              Dial 112. You hold the statutory right under Article 22 of the Constitution to communicate with counsel upon apprehension and to demand appearance before a Magistrate within 24 hours.
             </p>
-            <a href="tel:112" className="mt-3 flex h-11 items-center justify-center gap-2 rounded-xl bg-danger text-[13px] font-bold text-card-bg">
-              <Phone className="size-4" aria-hidden /> Call 112
+            <a href="tel:112" className="mt-4 flex h-10 items-center justify-center gap-2 rounded-[2px] bg-[#9a3424] font-mono text-[11px] uppercase tracking-wider text-[#fffaf2]">
+              <Phone className="size-4" aria-hidden /> Emergency 112
             </a>
           </div>
 
-          <div className="card p-4">
-            <p className="text-[11.5px] font-bold">No AI is used on this page</p>
-            <ul className="mt-2 space-y-1.5 text-[11px] leading-5 text-body">
-              <li>· Helplines are static links.</li>
-              <li>· Rights summaries are pre-written and reviewed.</li>
-              <li>· No chat, no model call, no document upload.</li>
-              <li>· Works on a 2G connection.</li>
+          <div className="rounded-[2px] border border-[#e2d5c1] bg-[#fffaf2] p-6">
+            <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#85725f]">Deterministic Engine</p>
+            <h3 className="mt-1 font-serif text-[16px] font-normal text-[#2a1c12]">No AI Execution on This Route</h3>
+            <ul className="mt-3 space-y-2 font-mono text-[11px] text-[#5b4a3b]">
+              <li>• Direct carrier telephone hooks</li>
+              <li>• Verified statutory constitutional rights</li>
+              <li>• Zero external LLM token overhead</li>
+              <li>• Guaranteed low-latency execution</li>
             </ul>
           </div>
 
-          <div className="rounded-2xl bg-brand-tint p-4">
-            <p className="text-[11.5px] font-bold">After the immediate danger</p>
-            <p className="mt-1 text-[11px] leading-5 text-body">
-              You can record what happened in the app, keep documents safe, and track deadlines. Nothing is shared
-              without your consent.
+          <div className="rounded-[2px] border border-[#e2d5c1] bg-[#ebe1d1]/30 p-6">
+            <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#85725f]">Post-Resolution</p>
+            <h3 className="mt-1 font-serif text-[16px] font-normal text-[#2a1c12]">Subsequent Evidence Preservation</h3>
+            <p className="mt-2 text-[12px] leading-relaxed text-[#5b4a3b]">
+              Once physical safety is established, record incident specifics and secure station diary receipts in your vault.
             </p>
-            <Link href={dh("/vault")} className="mt-2 inline-flex items-center gap-1 text-[11px] font-semibold text-brand hover:underline">
-              Open document vault <ArrowRight className="size-3" aria-hidden />
+            <Link href={dh("/vault")} className="mt-3 inline-flex items-center gap-1 font-mono text-[11px] uppercase tracking-wide text-[#9a6a35] hover:underline">
+              Access Encrypted Vault <ArrowRight className="size-3.5" aria-hidden />
             </Link>
           </div>
 
-          <Disclaimer variant="banner" text="Rights summaries are general information. They are not legal advice and may not cover your specific facts." />
+          <Disclaimer variant="banner" text="Statutory constitutional principles are provided for civic awareness. Contact an enrolled advocate for judicial representation before the magistrate." />
         </aside>
       </div>
 
-      <div className="mt-4 flex flex-wrap gap-2 text-[11px] text-muted">
-        <Link href={dh("/profile")} className="hover:underline">Grievance officer</Link>
+      <div className="flex flex-wrap gap-4 pt-2 font-mono text-[11px] text-[#85725f]">
+        <Link href={dh("/profile")} className="hover:text-[#2a1c12] hover:underline">Grievance Desk</Link>
         <span>·</span>
-        <Link href={dh("/profile")} className="hover:underline">Privacy & consent</Link>
+        <Link href={dh("/profile")} className="hover:text-[#2a1c12] hover:underline">DPDP Data Sovereign Rights</Link>
         <span>·</span>
-        <a href="tel:15100" className="hover:underline">DLSA 15100</a>
+        <a href="tel:15100" className="hover:text-[#2a1c12] hover:underline">NALSA Helpline 15100</a>
       </div>
     </div>
   );

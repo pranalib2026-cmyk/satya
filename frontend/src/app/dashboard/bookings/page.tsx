@@ -25,92 +25,98 @@ const statusTone = {
 
 export default function BookingsPage() {
   const router = useRouter();
-  const [bookings, setBookings] = useState<Booking[]>([])
-  const [tab, setTab] = useState<'upcoming' | 'past'>('upcoming')
+  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [tab, setTab] = useState<'upcoming' | 'past'>('upcoming');
 
   useEffect(() => {
-    void listBookings().then(setBookings)
-  }, [])
+    void listBookings().then(setBookings);
+  }, []);
 
-  const upcoming = bookings.filter((b) => b.status === 'confirmed' || b.status === 'pending_payment')
-  const past = bookings.filter((b) => b.status === 'completed' || b.status === 'cancelled' || b.status === 'refunded')
-  const list = tab === 'upcoming' ? upcoming : past
+  const upcoming = bookings.filter((b) => b.status === 'confirmed' || b.status === 'pending_payment');
+  const past = bookings.filter((b) => b.status === 'completed' || b.status === 'cancelled' || b.status === 'refunded');
+  const list = tab === 'upcoming' ? upcoming : past;
 
   return (
-    <div className="animate-fade">
+    <div className="animate-fade space-y-6">
       <PageHeader
-        eyebrow="Bookings"
-        title="Your consultations"
-        subtitle="Upcoming appointments, past consultations and feedback. Payment is mocked in this build."
+        eyebrow="CONSULTATION REGISTER"
+        title="Scheduled Consultations"
+        subtitle="Permanent ledger of booked sessions, past advocate deliberations, and verified evaluations."
         backTo={dh('/')}
       />
 
-      <div className="mb-4 flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#e2d5c1] pb-4">
         <Tabs
           value={tab}
           onChange={setTab}
           options={[
-            { value: 'upcoming', label: 'Upcoming', count: upcoming.length },
-            { value: 'past', label: 'Past', count: past.length },
+            { value: 'upcoming', label: 'Upcoming Dockets', count: upcoming.length },
+            { value: 'past', label: 'Concluded Proceedings', count: past.length },
           ]}
         />
         <Button size="sm" variant="secondary" onClick={() => router.push(dh('/advocates'))}>
-          Book another
+          Schedule Additional Hearing
         </Button>
       </div>
 
       {list.length === 0 ? (
         <EmptyState
-          icon={<CalendarClock className="size-5" />}
-          title={tab === 'upcoming' ? 'No upcoming consultations' : 'No past consultations'}
-          body="Find a verified advocate and book a 30-minute consultation."
-          action={<Button onClick={() => router.push(dh('/advocates'))}>Find an advocate</Button>}
+          icon={<CalendarClock className="size-5 text-[#9a6a35]" />}
+          title={tab === 'upcoming' ? 'No Active Hearings Scheduled' : 'No Concluded Hearings'}
+          body="Identify an enrolled advocate matched to your legal forum and reserve a 30-minute conference."
+          action={<Button onClick={() => router.push(dh('/advocates'))}>Explore Advocate Roll</Button>}
         />
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-4">
           {list.map((b) => (
-            <div key={b.id} className="card p-4 sm:p-5">
-              <div className="flex flex-wrap items-start justify-between gap-3">
-                <div className="flex items-start gap-3">
-                  <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-brand-soft text-[12px] font-extrabold text-brand-dark">
+            <div key={b.id} className="rounded-[2px] border border-[#e2d5c1] bg-[#fffaf2] p-5 sm:p-6 transition hover:border-[#9a6a35]">
+              <div className="flex flex-wrap items-start justify-between gap-4">
+                <div className="flex items-start gap-4">
+                  <span className="grid size-12 shrink-0 place-items-center rounded-[2px] border border-[#e2d5c1] bg-[#f4efe6] font-mono text-[14px] font-medium text-[#2a1c12]">
                     {new Date(b.date).getDate()}
                   </span>
                   <div>
-                    <p className="text-[14px] font-bold">Adv. {b.advocateName}</p>
-                    <p className="mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11.5px] text-body">
-                      <span className="inline-flex items-center gap-1"><CalendarPlus className="size-3.5" aria-hidden /> {formatDate(b.date, { day: 'numeric', month: 'short' })}</span>
-                      <span className="inline-flex items-center gap-1"><Clock className="size-3.5" aria-hidden /> {b.time}</span>
+                    <h3 className="font-serif text-[18px] font-normal text-[#2a1c12]">Adv. {b.advocateName}</h3>
+                    <p className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-[12.5px] text-[#5b4a3b]">
+                      <span className="inline-flex items-center gap-1.5 font-medium text-[#2a1c12]">
+                        <CalendarPlus className="size-3.5 text-[#9a6a35]" aria-hidden />
+                        {formatDate(b.date, { day: 'numeric', month: 'short' })}
+                      </span>
+                      <span className="inline-flex items-center gap-1.5">
+                        <Clock className="size-3.5 text-[#85725f]" aria-hidden />
+                        {b.time}
+                      </span>
                       <span className="capitalize">{b.mode.replace('-', ' ')}</span>
                     </p>
-                    <p className="mt-1 text-[10.5px] text-muted">Ref {b.id} · {formatInr(b.amount)}</p>
+                    <p className="mt-1.5 font-mono text-[11px] text-[#85725f]">Docket Ref: #{b.id} · Fee: {formatInr(b.amount)}</p>
                   </div>
                 </div>
-                <Badge tone={statusTone[b.status]}>{b.status.replace('_', ' ')}</Badge>
+                <Badge tone={statusTone[b.status]}>{b.status.replace('_', ' ').toUpperCase()}</Badge>
               </div>
 
-              <div className="mt-3 flex flex-wrap gap-2">
+              <div className="mt-4 flex flex-wrap items-center gap-2.5 pt-4 border-t border-[#e2d5c1]">
                 {b.status === 'confirmed' && (
                   <>
                     <Button size="sm" onClick={() => router.push(dh('/messages'))}>
-                      <MessageSquare className="size-3.5" aria-hidden /> Open messages
+                      <MessageSquare className="size-3.5" aria-hidden /> Enter Chambers Messages
                     </Button>
                     <Button size="sm" variant="secondary" onClick={() => downloadIcs(b)}>
-                      <Download className="size-3.5" aria-hidden /> Add to calendar
+                      <Download className="size-3.5" aria-hidden /> Add to Calendar
                     </Button>
                   </>
                 )}
                 {b.status === 'completed' && !b.feedbackGiven && (
                   <Button size="sm" onClick={() => router.push(dh(`/feedback/${b.id}`))}>
-                    <Star className="size-3.5" aria-hidden /> Leave feedback
+                    <Star className="size-3.5" aria-hidden /> Record Verified Evaluation
                   </Button>
                 )}
                 {b.status === 'completed' && b.feedbackGiven && (
-                  <p className="flex items-center gap-1.5 text-[11.5px] font-medium text-body">
-                    <CheckCircle2 className="size-3.5 text-dot" aria-hidden /> Feedback submitted. Thank you.
+                  <p className="flex items-center gap-1.5 text-[12px] font-medium text-[#2a6b3b]">
+                    <CheckCircle2 className="size-3.5" aria-hidden /> Evaluation registered.
                   </p>
                 )}
                 <Button size="sm" variant="ghost" onClick={() => router.push(dh(`/booking/${b.advocateId}`))}>
-                  Book again
+                  Re-schedule Slot
                 </Button>
               </div>
             </div>
@@ -118,10 +124,10 @@ export default function BookingsPage() {
         </div>
       )}
 
-      <p className="mt-5 text-[11px] text-muted">
-        Need to change a booking? Message the advocate or write to{' '}
-        <Link href={dh('/profile')} className="font-semibold text-brand hover:underline">grievances</Link>.
+      <p className="font-mono text-[11px] text-[#85725f]">
+        Procedural notice: to modify an authorized booking, message the advocate directly or contact the{' '}
+        <Link href={dh('/profile')} className="font-medium text-[#9a6a35] underline underline-offset-4 hover:text-[#2a1c12]">grievance officer</Link>.
       </p>
     </div>
-  )
+  );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -16,268 +16,271 @@ import {
   Siren,
   Sparkles,
 } from "lucide-react";
-import { Button, Card, Badge, Field, Input, Select } from "@/components/dashboard/ui";
+import { Button, Badge, Field, Input, Select } from "@/components/dashboard/ui";
 import { Disclaimer, PageHeader } from "@/components/dashboard/shared";
 import { loadCaseProfile } from "@/services/dashboard/intake";
-import { runTriage } from "@/services/dashboard/triage";
+import { getTriage, runTriage } from "@/services/dashboard/triage";
 import { cases, dlsa } from "@/data/dashboard-mock-data";
-import type { TriagePath } from "@/types/dashboard";
+import type { TriagePath, TriageResult } from "@/types/dashboard";
 import { cn } from "@/lib/utils";
 import { dh } from "@/lib/dashboard-utils";
 
 const ICONS = {
-  'self-help': FileText,
-  'legal-aid': Handshake,
+  "self-help": FileText,
+  "legal-aid": Handshake,
   advocate: Scale,
   emergency: Siren,
-} as const
-
-const TONES: Record<TriagePath['key'], string> = {
-  'self-help': 'bg-mint text-dot',
-  'legal-aid': 'bg-warn-soft text-warn',
-  advocate: 'bg-brand-soft text-brand',
-  emergency: 'bg-danger-soft text-danger',
-}
+} as const;
 
 export default function TriagePage() {
-  const router = useRouter()
-  const profile = loadCaseProfile() ?? cases[0]
-  const [result] = useState(() => runTriage({ profile, annualIncome: 600000 }))
-  const [selected, setSelected] = useState<TriagePath['key']>(result.recommended)
+  const router = useRouter();
+  const profile = loadCaseProfile() ?? cases[0];
+  const [result, setResult] = useState<TriageResult>(() => runTriage({ profile, annualIncome: 600000 }));
+  const [selected, setSelected] = useState<TriagePath["key"]>(result.recommended);
 
-  const [income, setIncome] = useState('')
-  const [category, setCategory] = useState('general')
-  const [checked, setChecked] = useState(false)
+  useEffect(() => {
+    getTriage(profile, 600000)
+      .then((res) => {
+        setResult(res);
+        setSelected(res.recommended);
+      })
+      .catch(() => {});
+  }, [profile]);
+
+  const [income, setIncome] = useState("");
+  const [category, setCategory] = useState("general");
+  const [checked, setChecked] = useState(false);
 
   const eligible =
-    category !== 'general' || (!!income && Number(income.replace(/[^\d]/g, '')) <= 300000)
+    category !== "general" || (!!income && Number(income.replace(/[^\d]/g, "")) <= 300000);
 
-  const path = result.paths.find((p) => p.key === selected) ?? result.paths[0]
+  const path = result.paths.find((p) => p.key === selected) ?? result.paths[0];
 
   return (
-    <div className="animate-fade">
+    <div className="space-y-6 animate-fade">
       <PageHeader
-        eyebrow="Triage result"
-        title="What we suggest you do next"
-        subtitle="Based on your case profile and a fixed set of rules — not an AI guess, and no payment influence."
-        backTo={dh('/intake')}
+        eyebrow="Structured Triage Output"
+        title="Recommended Statutory Course of Action"
+        subtitle="Determined via deterministic statutory limitation rules and court jurisdiction thresholds — zero commercial bias."
+        backTo={dh("/intake")}
         actions={
           <Badge tone="brand" className="h-7">
-            <Sparkles className="size-3" aria-hidden /> {Math.round(result.confidence * 100)}% confidence
+            <Sparkles className="size-3 mr-1" aria-hidden /> {Math.round(result.confidence * 100)}% Match Confidence
           </Badge>
         }
       />
 
-      <div className="mb-5 rounded-2xl border border-line bg-brand-tint p-4">
-        <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-[12px]">
-          <p><span className="font-semibold text-ink">Case:</span> {profile.title}</p>
-          <p><span className="font-semibold text-ink">Urgency:</span> {profile.urgency}</p>
-          <p><span className="font-semibold text-ink">Complexity:</span> {profile.complexity.replaceAll('-', ' ')}</p>
-          <Link href={dh("/intake")} className="ml-auto font-semibold text-brand hover:underline">
-            Edit case profile
+      {/* Case Assessment Summary Strip */}
+      <div className="rounded-[2px] border border-[#e2d5c1] bg-[#fffaf2] p-5 shadow-[0_1px_2px_rgba(42,28,18,0.04)]">
+        <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 text-xs border-b border-[#e2d5c1]/60 pb-3">
+          <p><span className="font-sans uppercase tracking-[0.08em] text-[#85725f] font-semibold">Matter:</span> <strong className="text-[#2a1c12] font-semibold">{profile.title}</strong></p>
+          <p><span className="font-sans uppercase tracking-[0.08em] text-[#85725f] font-semibold">Urgency:</span> <strong className="text-[#2a1c12] font-semibold uppercase">{profile.urgency}</strong></p>
+          <p><span className="font-sans uppercase tracking-[0.08em] text-[#85725f] font-semibold">Complexity:</span> <strong className="text-[#2a1c12] font-semibold capitalize">{profile.complexity.replaceAll("-", " ")}</strong></p>
+          <Link href={dh("/intake")} className="font-semibold text-[#9a6a35] hover:underline text-xs">
+            Edit Case Intake
           </Link>
         </div>
-        <div className="mt-2.5 flex flex-wrap gap-1.5">
+        <div className="mt-3 flex flex-wrap gap-1.5">
           {result.rules.map((r) => (
-            <span key={r} className="rounded-full bg-card-bg px-2.5 py-1 text-[10.5px] font-medium text-body ring-1 ring-line">
+            <span key={r} className="rounded-[2px] border border-[#e2d5c1] bg-[#ebe1d1]/40 px-2.5 py-1 text-[11px] font-mono text-[#5b4a3b]">
               {r}
             </span>
           ))}
         </div>
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-2">
+      {/* Four Triage Paths Grid */}
+      <div className="grid gap-4 sm:grid-cols-2">
         {result.paths.map((p) => {
-          const Icon = ICONS[p.key]
-          const active = selected === p.key
+          const Icon = ICONS[p.key];
+          const active = selected === p.key;
           return (
             <button
               type="button"
               key={p.key}
               onClick={() => setSelected(p.key)}
               className={cn(
-                'relative flex flex-col rounded-2xl border p-4 text-left transition sm:p-5',
+                "relative flex flex-col rounded-[2px] border p-5 text-left transition-all duration-150 cursor-pointer shadow-[0_1px_2px_rgba(42,28,18,0.04)]",
                 active
-                  ? 'border-brand bg-card-bg shadow-pop ring-4 ring-brand/10'
-                  : 'border-line bg-card-bg hover:border-brand/30',
+                  ? "border-[#2a1c12] bg-[#fffaf2] ring-1 ring-[#2a1c12] shadow-[0_4px_20px_rgba(42,28,18,0.06)]"
+                  : "border-[#e2d5c1] bg-[#fffaf2] hover:border-[#cfbe9e]"
               )}
               aria-pressed={active}
             >
               {p.recommended && (
-                <span className="absolute top-3.5 right-3.5 rounded-full bg-mint px-2 py-0.5 text-[10px] font-bold text-dot">
-                  Recommended
+                <span className="absolute top-4 right-4 rounded-[2px] border border-[#e2d5c1] bg-[#dceada]/70 px-2 py-0.5 text-[10px] font-sans uppercase tracking-[0.1em] font-semibold text-[#2e7d32]">
+                  Recommended Next Step
                 </span>
               )}
-              <span className={cn('grid size-10 place-items-center rounded-xl', TONES[p.key])}>
-                <Icon className="size-5" aria-hidden />
+              <span className="grid size-9 place-items-center rounded-[2px] border border-[#e2d5c1] bg-[#ebe1d1]/50 text-[#9a6a35]">
+                <Icon className="size-4.5" aria-hidden />
               </span>
-              <h3 className="mt-3 text-[15.5px] font-bold">{p.title}</h3>
-              <p className="mt-1 text-[12.5px] leading-5 text-body">{p.description}</p>
+              <h3 className="mt-3 font-serif text-[18px] sm:text-[20px] font-normal leading-snug text-[#2a1c12]">
+                {p.title}
+              </h3>
+              <p className="mt-1 text-xs sm:text-[13px] leading-relaxed text-[#5b4a3b]">{p.description}</p>
               {p.recommended && (
-                <p className="mt-2.5 rounded-lg bg-mint-soft px-2.5 py-2 text-[11.5px] leading-4.5 text-dot">
-                  <span className="font-bold">Why we suggest this: </span>
+                <div className="mt-3 rounded-[2px] border border-[#e2d5c1] bg-[#ebe1d1]/30 p-2.5 text-[11.5px] leading-relaxed text-[#5b4a3b]">
+                  <span className="font-semibold text-[#2a1c12]">Statutory Reason: </span>
                   {p.reason}
-                </p>
+                </div>
               )}
-              <span className="mt-auto pt-3 text-[11.5px] font-bold text-brand">Select this path →</span>
+              <span className="mt-auto pt-4 text-xs font-semibold text-[#9a6a35] flex items-center gap-1">
+                Select Course of Action →
+              </span>
             </button>
-          )
+          );
         })}
       </div>
 
-      {/* Selected path detail */}
-      <Card className="mt-4 p-5 sm:p-6">
-        <div className="flex flex-wrap items-start justify-between gap-3">
+      {/* Selected Path Action Panel */}
+      <div className="rounded-[2px] border border-[#e2d5c1] bg-[#fffaf2] p-6 sm:p-7 shadow-[0_1px_2px_rgba(42,28,18,0.04)]">
+        <div className="flex flex-wrap items-start justify-between gap-3 pb-4 border-b border-[#e2d5c1]/60">
           <div>
-            <p className="text-[10.5px] font-bold tracking-[0.14em] text-muted uppercase">You selected</p>
-            <h2 className="mt-1 text-[19px] font-extrabold">{path.title}</h2>
+            <p className="text-[10.5px] font-sans uppercase tracking-[0.14em] font-semibold text-[#85725f]">Active Selection</p>
+            <h2 className="mt-1 font-serif text-[22px] sm:text-[24px] font-normal text-[#2a1c12]">{path.title}</h2>
           </div>
-          <Badge tone={selected === result.recommended ? 'mint' : 'neutral'}>
-            {selected === result.recommended ? 'Our recommendation' : 'Your choice'}
+          <Badge tone={selected === result.recommended ? "mint" : "neutral"}>
+            {selected === result.recommended ? "System Recommendation" : "Citizen Discretion"}
           </Badge>
         </div>
 
-        {selected === 'self-help' && (
-          <div className="mt-4 grid gap-4 sm:grid-cols-[1fr_auto] sm:items-end">
-            <div>
-              <p className="text-[13px] leading-6 text-body">
-                Start with a reviewed template. Send a legal notice or file an RTI/consumer complaint yourself. The
-                template includes where to file, the fee and the documents to attach.
+        {selected === "self-help" && (
+          <div className="mt-5 grid gap-5 sm:grid-cols-[1fr_auto] sm:items-end">
+            <div className="space-y-1.5">
+              <p className="text-xs sm:text-[13.5px] leading-relaxed text-[#5b4a3b]">
+                Access vetted draft notices and statutory forms. File complaints directly before Consumer Commissions, Rent Controllers, or send formal legal demands without initial retainer costs.
               </p>
-              <p className="mt-2 text-[11px] text-muted">Templates are drafts. Advocate review is recommended before filing.</p>
+              <p className="text-[11.5px] text-[#85725f]">Templates contain statutory limitation warnings and filing checklists.</p>
             </div>
-            <Button onClick={() => router.push(dh('/self-help'))}>
-              Open self-help tools <ArrowRight className="size-4" aria-hidden />
+            <Button variant="primary" size="md" onClick={() => router.push(dh("/self-help"))}>
+              Open Self-Help Library <ArrowRight className="size-4 ml-1" />
             </Button>
           </div>
         )}
 
-        {selected === 'advocate' && (
-          <div className="mt-4 grid gap-4 sm:grid-cols-[1fr_auto] sm:items-end">
-            <div>
-              <p className="text-[13px] leading-6 text-body">
-                Get matched with verified advocates who practise in your forum, speak your language and fit your
-                budget. You will see a plain-language reason for every match.
+        {selected === "advocate" && (
+          <div className="mt-5 grid gap-5 sm:grid-cols-[1fr_auto] sm:items-end">
+            <div className="space-y-1.5">
+              <p className="text-xs sm:text-[13.5px] leading-relaxed text-[#5b4a3b]">
+                Connect with advocates verified on State Bar rolls matching your exact court jurisdiction, language, and budget parameters. Detailed reasoning is disclosed for every match.
               </p>
-              <p className="mt-2 flex items-center gap-1.5 text-[11px] text-muted">
-                <Info className="size-3.5" aria-hidden /> Payment never affects ranking.
+              <p className="flex items-center gap-1 text-[11.5px] text-[#85725f]">
+                <Info className="size-3.5 text-[#9a6a35]" aria-hidden /> Bar Council of India Rule 36 compliant non-advertising directory.
               </p>
             </div>
-            <Button onClick={() => router.push(dh('/advocates'))}>
-              Find advocates near me <ArrowRight className="size-4" aria-hidden />
+            <Button variant="primary" size="md" onClick={() => router.push(dh("/advocates"))}>
+              Match Verified Advocates <ArrowRight className="size-4 ml-1" />
             </Button>
           </div>
         )}
 
-        {selected === 'emergency' && (
-          <div className="mt-4 grid gap-4 sm:grid-cols-[1fr_auto] sm:items-end">
+        {selected === "emergency" && (
+          <div className="mt-5 grid gap-5 sm:grid-cols-[1fr_auto] sm:items-end">
             <div>
-              <p className="text-[13px] leading-6 text-body">
-                If there is immediate danger, do not wait for an AI answer. Call 112 now. The emergency page works
-                without AI, on a slow connection, and lists 112, 181 and 15100.
+              <p className="text-xs sm:text-[13.5px] leading-relaxed text-[#5b4a3b]">
+                In situations of immediate bodily harm, domestic violence, or unlawful custody, bypass online assessments and dial state emergency helplines directly.
               </p>
             </div>
-            <Button variant="danger" onClick={() => router.push(dh('/emergency'))}>
-              <Siren className="size-4" aria-hidden /> Open emergency help
+            <Button variant="danger" size="md" onClick={() => router.push(dh("/emergency"))}>
+              <Siren className="size-4 mr-1" /> Call Helpline: 112 / 181
             </Button>
           </div>
         )}
 
-        {selected === 'legal-aid' && (
-          <div className="mt-4">
-            <p className="text-[13px] leading-6 text-body">
-              Free representation may be available through the District Legal Services Authority. Check the short
-              eligibility criteria below.
+        {selected === "legal-aid" && (
+          <div className="mt-5 space-y-4">
+            <p className="text-xs sm:text-[13.5px] leading-relaxed text-[#5b4a3b]">
+              Free advocate representation and waiver of court fees is guaranteed by statute under the Legal Services Authorities Act, 1987. Check preliminary eligibility below.
             </p>
 
-            <div className="mt-4 grid gap-3 sm:grid-cols-[1fr_1fr_auto] sm:items-end">
-              <Field label="Annual household income" htmlFor="income">
+            <div className="grid gap-3 sm:grid-cols-[1fr_1fr_auto] sm:items-end">
+              <Field label="Annual Household Income (₹)" htmlFor="income">
                 <Input
                   id="income"
                   inputMode="numeric"
                   placeholder="e.g. 240000"
                   value={income}
                   onChange={(e) => {
-                    setIncome(e.target.value)
-                    setChecked(false)
+                    setIncome(e.target.value);
+                    setChecked(false);
                   }}
                 />
               </Field>
-              <Field label="Category" htmlFor="category">
+              <Field label="Social Category" htmlFor="category">
                 <Select
                   id="category"
                   value={category}
                   onChange={(e) => {
-                    setCategory(e.target.value)
-                    setChecked(false)
+                    setCategory(e.target.value);
+                    setChecked(false);
                   }}
                 >
-                  <option value="general">General</option>
-                  <option value="scst">Scheduled Caste / Scheduled Tribe</option>
-                  <option value="woman">Woman</option>
-                  <option value="child">Child</option>
-                  <option value="disability">Person with disability</option>
-                  <option value="custody">Person in custody</option>
+                  <option value="general">General Category</option>
+                  <option value="scst">Scheduled Caste / Scheduled Tribe (Automatic Eligibility)</option>
+                  <option value="woman">Woman / Child (Automatic Eligibility)</option>
+                  <option value="disability">Person with Disability (Automatic Eligibility)</option>
+                  <option value="custody">Person in Custody</option>
                 </Select>
               </Field>
-              <Button variant="secondary" onClick={() => setChecked(true)} disabled={!income && category === 'general'}>
-                Check eligibility
+              <Button variant="secondary" onClick={() => setChecked(true)} disabled={!income && category === "general"}>
+                Verify Eligibility
               </Button>
             </div>
 
             {checked && (
-              <div className={cn('mt-4 rounded-2xl border p-4', eligible ? 'border-dot/30 bg-mint-soft' : 'border-line bg-brand-tint')}>
-                <p className="flex items-center gap-1.5 text-[13px] font-bold text-ink">
-                  {eligible ? <CheckCircle2 className="size-4 text-dot" /> : <Info className="size-4 text-muted" />}
-                  {eligible ? 'You may be eligible for free legal aid' : 'Free legal aid may not apply on these facts'}
+              <div className={cn("rounded-[2px] border p-4 text-xs leading-relaxed", eligible ? "border-[#e2d5c1] bg-[#dceada]/50 text-[#1e5623]" : "border-[#e2d5c1] bg-[#ebe1d1]/40 text-[#5b4a3b]")}>
+                <p className="flex items-center gap-1.5 font-semibold text-sm">
+                  {eligible ? <CheckCircle2 className="size-4 text-[#2e7d32]" /> : <Info className="size-4 text-[#85725f]" />}
+                  {eligible ? "Eligible for Free Legal Services (Sec 12, LSA Act)" : "Standard Income Limit Exceeded"}
                 </p>
-                <p className="mt-1 text-[12px] leading-5 text-body">
+                <p className="mt-1 text-xs">
                   {eligible
-                    ? 'Bring an identity proof, address proof and any documents about your case to the DLSA front office. Eligibility is finally decided by the DLSA.'
-                    : 'You can still call 15100 to confirm, or use the self-help templates. Income limits and categories vary by State.'}
+                    ? "Bring identification and case documents to the District Legal Services Authority front office. Free counsel will be assigned."
+                    : "You may still consult the DLSA helpline at 15100 to verify state-specific exemptions or access self-help workflows."}
                 </p>
               </div>
             )}
 
-            <div className="mt-4 rounded-2xl border border-line p-4">
+            <div className="rounded-[2px] border border-[#e2d5c1] bg-[#fffaf2] p-5">
               <div className="flex flex-wrap items-start justify-between gap-3">
-                <div className="flex items-start gap-2.5">
-                  <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-warn-soft text-warn">
+                <div className="flex items-start gap-3">
+                  <span className="grid size-9 shrink-0 place-items-center rounded-[2px] border border-[#e2d5c1] bg-[#ebe1d1]/50 text-[#9a6a35]">
                     <Handshake className="size-4.5" aria-hidden />
                   </span>
-                  <div>
-                    <p className="text-[13.5px] font-bold">{dlsa.authority}</p>
-                    <p className="mt-1 flex items-start gap-1.5 text-[12px] leading-5 text-body">
-                      <MapPin className="mt-0.5 size-3.5 shrink-0" aria-hidden /> {dlsa.address}
+                  <div className="space-y-0.5">
+                    <p className="text-sm font-semibold text-[#2a1c12]">{dlsa.authority}</p>
+                    <p className="flex items-start gap-1.5 text-xs text-[#5b4a3b]">
+                      <MapPin className="mt-0.5 size-3 text-[#9a6a35] shrink-0" aria-hidden /> {dlsa.address}
                     </p>
-                    <p className="text-[12px] text-body">{dlsa.hours}</p>
+                    <p className="text-xs text-[#85725f]">{dlsa.hours}</p>
                   </div>
                 </div>
                 <a
                   href="tel:15100"
-                  className="inline-flex h-11 items-center gap-2 rounded-xl bg-mint px-4 text-[13px] font-bold text-dot transition hover:bg-mint-strong"
+                  className="inline-flex h-10 items-center gap-2 rounded-[2px] border border-[#2a1c12] bg-[#2a1c12] px-4 text-xs font-sans uppercase tracking-[0.1em] font-semibold text-[#fffaf2] transition hover:bg-[#9a6a35] hover:border-[#9a6a35]"
                 >
-                  <Phone className="size-4" aria-hidden /> Call 15100
+                  <Phone className="size-3.5" aria-hidden /> Call 15100
                 </a>
               </div>
-              <div className="mt-3 grid gap-2 border-t border-line pt-3 sm:grid-cols-2">
+              <div className="mt-4 grid gap-2 border-t border-[#e2d5c1]/60 pt-3 sm:grid-cols-2 text-xs text-[#5b4a3b]">
                 {dlsa.eligibility.slice(0, 4).map((e) => (
-                  <p key={e} className="flex items-start gap-1.5 text-[11.5px] leading-5 text-body">
-                    <BadgeCheck className="mt-0.5 size-3.5 shrink-0 text-dot" aria-hidden /> {e}
+                  <p key={e} className="flex items-start gap-1.5">
+                    <BadgeCheck className="mt-0.5 size-3.5 shrink-0 text-[#2e7d32]" aria-hidden /> {e}
                   </p>
                 ))}
               </div>
             </div>
           </div>
         )}
-      </Card>
+      </div>
 
-      <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+      <div className="pt-2 flex flex-wrap items-center justify-between gap-3">
         <Disclaimer />
-        <Button variant="ghost" size="sm" onClick={() => router.push(dh('/brief'))}>
-          Prepare case brief <ArrowRight className="size-3.5" aria-hidden />
+        <Button variant="ghost" size="sm" onClick={() => router.push(dh("/brief"))}>
+          Review Matter Brief <ArrowRight className="size-3.5 ml-1" />
         </Button>
       </div>
     </div>
-  )
+  );
 }

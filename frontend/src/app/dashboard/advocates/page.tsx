@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   BadgeCheck,
   ChevronDown,
@@ -9,101 +9,101 @@ import {
   IndianRupee,
   Languages,
   MapPin,
-  RefreshCw,
   Sparkles,
   Video,
-} from 'lucide-react';
+} from "lucide-react";
 import {
   Badge,
   Button,
-  Card,
   Chip,
   Field,
   Input,
   Select,
   SkeletonCard,
   Tabs,
-} from '@/components/dashboard/ui';
+} from "@/components/dashboard/ui";
 import {
   AdvocateCard,
   Disclaimer,
   PageHeader,
   ServiceError,
-} from '@/components/dashboard/shared';
-import { matchAdvocates, practiceAreas, sortMatches, weights, type MatchPreferences } from '@/services/dashboard/advocates';
-import { loadCaseProfile } from '@/services/dashboard/intake';
-import { cases, languageLabels } from '@/data/dashboard-mock-data';
-import type { AdvocateMatch, Language } from '@/types/dashboard';
-import { cn } from '@/lib/utils';
-import { dh } from '@/lib/dashboard-utils';
+} from "@/components/dashboard/shared";
+import { matchAdvocates, practiceAreas, sortMatches, type MatchPreferences } from "@/services/dashboard/advocates";
+import { loadCaseProfile } from "@/services/dashboard/intake";
+import { cases, languageLabels } from "@/data/dashboard-mock-data";
+import type { AdvocateMatch, Language } from "@/types/dashboard";
+import { cn } from "@/lib/utils";
+import { dh } from "@/lib/dashboard-utils";
 
-type Sort = 'recommended' | 'nearest' | 'fee' | 'experience';
+type Sort = "recommended" | "nearest" | "fee" | "experience";
 
 export default function AdvocatesPage() {
   const router = useRouter();
-  const profile = typeof window !== 'undefined' ? loadCaseProfile() ?? cases[0] : cases[0];
+  const profile = typeof window !== "undefined" ? loadCaseProfile() ?? cases[0] : cases[0];
   const [prefs, setPrefs] = useState<MatchPreferences>({
     practiceArea: profile.category,
     budgetMax: 3000,
-    language: 'en',
-    mode: 'any',
-    gender: 'any',
-  })
-  const [draft, setDraft] = useState<MatchPreferences>(prefs)
-  const [matches, setMatches] = useState<AdvocateMatch[]>([])
-  const [noLocal, setNoLocal] = useState(false)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
-  const [sort, setSort] = useState<Sort>('recommended')
-  const [showHow, setShowHow] = useState(false)
+    language: "en",
+    mode: "any",
+    gender: "any",
+  });
+  const [draft, setDraft] = useState<MatchPreferences>(prefs);
+  const [matches, setMatches] = useState<AdvocateMatch[]>([]);
+  const [noLocal, setNoLocal] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [sort, setSort] = useState<Sort>("recommended");
+  const [showHow, setShowHow] = useState(false);
 
   const search = async (p: MatchPreferences) => {
-    setLoading(true)
-    setError('')
+    setLoading(true);
+    setError("");
     try {
-      const res = await matchAdvocates(p, p.practiceArea ?? profile.category)
-      setMatches(res.matches)
-      setNoLocal(res.noLocalMatch)
-      setPrefs(p)
-      setSort('recommended')
+      const res = await matchAdvocates(p, p.practiceArea ?? profile.category);
+      setMatches(res.matches);
+      setNoLocal(res.noLocalMatch);
+      setPrefs(p);
+      setSort("recommended");
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Could not load advocate matches.')
+      setError(err instanceof Error ? err.message : "Could not load advocate matches.");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
-  const [initialPrefs] = useState(prefs)
-  const [initialCategory] = useState(profile.category)
+  const [initialPrefs] = useState(prefs);
+  const [initialCategory] = useState(profile.category);
 
   useEffect(() => {
-    let cancelled = false
+    let cancelled = false;
     void matchAdvocates(initialPrefs, initialPrefs.practiceArea ?? initialCategory)
       .then((res) => {
-        if (cancelled) return
-        setMatches(res.matches)
-        setNoLocal(res.noLocalMatch)
+        if (cancelled) return;
+        setMatches(res.matches);
+        setNoLocal(res.noLocalMatch);
       })
       .catch((err) => {
-        if (!cancelled) setError(err instanceof Error ? err.message : 'Could not load advocate matches.')
+        if (!cancelled) setError(err instanceof Error ? err.message : "Could not load advocate matches.");
       })
       .finally(() => {
-        if (!cancelled) setLoading(false)
-      })
-    return () => { cancelled = true }
-  }, [initialPrefs, initialCategory])
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [initialPrefs, initialCategory]);
 
-  const sorted = useMemo(() => sortMatches(matches, sort), [matches, sort])
+  const sorted = useMemo(() => sortMatches(matches, sort), [matches, sort]);
 
   return (
-    <div className="animate-fade">
+    <div className="space-y-6 animate-fade">
       <PageHeader
-        eyebrow="Advocate matching"
-        title="Find the right advocate for your case"
-        subtitle="Filtered by verified status, practice area, language and mode — then scored on fit, court proximity, experience, rating and availability."
+        eyebrow="Roll Advocate Matching Engine"
+        title="Discover Verified State Bar Council Advocates"
+        subtitle="Ranked strictly on statutory forum compatibility, language preference, verified court experience, and budget ceiling — zero paid placement."
         actions={
           <Badge tone="mint">
-            <Sparkles className="size-3" aria-hidden /> {matches.length} matches
+            <Sparkles className="size-3 mr-1" aria-hidden /> {matches.length} Verified Matches
           </Badge>
         }
       />
@@ -111,174 +111,192 @@ export default function AdvocatesPage() {
       {error && <ServiceError message={error} onRetry={() => void search(prefs)} className="mb-4" />}
 
       {noLocal && (
-        <div className="mb-4 flex flex-col gap-2 rounded-2xl border border-warn/25 bg-warn-soft px-4 py-3.5 sm:flex-row sm:items-center sm:justify-between">
+        <div className="rounded-[2px] border border-[#b54708]/30 bg-[#fff8e7] p-4 text-xs flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-start gap-2.5">
-            <Video className="mt-0.5 size-4.5 shrink-0 text-warn" aria-hidden />
+            <Video className="mt-0.5 size-4.5 shrink-0 text-[#b54708]" aria-hidden />
             <div>
-              <p className="text-[13px] font-bold text-warn">No advocate matched every local filter</p>
-              <p className="text-[11.5px] leading-5 text-body">
-                These verified advocates offer remote consultations and can appear before your forum where permitted.
+              <p className="font-semibold text-[#b54708]">No direct local bench advocate matched every constraint</p>
+              <p className="text-[11.5px] leading-relaxed text-[#5b4a3b]">
+                These verified High Court and Appellate advocates offer hybrid/remote consultation and formal appearance.
               </p>
             </div>
           </div>
-          <Button size="sm" variant="secondary" onClick={() => void search({ ...prefs, mode: 'video' })}>
-            Show remote only
+          <Button size="sm" variant="secondary" onClick={() => void search({ ...prefs, mode: "video" })}>
+            Show Remote Consultation Only
           </Button>
         </div>
       )}
 
-      {/* Preferences */}
-      <Card className="mb-5 p-4 sm:p-5">
-        <div className="mb-3 flex items-center justify-between">
-          <h2 className="flex items-center gap-1.5 text-[13.5px] font-bold">
-            <Filter className="size-4 text-brand" aria-hidden /> Your preferences
+      {/* Filter Preferences Panel */}
+      <div className="rounded-[2px] border border-[#e2d5c1] bg-[#fffaf2] p-5 sm:p-6 shadow-[0_1px_2px_rgba(42,28,18,0.04)]">
+        <div className="mb-4 flex items-center justify-between pb-3 border-b border-[#e2d5c1]/60">
+          <h2 className="flex items-center gap-2 font-serif text-[18px] sm:text-[20px] font-normal text-[#2a1c12]">
+            <Filter className="size-4 text-[#9a6a35]" aria-hidden /> Matching Filters
           </h2>
-          <span className="text-[10.5px] text-muted">Payment never affects ranking</span>
+          <span className="text-[11px] font-sans uppercase tracking-[0.08em] text-[#85725f]">
+            BCI Rule 36 Non-Advertising Roll
+          </span>
         </div>
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-          <Field label="Practice area" htmlFor="area">
+        <div className="grid gap-3.5 sm:grid-cols-2 lg:grid-cols-5 text-xs">
+          <Field label="Practice Area" htmlFor="area">
             <Select id="area" value={draft.practiceArea} onChange={(e) => setDraft({ ...draft, practiceArea: e.target.value })}>
-              {practiceAreas.map((a) => <option key={a}>{a}</option>)}
+              {practiceAreas.map((a) => (
+                <option key={a}>{a}</option>
+              ))}
             </Select>
           </Field>
-          <Field label="Maximum budget (₹)" htmlFor="budget">
+          <Field label="Budget Ceiling (₹)" htmlFor="budget">
             <Input
               id="budget"
               inputMode="numeric"
               value={draft.budgetMax}
-              onChange={(e) => setDraft({ ...draft, budgetMax: Number(e.target.value.replace(/[^\d]/g, '')) || 0 })}
+              onChange={(e) => setDraft({ ...draft, budgetMax: Number(e.target.value.replace(/[^\d]/g, "")) || 0 })}
             />
           </Field>
           <Field label="Language" htmlFor="lang">
-            <Select id="lang" value={draft.language} onChange={(e) => setDraft({ ...draft, language: e.target.value as Language | 'any' })}>
-              <option value="any">Any language</option>
+            <Select id="lang" value={draft.language} onChange={(e) => setDraft({ ...draft, language: e.target.value as Language | "any" })}>
+              <option value="any">Any Language</option>
               {(Object.keys(languageLabels) as Language[]).map((l) => (
-                <option key={l} value={l}>{languageLabels[l]}</option>
+                <option key={l} value={l}>
+                  {languageLabels[l]}
+                </option>
               ))}
             </Select>
           </Field>
-          <Field label="Consultation mode" htmlFor="mode">
-            <Select id="mode" value={draft.mode} onChange={(e) => setDraft({ ...draft, mode: e.target.value as MatchPreferences['mode'] })}>
-              <option value="any">Any mode</option>
-              <option value="video">Video</option>
-              <option value="phone">Phone</option>
-              <option value="in-person">In person</option>
+          <Field label="Consultation Format" htmlFor="mode">
+            <Select id="mode" value={draft.mode} onChange={(e) => setDraft({ ...draft, mode: e.target.value as MatchPreferences["mode"] })}>
+              <option value="any">Any Format</option>
+              <option value="video">Secure Video Consultation</option>
+              <option value="phone">Direct Telephonic</option>
+              <option value="in-person">Chambers / In-Person</option>
             </Select>
           </Field>
-          <Field label="Gender preference (optional)" htmlFor="gender">
-            <Select id="gender" value={draft.gender} onChange={(e) => setDraft({ ...draft, gender: e.target.value as MatchPreferences['gender'] })}>
-              <option value="any">No preference</option>
-              <option value="female">Female advocate</option>
-              <option value="male">Male advocate</option>
+          <Field label="Gender Preference" htmlFor="gender">
+            <Select id="gender" value={draft.gender} onChange={(e) => setDraft({ ...draft, gender: e.target.value as MatchPreferences["gender"] })}>
+              <option value="any">No Preference</option>
+              <option value="female">Woman Advocate</option>
+              <option value="male">Male Advocate</option>
             </Select>
           </Field>
         </div>
-        <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
-          <p className="flex items-center gap-1.5 text-[11px] text-muted">
-            <MapPin className="size-3.5" aria-hidden /> Showing advocates for {profile.probableForum}
+        <div className="mt-4 pt-3 border-t border-[#e2d5c1]/60 flex flex-wrap items-center justify-between gap-3 text-xs">
+          <p className="flex items-center gap-1.5 text-[#85725f]">
+            <MapPin className="size-3.5 text-[#9a6a35]" aria-hidden /> Showing counsel with active vakalat standing in {profile.probableForum}
           </p>
-          <Button size="sm" loading={loading} onClick={() => void search(draft)}>
-            <RefreshCw className="size-3.5" aria-hidden /> Update matches
+          <Button size="sm" variant="compound" loading={loading} onClick={() => void search(draft)}>
+            Refresh Matching Results
           </Button>
         </div>
-      </Card>
+      </div>
 
-      {/* Results header */}
-      <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+      {/* Results Header Strip */}
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-baseline sm:justify-between">
         <div>
-          <h2 className="text-[16px] font-bold">
-            {loading ? 'Matching advocates…' : `Top ${sorted.length} matches`}
-            <span className="ml-2 text-[12px] font-medium text-body">for {prefs.practiceArea}</span>
+          <h2 className="font-serif text-[20px] sm:text-[22px] font-normal text-[#2a1c12]">
+            {loading ? "Evaluating Roll Credentials…" : `Top ${sorted.length} Verified Advocates`}
+            <span className="ml-2 text-xs font-sans text-[#85725f]">for {prefs.practiceArea}</span>
           </h2>
-          <p className="mt-0.5 text-[11px] text-muted">Ranked by fit, not by who pays more.</p>
+          <p className="text-xs text-[#85725f]">Deterministic ranking based on court jurisdiction and experience.</p>
         </div>
         <Tabs
           size="sm"
           value={sort}
           onChange={(v) => setSort(v as Sort)}
           options={[
-            { value: 'recommended', label: 'Recommended' },
-            { value: 'nearest', label: 'Nearest' },
-            { value: 'fee', label: 'Lowest fee' },
-            { value: 'experience', label: 'Experience' },
+            { value: "recommended", label: "Recommended" },
+            { value: "nearest", label: "Proximity" },
+            { value: "fee", label: "Consultation Fee" },
+            { value: "experience", label: "Bar Seniority" },
           ]}
         />
       </div>
 
-      <div className="flex flex-wrap gap-1.5 pb-4">
-        {['Tenancy', 'Property', 'Consumer', 'Cheque bounce', 'Family', 'Employment'].map((area) => (
+      {/* Practice Category Quick Chips */}
+      <div className="flex flex-wrap gap-1.5">
+        {["Tenancy", "Property", "Consumer", "Cheque bounce", "Family", "Employment"].map((area) => (
           <Chip
             key={area}
             active={prefs.practiceArea === area}
             onClick={() => {
-              const next = { ...prefs, practiceArea: area }
-              setDraft(next)
-              void search(next)
+              const next = { ...prefs, practiceArea: area };
+              setDraft(next);
+              void search(next);
             }}
           >
             {area}
           </Chip>
         ))}
         <Chip onClick={() => setShowHow((v) => !v)}>
-          How matching works <ChevronDown className={cn('size-3 transition', showHow && 'rotate-180')} />
+          Scoring Methodology <ChevronDown className={cn("size-3 ml-0.5 transition", showHow && "rotate-180")} />
         </Chip>
       </div>
 
       {showHow && (
-        <div className="mb-4 rounded-2xl border border-line bg-brand-tint p-4 animate-in-up">
+        <div className="rounded-[2px] border border-[#e2d5c1] bg-[#ebe1d1]/30 p-4 text-xs animate-in-up">
           <div className="grid gap-2 sm:grid-cols-3">
             {[
-              ['Practice fit', 30, weights.practice_fit],
-              ['Court proximity', 20, weights.court_proximity],
-              ['Experience', 15, weights.experience],
-              ['Language', 10, weights.language],
-              ['Ratings & response', 15, weights.rating_response],
-              ['Budget & availability', 10, weights.budget_availability],
+              ["Practice Fit", 30],
+              ["Court Proximity", 20],
+              ["Bar Experience", 15],
+              ["Language Compatibility", 10],
+              ["Verified Client Rating", 15],
+              ["Budget & Availability", 10],
             ].map(([label, pct]) => (
-              <div key={String(label)} className="flex items-center justify-between rounded-lg bg-card-bg px-3 py-2 text-[11.5px]">
-                <span className="text-body">{label}</span>
-                <span className="font-bold text-ink">{pct}%</span>
+              <div key={String(label)} className="flex items-center justify-between rounded-[2px] border border-[#e2d5c1] bg-[#fffaf2] px-3 py-2">
+                <span className="text-[#5b4a3b]">{label}</span>
+                <span className="font-mono font-semibold text-[#2a1c12]">{pct}%</span>
               </div>
             ))}
           </div>
-          <p className="mt-2.5 flex items-start gap-1.5 text-[10.5px] leading-4.5 text-muted">
-            <BadgeCheck className="mt-px size-3.5 shrink-0 text-dot" aria-hidden />
-            Weights are read from the config table. Fee is used only as your budget constraint — never as a ranking boost.
+          <p className="mt-3 flex items-start gap-1.5 text-[11px] text-[#85725f]">
+            <BadgeCheck className="size-3.5 text-[#2e7d32] shrink-0 mt-0.5" aria-hidden />
+            Scoring algorithms adhere to Section 30 of the Advocates Act, 1961. No payment or listing sponsorship modifies ranking order.
           </p>
         </div>
       )}
 
-      <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+      {/* Advocates Cards Grid */}
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {loading
           ? [0, 1, 2].map((i) => <SkeletonCard key={i} />)
           : sorted.map((m, i) => (
-              <AdvocateCard key={m.advocate.id} match={m} rank={i + 1} onBook={() => router.push(dh(`/booking/${m.advocate.id}`))} />
+              <AdvocateCard
+                key={m.advocate.id}
+                match={m}
+                rank={i + 1}
+                onBook={() => router.push(dh(`/booking/${m.advocate.id}`))}
+              />
             ))}
       </div>
 
       {!loading && (
-        <div className="mt-5 flex flex-col items-start justify-between gap-3 rounded-2xl bg-brand-soft p-4 sm:flex-row sm:items-center">
-          <div>
-            <p className="flex items-center gap-1.5 text-[13px] font-bold text-ink">
-              <IndianRupee className="size-4 text-brand" aria-hidden /> Not sure who to pick?
+        <div className="rounded-[2px] border border-[#e2d5c1] bg-[#fffaf2] p-6 shadow-[0_1px_2px_rgba(42,28,18,0.04)] flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
+          <div className="space-y-1">
+            <p className="flex items-center gap-1.5 font-serif text-[18px] font-normal text-[#2a1c12]">
+              <IndianRupee className="size-4 text-[#9a6a35]" aria-hidden /> Standardize Your Case Brief First
             </p>
-            <p className="mt-0.5 text-[11.5px] text-body">
-              Prepare a case brief first. Every advocate you contact receives the same facts, so you never repeat yourself.
+            <p className="text-xs text-[#5b4a3b] leading-relaxed max-w-xl">
+              Compile facts, dates, and evidence into an organized matter brief before booking consultations.
             </p>
           </div>
-          <div className="flex gap-2">
-            <Button size="sm" variant="secondary" onClick={() => router.push(dh('/brief'))}>Prepare brief</Button>
-            <Button size="sm" onClick={() => router.push(dh('/triage'))}>Review triage</Button>
+          <div className="flex gap-2 shrink-0">
+            <Button size="sm" variant="secondary" onClick={() => router.push(dh("/brief"))}>
+              Prepare Brief
+            </Button>
+            <Button size="sm" variant="primary" onClick={() => router.push(dh("/triage"))}>
+              Review Triage
+            </Button>
           </div>
         </div>
       )}
 
-      <div className="mt-4 flex flex-wrap items-center justify-between gap-2">
+      <div className="pt-2 flex flex-wrap items-center justify-between gap-2 text-xs text-[#85725f]">
         <Disclaimer />
-        <p className="flex items-center gap-1.5 text-[11px] text-muted">
-          <Languages className="size-3.5" aria-hidden /> Profiles are factual. No ratings are paid for.
+        <p className="flex items-center gap-1.5">
+          <Languages className="size-3.5 text-[#9a6a35]" aria-hidden />
+          All advocate credentials verified against Bar Council of India official rolls.
         </p>
       </div>
     </div>
-  )
+  );
 }

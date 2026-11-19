@@ -12,7 +12,7 @@ import { Button, Card, Badge, Textarea, EmptyState } from "@/components/dashboar
 import { PageHeader } from "@/components/dashboard/shared";
 import { dh } from "@/lib/dashboard-utils";
 
-const tags = ["Clear communication", "On time", "Fair fee", "Explained next steps", "Prepared well", "Respectful"];
+const tags = ["Clear communication", "Punctual & prepared", "Fair statutory fee", "Actionable next steps", "Procedural clarity", "Respectful & attentive"];
 
 export default function FeedbackPage() {
   const params = useParams<{ bookingId: string }>();
@@ -34,13 +34,13 @@ export default function FeedbackPage() {
 
   if (booking && booking.status !== "completed") {
     return (
-      <div className="mx-auto max-w-lg">
-        <PageHeader title="Feedback" backTo={dh("/bookings")} />
+      <div className="mx-auto max-w-lg space-y-6">
+        <PageHeader title="Client Evaluation" backTo={dh("/bookings")} />
         <EmptyState
-          icon={<MessageSquare className="size-5" />}
-          title="Feedback opens after the consultation"
-          body="You can rate an advocate only once the booking is marked completed. This keeps reviews verified."
-          action={<Button onClick={() => router.push(dh("/bookings"))}>Back to bookings</Button>}
+          icon={<MessageSquare className="size-5 text-[#9a6a35]" />}
+          title="Evaluation Registers After Hearing Concludes"
+          body="Feedback may only be registered once the advocate marks the consultation session concluded. This ensures 100% verified evaluations."
+          action={<Button onClick={() => router.push(dh("/bookings"))}>Return to Consultations</Button>}
         />
       </div>
     );
@@ -48,36 +48,38 @@ export default function FeedbackPage() {
 
   if (done) {
     return (
-      <div className="mx-auto max-w-lg animate-fade text-center">
-        <span className="mx-auto grid size-16 place-items-center rounded-3xl bg-mint">
-          <CheckCircle2 className="size-8 text-dot" aria-hidden />
+      <div className="mx-auto max-w-lg animate-fade text-center space-y-6 pt-6">
+        <span className="mx-auto grid size-16 place-items-center rounded-[2px] border border-[#2a6b3b]/30 bg-[#2a6b3b]/10 text-[#2a6b3b]">
+          <CheckCircle2 className="size-8" aria-hidden />
         </span>
-        <h1 className="mt-4 text-[26px] font-extrabold">Thank you for the feedback</h1>
-        <p className="mt-2 text-[13.5px] leading-6 text-body">
-          Your rating helps other clients choose well and helps advocates improve. Feedback is moderated and shown
-          without success-rate claims.
-        </p>
-        <div className="mt-6 flex justify-center gap-2">
-          <Button variant="secondary" onClick={() => router.push(dh("/bookings"))}>My bookings</Button>
-          <Button onClick={() => router.push(dh("/advocates"))}>Find an advocate</Button>
+        <div>
+          <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#85725f]">Audit Receipt</p>
+          <h1 className="mt-1 font-serif text-[28px] font-normal text-[#2a1c12]">Evaluation Recorded</h1>
+          <p className="mt-2 text-[13.5px] leading-relaxed text-[#5b4a3b]">
+            Your evaluation has been deposited into the verified advocate roll. Thank you for contributing to transparent legal access under BCI compliance guidelines.
+          </p>
+        </div>
+        <div className="flex justify-center gap-3">
+          <Button variant="secondary" onClick={() => router.push(dh("/bookings"))}>Consultation Register</Button>
+          <Button onClick={() => router.push(dh("/advocates"))}>Advocate Roll</Button>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="mx-auto max-w-2xl animate-fade">
+    <div className="mx-auto max-w-2xl animate-fade space-y-6">
       <PageHeader
-        eyebrow="Verified feedback"
-        title="How was your consultation?"
-        subtitle={booking ? `With Adv. ${booking.advocateName} on ${formatDate(booking.date)}` : "Only clients with a completed booking can leave feedback."}
+        eyebrow="POST-HEARING EVALUATION"
+        title="Consultation Feedback"
+        subtitle={booking ? `With Adv. ${booking.advocateName} on ${formatDate(booking.date)}` : "Verified evaluation open solely to participating citizens."}
         backTo={dh("/bookings")}
       />
 
-      <Card className="p-5 sm:p-6">
+      <Card className="p-6 sm:p-8">
         <div>
-          <p className="label">Your rating</p>
-          <div className="flex items-center gap-1.5" role="group" aria-label="Rating from 1 to 5">
+          <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#85725f]">Overall Rating</p>
+          <div className="mt-3 flex items-center gap-2" role="group" aria-label="Rating from 1 to 5">
             {[1, 2, 3, 4, 5].map((n) => (
               <button
                 key={n}
@@ -87,75 +89,78 @@ export default function FeedbackPage() {
                 onClick={() => setRating(n)}
                 aria-label={`${n} star${n > 1 ? "s" : ""}`}
                 aria-pressed={rating === n}
-                className="grid size-11 cursor-pointer place-items-center rounded-xl transition hover:bg-warn-soft"
+                className="grid size-11 cursor-pointer place-items-center rounded-[2px] border border-[#e2d5c1] bg-[#fffaf2] transition hover:border-[#9a6a35]"
               >
                 <Star
                   className={cn(
-                    "size-7 transition",
-                    n <= (hover || rating) ? "fill-gold text-gold" : "text-border-hover"
+                    "size-6 transition",
+                    n <= (hover || rating) ? "fill-[#d1a46a] text-[#9a6a35]" : "text-[#e2d5c1]"
                   )}
                   aria-hidden
                 />
               </button>
             ))}
-            <span className="ml-2 text-[12px] font-semibold text-body">
-              {rating ? ["", "Poor", "Fair", "Good", "Very good", "Excellent"][rating] : "Select a rating"}
+            <span className="ml-3 font-serif text-[14px] text-[#2a1c12]">
+              {rating ? ["", "Deficient", "Fair", "Satisfactory", "Commendable", "Exemplary"][rating] : "Select statutory grade"}
             </span>
           </div>
         </div>
 
-        <div className="mt-5">
-          <p className="label">What went well? <span className="font-normal text-muted">(optional)</span></p>
-          <div className="flex flex-wrap gap-1.5">
+        <div className="mt-6 pt-6 border-t border-[#e2d5c1]">
+          <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#85725f]">Counsel Strengths <span className="text-[#85725f]">(Optional)</span></p>
+          <div className="mt-3 flex flex-wrap gap-2">
             {tags.map((t) => (
               <button
                 key={t}
                 type="button"
                 onClick={() => setSelected((s) => (s.includes(t) ? s.filter((x) => x !== t) : [...s, t]))}
                 className={cn(
-                  "cursor-pointer rounded-full border px-3 py-1.5 text-[12px] font-semibold transition",
+                  "cursor-pointer rounded-[2px] border px-3 py-1.5 font-mono text-[11px] uppercase tracking-wider transition-colors",
                   selected.includes(t)
-                    ? "border-dot bg-mint text-dot"
-                    : "border-line text-body hover:border-brand/40"
+                    ? "border-[#2a1c12] bg-[#2a1c12] text-[#fffaf2]"
+                    : "border-[#e2d5c1] bg-[#fffaf2] text-[#5b4a3b] hover:border-[#9a6a35]"
                 )}
               >
-                {selected.includes(t) && <span className="mr-1">✓</span>}
+                {selected.includes(t) && <span className="mr-1 text-[#d1a46a]">✓</span>}
                 {t}
               </button>
             ))}
           </div>
         </div>
 
-        <div className="mt-5">
-          <label className="label" htmlFor="comment">Anything else? <span className="font-normal text-muted">(optional)</span></label>
+        <div className="mt-6 pt-6 border-t border-[#e2d5c1]">
+          <label className="block font-mono text-[10px] uppercase tracking-[0.2em] text-[#85725f]" htmlFor="comment">
+            Detailed Observations <span className="text-[#85725f]">(Optional)</span>
+          </label>
           <Textarea
             id="comment"
             value={comment}
             onChange={(e) => setComment(e.target.value)}
             rows={4}
             maxLength={500}
-            placeholder="Was the advice easy to understand? Did you know what to do next?"
+            placeholder="Were the statutory provisions articulated clearly? Did you receive actionable advice regarding procedural steps?"
+            className="mt-2"
           />
-          <p className="mt-1 text-right text-[10.5px] text-muted">{comment.length}/500</p>
+          <p className="mt-1.5 text-right font-mono text-[10px] text-[#85725f]">{comment.length}/500</p>
         </div>
 
-        <div className="mt-4">
-          <p className="label">Was your issue resolved?</p>
-          <div className="grid gap-2 sm:grid-cols-3">
+        <div className="mt-6 pt-6 border-t border-[#e2d5c1]">
+          <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#85725f]">Matter Resolution Status</p>
+          <div className="mt-3 grid gap-3 sm:grid-cols-3">
             {[
-              ["yes", "Yes"],
-              ["in_progress", "In progress"],
-              ["no", "No"],
+              ["yes", "Substantially Resolved"],
+              ["in_progress", "Filing in Progress"],
+              ["no", "Unresolved / Advisory Only"],
             ].map(([value, label]) => (
               <button
                 key={value}
                 type="button"
                 onClick={() => setResolved(value as typeof resolved)}
                 className={cn(
-                  "h-11 cursor-pointer rounded-xl border text-[12.5px] font-semibold transition",
+                  "h-11 cursor-pointer rounded-[2px] border px-3 text-[12.5px] font-medium transition-colors",
                   resolved === value
-                    ? "border-brand bg-brand-soft text-brand-dark ring-4 ring-brand/10"
-                    : "border-line text-body hover:border-brand/40"
+                    ? "border-[#2a1c12] bg-[#2a1c12] text-[#fffaf2]"
+                    : "border-[#e2d5c1] bg-[#fffaf2] text-[#5b4a3b] hover:border-[#9a6a35]"
                 )}
               >
                 {label}
@@ -166,7 +171,7 @@ export default function FeedbackPage() {
 
         <Button
           fullWidth
-          className="mt-6"
+          className="mt-8"
           loading={submitting}
           disabled={!rating || !resolved}
           onClick={async () => {
@@ -183,16 +188,16 @@ export default function FeedbackPage() {
             setDone(true);
           }}
         >
-          Submit feedback
+          Transmit Verified Evaluation
         </Button>
-        <p className="mt-2 text-center text-[10.5px] text-muted">
-          Reviews are verified, moderated and never bought. We do not publish claims about success rates.
+        <p className="mt-3 text-center font-mono text-[10px] text-[#85725f]">
+          Evaluations are strictly moderated. NyayaSetu prohibits published claims concerning guaranteed outcomes under BCI Rule 36.
         </p>
       </Card>
 
-      <div className="mt-4 flex justify-center">
-        <Badge tone="outline">
-          <Star className="size-3" aria-hidden /> Feedback appears on the advocate’s verified profile
+      <div className="flex justify-center">
+        <Badge tone="neutral">
+          <Star className="size-3 text-[#9a6a35]" aria-hidden /> Aggregated anonymously onto advocate’s public dossier
         </Badge>
       </div>
     </div>
