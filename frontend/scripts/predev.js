@@ -27,8 +27,10 @@ function cleanup() {
       const output = execSync("netstat -ano | findstr :3000", { encoding: "utf8" });
       pids = output
         .split("\n")
-        .map((line) => line.trim().split(/\s+/).pop())
-        .filter((pid) => pid && !isNaN(Number(pid)));
+        .map((line) => line.trim())
+        .filter((line) => /LISTENING/i.test(line))
+        .map((line) => line.split(/\s+/).pop())
+        .filter((pid) => pid && /^\d+$/.test(pid) && pid !== "0" && pid !== String(process.pid));
     } else {
       const output = execSync("lsof -ti:3000 2>/dev/null", { encoding: "utf8" });
       pids = output
