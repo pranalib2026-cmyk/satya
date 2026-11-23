@@ -1,380 +1,416 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
-import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
-import {
-  ArrowRight,
-  BookOpen,
-  Mic,
-  Paperclip,
-  Scale,
-  Send,
-  ShieldCheck,
-  Sparkles,
-  UserRound,
-} from "lucide-react";
-import { getConversation, streamAnswer } from "@/services/dashboard/chat";
-import type { Message } from "@/types/dashboard";
-import { cn } from "@/lib/utils";
-import { Avatar, Badge, Button, PageLoader } from "@/components/dashboard/ui";
-import { CitationChip, Disclaimer } from "@/components/dashboard/shared";
+import React, { Suspense, useEffect, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { PlusCircle, Sparkles } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
-import { dh } from "@/lib/dashboard-utils";
+import { useDashboardUI } from "@/lib/dashboard-ui-context";
+import { Button, PageLoader } from "@/components/dashboard/ui";
+import {
+  getAssistantAnswer,
+  type AssistantAnswer,
+  type ScanExplainResult,
+} from "@/services/dashboard/chat-assistant";
+import { EmptyState } from "./components/EmptyState";
+import { ThinkingState } from "./components/ThinkingState";
+import { AssistantAnswerCard } from "./components/AssistantAnswerCard";
+import { ChatComposer } from "./components/ChatComposer";
+import { ScanExplainResultCard } from "./components/ScanExplainResultCard";
+import { Toast, type ToastMessage } from "./components/Toast";
 
-const suggestions = [
-  "What are my options if a commercial cheque bounces under Sec 138?",
-  "How long do I have to reply to an advocate legal notice?",
-  "Landlord has withheld tenancy security deposit past 30 days.",
-];
-
-function Typing() {
-  return (
-    <div className="flex items-center gap-1.5 rounded-[2px] border border-[#e2d5c1] bg-[#fffaf2] px-3.5 py-2.5">
-      <span className="typing-dot" />
-      <span className="typing-dot" />
-      <span className="typing-dot" />
-      <span className="ml-1 text-xs text-[#85725f]">Retrieving Bare Acts & Judicial Precedents…</span>
-    </div>
-  );
-}
-
-function Bubble({ message }: { message: Message }) {
-  const isUser = message.role === "user";
-  return (
-    <div className={cn("flex gap-2.5", isUser ? "justify-end" : "justify-start")}>
-      {!isUser && (
-        <span className="mt-0.5 grid size-8 shrink-0 place-items-center rounded-[2px] border border-[#e2d5c1] bg-[#ebe1d1]/50 text-[#9a6a35]">
-          <Sparkles className="size-4" aria-hidden />
-        </span>
-      )}
-      <div className={cn("max-w-[86%] sm:max-w-[78%]", isUser && "order-first")}>
-        <div
-          className={cn(
-            "rounded-[2px] px-4.5 py-3.5 text-xs sm:text-[13.5px] leading-relaxed whitespace-pre-wrap select-text",
-            isUser
-              ? "bg-[#2a1c12] text-[#fffaf2] shadow-xs"
-              : "border border-[#e2d5c1] bg-[#fffaf2] text-[#2a1c12] shadow-xs"
-          )}
-        >
-          {message.content}
-        </div>
-
-        {!isUser && message.citations && message.citations.length > 0 && (
-          <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
-            <span className="inline-flex items-center gap-1 text-[10.5px] font-sans uppercase tracking-[0.1em] font-medium text-[#85725f]">
-              <BookOpen className="size-3 text-[#9a6a35]" aria-hidden /> Statutory Citations:
-            </span>
-            {message.citations.map((c) => (
-              <CitationChip key={c.id} citation={c} />
-            ))}
-          </div>
-        )}
-        {!isUser && message.disclaimer && (
-          <p className="mt-2 flex items-start gap-1.5 text-[11px] leading-relaxed text-[#85725f]">
-            <ShieldCheck className="mt-0.5 size-3 text-[#9a6a35] shrink-0" aria-hidden />
-            {message.disclaimer}
-          </p>
-        )}
-        {isUser && (
-          <span className="mt-1 flex items-center justify-end gap-1 text-[10.5px] font-mono text-[#85725f]">
-            <span className="size-1.5 rounded-full bg-[#2e7d32]" aria-hidden /> Delivered
-          </span>
-        )}
-      </div>
-      {isUser && <Avatar initials="RK" size="sm" tone="neutral" className="mt-0.5" />}
-    </div>
-  );
+interface ChatTurn {
+  id: string;
+  role: "user" | "assistant";
+  userText?: string;
+  detectedLang?: string;
+  assistantAnswer?: AssistantAnswer;
+  isStreaming?: boolean;
+  streamedText?: string;
+  scanResult?: ScanExplainResult;
+  timestamp: string;
 }
 
 export default function ChatPage() {
   return (
-    <React.Suspense fallback={<PageLoader />}>
+    <Suspense fallback={<PageLoader />}>
       <ChatContent />
-    </React.Suspense>
+    </Suspense>
   );
 }
 
 function ChatContent() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const { user } = useAuth();
+  const { pushNotification } = useDashboardUI();
   const initialQuestion = searchParams.get("question");
 
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [turns, setTurns] = useState<ChatTurn[]>([]);
   const [input, setInput] = useState("");
-  const [streaming, setStreaming] = useState(false);
-  const [partial, setPartial] = useState("");
-  const [busy, setBusy] = useState(true);
-  const endRef = useRef<HTMLDivElement>(null);
-  const started = useRef(false);
+  const [isThinking, setIsThinking] = useState(false);
+  const [streamingTurnId, setStreamingTurnId] = useState<string | null>(null);
+  const [toast, setToast] = useState<ToastMessage | null>(null);
+  const [activeScanResult, setActiveScanResult] = useState<ScanExplainResult | null>(null);
 
-  useEffect(() => {
-    void getConversation().then((msgs) => {
-      setMessages(msgs);
-      setBusy(false);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
+  const scrollAnchorRef = useRef<HTMLDivElement>(null);
+  const initialTriggered = useRef(false);
+
+  const showToast = (message: string, type: ToastMessage["type"] = "success") => {
+    setToast({
+      id: `toast_${Date.now()}`,
+      message,
+      type,
     });
-  }, []);
+  };
 
-  useEffect(() => {
-    const el = endRef.current;
-    if (el) el.scrollTop = el.scrollHeight;
-  }, [messages, partial, streaming, busy]);
-
-  const send = async (text: string) => {
-    const clean = text.trim();
-    if (!clean || streaming) return;
-    setInput("");
-    setMessages((m) => [
-      ...m,
-      {
-        id: `msg_${Date.now()}`,
-        conversationId: "conv_1",
-        role: "user",
-        content: clean,
-        createdAt: new Date().toISOString(),
-      },
-    ]);
-    setStreaming(true);
-    setPartial("");
-    try {
-      const { message } = await streamAnswer(clean, (chunk) => setPartial((p) => p + chunk));
-      setMessages((m) => [...m, message]);
-    } finally {
-      setPartial("");
-      setStreaming(false);
+  // Robust internal auto-scroll that only scrolls the message list
+  const scrollToBottom = (behavior: ScrollBehavior = "smooth") => {
+    const el = messagesContainerRef.current;
+    if (el) {
+      el.scrollTo({
+        top: el.scrollHeight,
+        behavior,
+      });
     }
   };
 
+  // Scroll to latest message smoothly whenever turns or thinking state changes
   useEffect(() => {
-    if (!busy && initialQuestion && !started.current) {
-      started.current = true;
-      void send(initialQuestion);
+    const timeout = setTimeout(() => {
+      scrollToBottom("smooth");
+    }, 40);
+    return () => clearTimeout(timeout);
+  }, [turns, isThinking, streamingTurnId, activeScanResult]);
+
+  // Handle new conversation
+  const handleNewChat = () => {
+    setTurns([]);
+    setInput("");
+    setIsThinking(false);
+    setStreamingTurnId(null);
+    setActiveScanResult(null);
+    showToast("Started new consultation session");
+  };
+
+  // Send message and execute mock streaming pipeline
+  const handleSend = async (rawQuery: string) => {
+    const query = rawQuery.trim();
+    if (!query || isThinking || streamingTurnId) return;
+
+    setInput("");
+    const userTurnId = `usr_${Date.now()}`;
+    const assistantTurnId = `ast_${Date.now() + 1}`;
+
+    // Append user message
+    setTurns((prev) => [
+      ...prev,
+      {
+        id: userTurnId,
+        role: "user",
+        userText: query,
+        timestamp: new Date().toISOString(),
+      },
+    ]);
+
+    // Activate thinking state
+    setIsThinking(true);
+    setTimeout(() => scrollToBottom("smooth"), 50);
+
+    try {
+      // Fetch assistant response from typed mock service (600-900ms delay)
+      const answer = await getAssistantAnswer(query);
+
+      setIsThinking(false);
+      setStreamingTurnId(assistantTurnId);
+
+      // Initialize assistant turn in streaming mode
+      setTurns((prev) => [
+        ...prev,
+        {
+          id: assistantTurnId,
+          role: "assistant",
+          isStreaming: true,
+          streamedText: "",
+          assistantAnswer: answer,
+          timestamp: new Date().toISOString(),
+        },
+      ]);
+
+      // Stream words for natural agent reading experience
+      const textToStream = answer.oneLineSummary;
+      const words = textToStream.split(" ");
+      let currentAcc = "";
+
+      for (let i = 0; i < words.length; i++) {
+        currentAcc += (i === 0 ? "" : " ") + words[i];
+        const snapshot = currentAcc;
+        setTurns((prev) =>
+          prev.map((t) =>
+            t.id === assistantTurnId
+              ? { ...t, streamedText: snapshot }
+              : t
+          )
+        );
+        scrollToBottom("instant");
+        // Short token delay
+        await new Promise((r) => setTimeout(r, 40));
+      }
+
+      // Finalize turn
+      setTurns((prev) =>
+        prev.map((t) =>
+          t.id === assistantTurnId
+            ? { ...t, isStreaming: false, streamedText: undefined }
+            : t
+        )
+      );
+
+      // Final smooth scroll to show full structured result card
+      setTimeout(() => {
+        scrollToBottom("smooth");
+      }, 100);
+    } catch {
+      setIsThinking(false);
+      showToast("Unable to process statutory inquiry. Please retry.", "warn");
+    } finally {
+      setStreamingTurnId(null);
+    }
+  };
+
+  // Check URL query param on mount
+  useEffect(() => {
+    if (initialQuestion && !initialTriggered.current) {
+      initialTriggered.current = true;
+      void handleSend(initialQuestion);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [busy, initialQuestion]);
+  }, [initialQuestion]);
+
+  // Handle Scan & Explain file attach
+  const handleAttachFile = (file: File) => {
+    const sizeKB = (file.size / 1024).toFixed(1) + " KB";
+    const name = file.name;
+
+    let whatThisIs = "Formal Statutory Demand Notice under Sec 138 NI Act / Section 106 TPA.";
+    let deadlinesFound = "15 calendar days from date of receipt to tender settlement.";
+    let amounts = "₹60,000 principal claim + 18% statutory penal interest.";
+    let whatToDoNext = "Issue a formal advocate reply denying non-wear deductions or disputed liability.";
+
+    if (/agreement|lease|rent/i.test(name)) {
+      whatThisIs = "Registered Residential Tenancy Agreement under Karnataka Rent Act, 1999.";
+      deadlinesFound = "30-day notice period required before termination of tenancy.";
+      amounts = "Monthly rental ₹22,000 · Security Deposit held: ₹1,10,000.";
+      whatToDoNext = "Compile handover inspection memo and bank transaction clearance slips.";
+    }
+
+    const mockResult: ScanExplainResult = {
+      fileName: name,
+      fileSize: sizeKB,
+      whatThisIs,
+      deadlinesFound,
+      amounts,
+      whatToDoNext,
+    };
+
+    setActiveScanResult(mockResult);
+    showToast(`Scanned and analyzed ${name}`);
+    setTimeout(() => scrollToBottom("smooth"), 100);
+  };
+
+  // Handle Voice input transcript
+  const handleVoiceTranscript = (transcript: string, detectedLang: string) => {
+    setInput(transcript);
+    showToast(`Voice transcribed · Detected: ${detectedLang}`);
+  };
+
+  // Save to My Cases
+  const handleSaveToCases = (title: string, summary: string) => {
+    pushNotification({
+      title: `Matter Saved: ${title}`,
+      body: summary.slice(0, 90) + "...",
+      href: "/dashboard/cases",
+    });
+  };
+
+  // Add to Court Deadlines
+  const handleAddToDeadlines = (title: string, dueDate: string) => {
+    pushNotification({
+      title: `Deadline Scheduled: ${title}`,
+      body: `Filing window due on ${dueDate} under statutory schedules.`,
+      href: "/dashboard/deadlines",
+    });
+  };
+
+  // Request Consultation
+  const handleRequestConsultation = (advocateName: string) => {
+    pushNotification({
+      title: `Consultation Dispatched: ${advocateName}`,
+      body: "Preliminary matter profile transmitted for docket review.",
+      href: "/dashboard/bookings",
+    });
+  };
 
   return (
-    <div className="space-y-6 animate-fade">
-      {/* Editorial Header */}
-      <div className="pb-5 border-b border-[#e2d5c1] flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <span className="grid size-10 place-items-center rounded-[2px] border border-[#e2d5c1] bg-[#ebe1d1]/50 text-[#9a6a35]">
-            <Sparkles className="size-5" aria-hidden />
-          </span>
-          <div>
-            <h1 className="font-serif text-[26px] sm:text-[30px] font-normal tracking-tight text-[#2a1c12] leading-tight">
+    <>
+      {/* Scoped CSS ensuring the chat window remains stationary like ChatGPT/Claude */}
+      <style>{`
+        /* Keep page stationary on chat route: only message container scrolls */
+        body:has(#chat-agent-root) {
+          overflow: hidden !important;
+        }
+        body:has(#chat-agent-root) #main-content {
+          padding-top: 0.75rem !important;
+          padding-bottom: 0 !important;
+          overflow: hidden !important;
+          display: flex !important;
+          flex-direction: column !important;
+          height: calc(100dvh - 128px) !important;
+        }
+        @media (min-width: 1024px) {
+          body:has(#chat-agent-root) #main-content {
+            height: calc(100dvh - 64px) !important;
+          }
+        }
+        body:has(#chat-agent-root) #main-content > div {
+          height: 100% !important;
+          display: flex !important;
+          flex-direction: column !important;
+        }
+        body:has(#chat-agent-root) footer:not(#composer-container) {
+          display: none !important;
+        }
+      `}</style>
+
+      <div
+        id="chat-agent-root"
+        className="relative flex flex-col h-full max-w-[760px] mx-auto w-full px-2 sm:px-4 select-none animate-fade"
+      >
+        {/* Toast Notification Container */}
+        <Toast toast={toast} onDismiss={() => setToast(null)} />
+
+        {/* 1. Header: Stationary Title in Gambetta serif + small ghost "New chat" button */}
+        <header className="shrink-0 flex items-center justify-between pb-3.5 border-b border-[#e2d5c1]">
+          <div className="flex items-center gap-2.5">
+            <span className="grid size-8.5 place-items-center rounded-[2px] border border-[#e2d5c1] bg-[#ebe1d1]/50 text-[#9a6a35]">
+              <Sparkles className="size-4" aria-hidden="true" />
+            </span>
+            <h1 className="font-serif text-[22px] sm:text-[26px] font-normal tracking-tight text-[#2a1c12] leading-none">
               AI Legal Assistant
             </h1>
-            <p className="mt-0.5 flex items-center gap-1.5 text-xs text-[#5b4a3b]">
-              <span className="size-1.5 rounded-full bg-[#2e7d32]" aria-hidden />
-              Statutory answers with citations · Bare Acts, High Court & SC Rules
-            </p>
           </div>
-        </div>
-        <div className="flex items-center gap-2">
-          <Badge tone="mint">
-            <ShieldCheck className="size-3" aria-hidden /> Guardrails Active
-          </Badge>
-          <Button size="sm" variant="secondary" onClick={() => router.push(dh("/intake"))}>
-            Structured Intake
+
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={handleNewChat}
+            className="h-8 text-xs text-[#5b4a3b] hover:text-[#2a1c12] hover:bg-[#ebe1d1]/50 rounded-[2px]"
+            aria-label="Start new consultation chat"
+          >
+            <PlusCircle className="size-3.5 mr-1 text-[#9a6a35]" aria-hidden="true" />
+            New chat
           </Button>
-        </div>
-      </div>
+        </header>
 
-      <div className="grid gap-5 lg:grid-cols-[1fr_310px]">
-        {/* Chat Panel */}
-        <section className="rounded-[2px] border border-[#e2d5c1] bg-[#fffaf2] flex h-[calc(100dvh-275px)] min-h-[480px] flex-col overflow-hidden shadow-[0_1px_2px_rgba(42,28,18,0.04)] lg:h-[calc(100dvh-230px)]">
-          <div ref={endRef} className="flex-1 space-y-4 overflow-y-auto bg-[#f4efe6]/40 px-4 py-5 sm:px-6">
-            {busy ? (
-              <div className="space-y-3">
-                <div className="h-16 w-3/4 animate-pulse rounded-[2px] bg-[#ebe1d1]/50" />
-                <div className="ml-auto h-12 w-2/3 animate-pulse rounded-[2px] bg-[#ebe1d1]/60" />
-                <div className="h-24 w-4/5 animate-pulse rounded-[2px] bg-[#ebe1d1]/50" />
-              </div>
-            ) : (
-              <>
-                <div className="flex items-center justify-center">
-                  <span className="rounded-[2px] border border-[#e2d5c1] bg-[#fffaf2] px-3 py-1 text-[10.5px] font-sans uppercase tracking-[0.1em] font-medium text-[#85725f]">
-                    Today · Session Initialized
-                  </span>
-                </div>
-
-                {messages.map((m) => (
-                  <Bubble key={m.id} message={m} />
-                ))}
-
-                {streaming && (
-                  <div className="flex gap-2.5">
-                    <span className="mt-0.5 grid size-8 shrink-0 place-items-center rounded-[2px] border border-[#e2d5c1] bg-[#ebe1d1]/50 text-[#9a6a35]">
-                      <Sparkles className="size-4" aria-hidden />
-                    </span>
-                    <div className="max-w-[86%]">
-                      {partial ? (
-                        <div className="rounded-[2px] border border-[#e2d5c1] bg-[#fffaf2] px-4.5 py-3.5 text-xs sm:text-[13.5px] leading-relaxed whitespace-pre-wrap text-[#2a1c12] shadow-xs">
-                          {partial}
-                          <span className="ml-0.5 inline-block h-4 w-0.5 animate-pulse bg-[#9a6a35] align-middle" />
+        {/* 2. Scrollable Messages Area: ONLY this element scrolls! */}
+        <div
+          ref={messagesContainerRef}
+          className="flex-1 min-h-0 overflow-y-auto py-5 space-y-6 pr-1 select-text scroll-smooth"
+          aria-live="polite"
+        >
+          {turns.length === 0 && !isThinking ? (
+            <EmptyState
+              userName={user?.name?.split(" ")[0]}
+              onSelectPrompt={(p) => void handleSend(p)}
+            />
+          ) : (
+            <div className="space-y-6">
+              {turns.map((turn) => {
+                if (turn.role === "user") {
+                  return (
+                    <div key={turn.id} className="flex justify-end gap-2.5 animate-in-up">
+                      <div className="max-w-[88%] sm:max-w-[80%]">
+                        <div className="rounded-[2px] bg-[#2a1c12] px-4.5 py-3.5 text-xs sm:text-[13.5px] leading-relaxed text-[#fffaf2] shadow-xs select-text">
+                          {turn.userText}
                         </div>
-                      ) : (
-                        <Typing />
-                      )}
+                        <div className="mt-1 flex items-center justify-end gap-1.5 text-[10.5px] font-mono text-[#85725f]">
+                          <span className="size-1.5 rounded-full bg-[#2e7d32]" aria-hidden="true" />
+                          Delivered
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                )}
-              </>
-            )}
+                  );
+                }
 
-            {!busy && !streaming && (
-              <div className="rounded-[2px] border border-[#e2d5c1] bg-[#ebe1d1]/35 p-4 space-y-1.5">
-                <p className="flex items-center gap-1.5 text-xs font-semibold text-[#2a1c12]">
-                  <Sparkles className="size-3.5 text-[#9a6a35]" aria-hidden />
-                  Organize into formal Case Matter Brief
-                </p>
-                <p className="text-xs text-[#5b4a3b] leading-relaxed">
-                  Five structured questions to catalog facts, court jurisdiction, and statutory limitation dates.
-                </p>
-                <div className="pt-1.5 flex flex-wrap gap-2">
-                  <Button size="sm" variant="primary" onClick={() => router.push(dh("/intake"))}>
-                    Start Structured Intake <ArrowRight className="size-3.5 ml-1" />
-                  </Button>
-                  <Button size="sm" variant="secondary" onClick={() => router.push(dh("/advocates"))}>
-                    Consult Verified Advocate
-                  </Button>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Composer */}
-          <div className="border-t border-[#e2d5c1] bg-[#fffaf2] px-4 py-3 sm:px-5">
-            <div className="mb-2.5 flex gap-1.5 overflow-x-auto no-scrollbar">
-              {suggestions.map((s) => (
-                <button
-                  key={s}
-                  type="button"
-                  onClick={() => void send(s)}
-                  disabled={streaming}
-                  className="shrink-0 rounded-[2px] border border-[#e2d5c1] bg-[#ebe1d1]/30 px-2.5 py-1 text-[11px] font-medium text-[#5b4a3b] transition hover:border-[#9a6a35] hover:text-[#2a1c12] disabled:opacity-50"
-                >
-                  {s}
-                </button>
-              ))}
-            </div>
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                void send(input);
-              }}
-              className="flex items-end gap-2 rounded-[2px] border border-[#e2d5c1] bg-[#fffaf2] p-1.5 focus-within:border-[#9a6a35] focus-within:ring-1 focus-within:ring-[#9a6a35]"
-            >
-              <button
-                type="button"
-                aria-label="Attach document"
-                className="grid size-9 shrink-0 place-items-center rounded-[2px] text-[#85725f] hover:bg-[#ebe1d1]/40 hover:text-[#2a1c12] transition"
-              >
-                <Paperclip className="size-4" aria-hidden />
-              </button>
-              <textarea
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && !e.shiftKey) {
-                    e.preventDefault();
-                    void send(input);
+                if (turn.role === "assistant" && turn.assistantAnswer) {
+                  // Streaming transition state
+                  if (turn.isStreaming) {
+                    return (
+                      <div key={turn.id} className="space-y-3 animate-in-up">
+                        <div className="rounded-[2px] border border-[#e2d5c1] bg-[#fffaf2] p-5 shadow-xs space-y-3">
+                          <div className="h-5 w-28 rounded-[2px] bg-[#ebe1d1]/60 animate-pulse" />
+                          <p className="font-serif text-[17px] sm:text-[19px] font-normal leading-snug text-[#2a1c12]">
+                            {turn.streamedText}
+                            <span className="ml-1 inline-block h-4 w-1 animate-pulse bg-[#9a6a35] align-middle" />
+                          </p>
+                        </div>
+                      </div>
+                    );
                   }
-                }}
-                rows={1}
-                placeholder="State your statutory inquiry or legal question…"
-                aria-label="Message the AI legal assistant"
-                className="max-h-28 min-h-9 flex-1 resize-none bg-transparent px-2 py-2 text-xs sm:text-sm leading-relaxed text-[#2a1c12] placeholder:text-[#85725f]/60 focus:outline-none"
-              />
-              <button
-                type="button"
-                aria-label="Voice input"
-                className="grid size-9 shrink-0 place-items-center rounded-[2px] text-[#85725f] hover:bg-[#ebe1d1]/40 hover:text-[#2a1c12] transition"
-              >
-                <Mic className="size-4" aria-hidden />
-              </button>
-              <Button
-                type="submit"
-                size="sm"
-                variant="primary"
-                className="size-9 !px-0 rounded-[2px]"
-                disabled={!input.trim() || streaming}
-                aria-label="Send query"
-              >
-                <Send className="size-3.5" aria-hidden />
-              </Button>
-            </form>
-            <p className="mt-2 text-[10.5px] leading-relaxed text-[#85725f]">
-              {user?.name ? `${user.name}, ` : ""}
-              Information retrieved from official gazetted Indian Bare Acts. Preliminary AI assessments do not create an advocate-client relationship.
-            </p>
-          </div>
-        </section>
 
-        {/* Right Rail */}
-        <aside className="hidden space-y-4 lg:block">
-          <div className="rounded-[2px] border border-[#e2d5c1] bg-[#fffaf2] p-5 shadow-[0_1px_2px_rgba(42,28,18,0.04)]">
-            <div className="flex items-center justify-between pb-3 border-b border-[#e2d5c1]/60">
-              <h2 className="font-serif text-[17px] font-normal text-[#2a1c12]">Retrieval Engine</h2>
-              <Badge variant="stamp">RAG v2</Badge>
+                  // Fully populated structured answer anatomy
+                  return (
+                    <AssistantAnswerCard
+                      key={turn.id}
+                      answer={turn.assistantAnswer}
+                      onSaveToCases={handleSaveToCases}
+                      onAddToDeadlines={handleAddToDeadlines}
+                      onRequestConsultation={handleRequestConsultation}
+                      onFollowUpClick={(prompt) => void handleSend(prompt)}
+                      onShowToast={(msg) => showToast(msg)}
+                    />
+                  );
+                }
+
+                return null;
+              })}
+
+              {/* Cycling Thinking State while awaiting response */}
+              {isThinking && (
+                <div className="animate-in-up">
+                  <ThinkingState />
+                </div>
+              )}
+
+              {/* Scan & Explain Inline Card Result */}
+              {activeScanResult && (
+                <ScanExplainResultCard
+                  result={activeScanResult}
+                  onClose={() => setActiveScanResult(null)}
+                  onAskFollowUp={(p) => void handleSend(p)}
+                />
+              )}
+
+              {/* Anchor for auto-scroll tracking */}
+              <div ref={scrollAnchorRef} className="h-2" />
             </div>
-            <ol className="mt-3.5 space-y-3 text-xs">
-              {[
-                ["Retrieve", "Bare Acts, High Court & Supreme Court statutory rules are retrieved."],
-                ["Filter", "Jurisdiction and temporal relevance verified against central statutes."],
-                ["Cite", "Sections and gazette provisions surfaced with active source links."],
-                ["Verify", "Deterministic guardrails prevent hallucinated legal advice."],
-              ].map(([step, text], i) => (
-                <li key={step} className="flex gap-2.5">
-                  <span className="grid size-5 shrink-0 place-items-center rounded-[2px] border border-[#e2d5c1] bg-[#ebe1d1]/60 font-mono text-[10px] font-bold text-[#2a1c12]">
-                    {i + 1}
-                  </span>
-                  <div>
-                    <p className="font-semibold text-[#2a1c12]">{step}</p>
-                    <p className="text-[#5b4a3b] leading-relaxed mt-0.5">{text}</p>
-                  </div>
-                </li>
-              ))}
-            </ol>
-          </div>
+          )}
+        </div>
 
-          <div className="rounded-[2px] border border-[#e2d5c1] bg-[#fffaf2] p-5 shadow-[0_1px_2px_rgba(42,28,18,0.04)] space-y-3">
-            <h2 className="font-serif text-[17px] font-normal text-[#2a1c12]">Advocate Consultation</h2>
-            <ul className="space-y-2 text-xs text-[#5b4a3b] leading-relaxed">
-              <li className="flex gap-2">
-                <span className="mt-1.5 size-1 shrink-0 rounded-full bg-[#9a6a35]" />
-                Limitation deadline within 7 days.
-              </li>
-              <li className="flex gap-2">
-                <span className="mt-1.5 size-1 shrink-0 rounded-full bg-[#9a6a35]" />
-                Formal legal notice or summons received.
-              </li>
-              <li className="flex gap-2">
-                <span className="mt-1.5 size-1 shrink-0 rounded-full bg-[#9a6a35]" />
-                Court petition drafting and Vakalatnama required.
-              </li>
-            </ul>
-            <Button size="sm" variant="secondary" fullWidth onClick={() => router.push(dh("/advocates"))}>
-              <Scale className="size-3.5 mr-1 text-[#9a6a35]" aria-hidden /> Match Roll Advocates
-            </Button>
-            <Link
-              href={dh("/emergency")}
-              className="flex h-9 items-center justify-center gap-1.5 rounded-[2px] border border-[#c0392b]/30 bg-[#fdf2f0] text-xs font-sans uppercase tracking-[0.08em] font-semibold text-[#c0392b] hover:bg-[#c0392b] hover:text-[#fffaf2] transition-colors"
-            >
-              Emergency Helpline: 112 / 181
-            </Link>
-          </div>
-
-          <Disclaimer variant="banner" />
-        </aside>
+        {/* 3. Stationary Pinned Composer at Bottom: Never scrolls up! */}
+        <footer
+          id="composer-container"
+          className="shrink-0 pt-2.5 pb-2.5 bg-[#f4efe6] border-t border-[#e2d5c1]/70"
+        >
+          <ChatComposer
+            input={input}
+            setInput={setInput}
+            onSend={(text) => void handleSend(text)}
+            onAttachFile={handleAttachFile}
+            onVoiceTranscript={handleVoiceTranscript}
+            streaming={isThinking || Boolean(streamingTurnId)}
+          />
+        </footer>
       </div>
-
-      <div className="flex items-center gap-2 text-xs text-[#85725f] lg:hidden">
-        <UserRound className="size-3.5 text-[#9a6a35]" aria-hidden />
-        Inquiries are processed under DPDP Act, 2023 encryption. Never share OTPs or banking credentials.
-      </div>
-    </div>
+    </>
   );
 }
