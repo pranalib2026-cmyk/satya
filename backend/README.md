@@ -189,7 +189,7 @@ pytest tests/test_advocate_matching.py -v
 
 ## 8. Detailed Specifications
 
-* **API Endpoints & Contract:** [`docs/API_CONTRACT.md`](file:///Users/yashodhan/Documents/Projects/NyayaSetu/backend/docs/API_CONTRACT.md)
-* **Database Schema & Models:** [`docs/DATABASE_SCHEMA.md`](file:///Users/yashodhan/Documents/Projects/NyayaSetu/backend/docs/DATABASE_SCHEMA.md)
-* **Backend Architecture:** [`docs/ARCHITECTURE.md`](file:///Users/yashodhan/Documents/Projects/NyayaSetu/backend/docs/ARCHITECTURE.md)
-* **Development History:** [`docs/DEVELOPMENT_LOG.md`](file:///Users/yashodhan/Documents/Projects/NyayaSetu/backend/docs/DEVELOPMENT_LOG.md)
+* **API Endpoints & Contract:** [`../docs/API.md`](../docs/API.md)
+* **Database Schema & Models:** [`../docs/DATABASE.md`](../docs/DATABASE.md)
+* **Backend Architecture:** [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
+* **Development & Operations:** [`../docs/DEVELOPMENT.md`](../docs/DEVELOPMENT.md)

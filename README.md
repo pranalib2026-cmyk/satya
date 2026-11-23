@@ -202,9 +202,9 @@ node scripts/test-services.mjs
 
 ## 7. Documentation Directory
 
-* **System Architecture:** [`docs/ARCHITECTURE.md`](file:///Users/yashodhan/Documents/Projects/NyayaSetu/docs/ARCHITECTURE.md)
-* **API Specification & Endpoints:** [`docs/API.md`](file:///Users/yashodhan/Documents/Projects/NyayaSetu/docs/API.md) and [`backend/docs/API_CONTRACT.md`](file:///Users/yashodhan/Documents/Projects/NyayaSetu/backend/docs/API_CONTRACT.md)
-* **Database Models & Alembic Schema:** [`docs/DATABASE.md`](file:///Users/yashodhan/Documents/Projects/NyayaSetu/docs/DATABASE.md) and [`backend/docs/DATABASE_SCHEMA.md`](file:///Users/yashodhan/Documents/Projects/NyayaSetu/backend/docs/DATABASE_SCHEMA.md)
-* **Developer Guidelines & Code Rules:** [`AGENTS.md`](file:///Users/yashodhan/Documents/Projects/NyayaSetu/AGENTS.md)
-* **Architecture Verification Baseline:** [`docs/ARCHITECTURE_VERIFICATION.md`](file:///Users/yashodhan/Documents/Projects/NyayaSetu/docs/ARCHITECTURE_VERIFICATION.md)
-* **Complete Final Audit Report:** [`NYAYASETU_FINAL_AUDIT.md`](file:///Users/yashodhan/Documents/Projects/NyayaSetu/NYAYASETU_FINAL_AUDIT.md)
+* **System Architecture:** [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
+* **API Specification & Endpoints:** [`docs/API.md`](docs/API.md)
+* **Database Models & Alembic Schema:** [`docs/DATABASE.md`](docs/DATABASE.md)
+* **Developer Guidelines & Code Rules:** [`AGENTS.md`](AGENTS.md)
+* **Development & Operations:** [`docs/DEVELOPMENT.md`](docs/DEVELOPMENT.md)
+* **Delivery History/Audits:** [`docs/DELIVERY_RECORD.md`](docs/DELIVERY_RECORD.md)
