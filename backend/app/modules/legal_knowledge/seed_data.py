@@ -1,9 +1,26 @@
-"""Curated, verified statutory Indian legal sources for NyayaSetu RAG."""
+"""Curated, verified statutory Indian legal sources for NyayaSetu RAG.
+
+Covers 10 core Indian legal practice domains with verified Bare Act text,
+statutory section numbers, official gazette citations, and government portal URLs:
+1. Family Law (Domestic Violence, Marriage & Divorce, Succession)
+2. Criminal Law (BNS, BNSS, BSA - Sanhitas 2023)
+3. Commercial & Contracts (Indian Contract Act, Negotiable Instruments Act)
+4. Consumer Protection (Consumer Protection Act, 2019)
+5. Cyber Law & Data Privacy (IT Act 2000, DPDP Act 2023)
+6. Motor Vehicle Accidents (Motor Vehicles Act 1988/2019 - MACT)
+7. Property & Civil Law (Transfer of Property Act, Limitation Act, RERA)
+8. Legal Aid & Access (Legal Services Authorities Act, 1987)
+9. Employment & Labour (Industrial Disputes Act, Payment of Gratuity Act)
+10. Intellectual Property (Copyright Act, Trade Marks Act)
+"""
 
 from datetime import date
 from typing import Any, Dict, List
 
 CURATED_LEGAL_SOURCES: List[Dict[str, Any]] = [
+    # ──────────────────────────────────────────────────────────────
+    # 1. Commercial & Banking: Negotiable Instruments Act, 1881
+    # ──────────────────────────────────────────────────────────────
     {
         "title": "The Negotiable Instruments Act, 1881",
         "source_type": "BARE_ACT",
@@ -58,6 +75,10 @@ CURATED_LEGAL_SOURCES: List[Dict[str, Any]] = [
             },
         ],
     },
+
+    # ──────────────────────────────────────────────────────────────
+    # 2. Consumer Law: Consumer Protection Act, 2019
+    # ──────────────────────────────────────────────────────────────
     {
         "title": "The Consumer Protection Act, 2019",
         "source_type": "BARE_ACT",
@@ -102,8 +123,22 @@ CURATED_LEGAL_SOURCES: List[Dict[str, Any]] = [
                     "orders of any District Commission within the State."
                 ),
             },
+            {
+                "section_number": "Section 84",
+                "clause_heading": "Liability of product manufacturer in product liability action",
+                "chunk_text": (
+                    "A product manufacturer shall be liable in a product liability action if (a) the product contains a manufacturing "
+                    "defect; (b) the product is defective in design; (c) there is a deviation from manufacturing specifications; "
+                    "(d) the product does not conform to the express warranty; or (e) the product fails to contain adequate instructions "
+                    "of correct usage to prevent any harm or any warning regarding improper or incorrect usage."
+                ),
+            },
         ],
     },
+
+    # ──────────────────────────────────────────────────────────────
+    # 3. Legal Aid & Access: Legal Services Authorities Act, 1987
+    # ──────────────────────────────────────────────────────────────
     {
         "title": "The Legal Services Authorities Act, 1987",
         "source_type": "LEGAL_AID_SCHEME",
@@ -142,8 +177,23 @@ CURATED_LEGAL_SOURCES: List[Dict[str, Any]] = [
                     "for which the Lok Adalat is organized."
                 ),
             },
+            {
+                "section_number": "Section 21",
+                "clause_heading": "Award of Lok Adalat and refund of court fee",
+                "chunk_text": (
+                    "Every award of the Lok Adalat shall be deemed to be a decree of a civil court or, as the case may be, an order "
+                    "of any other court and where a compromise or settlement has been arrived at, by a Lok Adalat in a case referred "
+                    "to it under sub-section (1) of section 20, the court-fee paid in such case shall be refunded in the manner provided "
+                    "under the Court-fees Act, 1870. Every award made by a Lok Adalat shall be final and binding on all the parties to the "
+                    "dispute, and no appeal shall lie to any court against the award."
+                ),
+            },
         ],
     },
+
+    # ──────────────────────────────────────────────────────────────
+    # 4. Property & Real Estate: RERA Act, 2016
+    # ──────────────────────────────────────────────────────────────
     {
         "title": "The Real Estate (Regulation and Development) Act, 2016",
         "source_type": "BARE_ACT",
@@ -172,6 +222,10 @@ CURATED_LEGAL_SOURCES: List[Dict[str, Any]] = [
             },
         ],
     },
+
+    # ──────────────────────────────────────────────────────────────
+    # 5. Criminal Procedure: Bharatiya Nagarik Suraksha Sanhita, 2023
+    # ──────────────────────────────────────────────────────────────
     {
         "title": "The Bharatiya Nagarik Suraksha Sanhita, 2023",
         "source_type": "BARE_ACT",
@@ -187,6 +241,17 @@ CURATED_LEGAL_SOURCES: List[Dict[str, Any]] = [
         "year": 2023,
         "chunks": [
             {
+                "section_number": "Section 173",
+                "clause_heading": "Information in cognizable cases (First Information Report)",
+                "chunk_text": (
+                    "Every information relating to the commission of a cognizable offence, if given orally to an officer in charge "
+                    "of a police station, shall be reduced to writing by him or under his direction, and be read over to the informant; "
+                    "and every such information, whether given in writing or reduced to writing as aforesaid, shall be signed by the person "
+                    "giving it, and the substance thereof shall be entered in a book to be kept by such officer. Information may also be "
+                    "given electronically and taken on record."
+                ),
+            },
+            {
                 "section_number": "Section 479",
                 "clause_heading": "Maximum period for which an undertrial prisoner can be detained",
                 "chunk_text": (
@@ -199,14 +264,706 @@ CURATED_LEGAL_SOURCES: List[Dict[str, Any]] = [
                 ),
             },
             {
-                "section_number": "Section 173",
-                "clause_heading": "Information in cognizable cases (First Information Report)",
+                "section_number": "Section 482",
+                "clause_heading": "Direction for grant of bail to person apprehending arrest (Anticipatory Bail)",
                 "chunk_text": (
-                    "Every information relating to the commission of a cognizable offence, if given orally to an officer in charge "
-                    "of a police station, shall be reduced to writing by him or under his direction, and be read over to the informant; "
-                    "and every such information, whether given in writing or reduced to writing as aforesaid, shall be signed by the person "
-                    "giving it, and the substance thereof shall be entered in a book to be kept by such officer. Information may also be "
-                    "given electronically and taken on record."
+                    "When any person has reason to believe that he may be arrested on an accusation of having committed a non-bailable "
+                    "offence, he may apply to the High Court or the Court of Session for a direction under this section that in the event "
+                    "of such arrest he shall be released on bail; and that Court may, after taking into consideration the nature and gravity "
+                    "of the accusation, the antecedents of the applicant, the possibility of the applicant to flee from justice, and where "
+                    "the accusation has been made with the object of injuring or humiliating the applicant by having him so arrested, "
+                    "either reject the application or issue an interim order for the grant of anticipatory bail."
+                ),
+            },
+        ],
+    },
+
+    # ──────────────────────────────────────────────────────────────
+    # 6. Substantive Criminal Law: Bharatiya Nyaya Sanhita, 2023
+    # ──────────────────────────────────────────────────────────────
+    {
+        "title": "The Bharatiya Nyaya Sanhita, 2023",
+        "source_type": "BARE_ACT",
+        "short_code": "BNS_2023",
+        "citation": "Act No. 45 of 2023",
+        "act_or_judgment_identifier": "Act No. 45 of 2023",
+        "jurisdiction": "Union of India",
+        "court": None,
+        "publication_date": date(2023, 12, 25),
+        "last_verified_date": date(2026, 1, 1),
+        "document_version": "2026.1",
+        "official_source_url": "https://www.mha.gov.in/en/acts",
+        "year": 2023,
+        "chunks": [
+            {
+                "section_number": "Section 85",
+                "clause_heading": "Husband or relative of husband of a woman subjecting her to cruelty",
+                "chunk_text": (
+                    "Whoever, being the husband or the relative of the husband of a woman, subjects such woman to cruelty shall be "
+                    "punished with imprisonment for a term which may extend to three years and shall also be liable to fine. For the "
+                    "purposes of this section, cruelty means (a) any wilful conduct which is of such a nature as is likely to drive the "
+                    "woman to commit suicide or to cause grave injury or danger to life, limb or health (whether mental or physical) "
+                    "of the woman; or (b) harassment of the woman where such harassment is with a view to coercing her or any person "
+                    "related to her to meet any unlawful demand for any property or valuable security."
+                ),
+            },
+            {
+                "section_number": "Section 316",
+                "clause_heading": "Criminal breach of trust",
+                "chunk_text": (
+                    "Whoever, being in any manner entrusted with property, or with any dominion over property, dishonestly "
+                    "misappropriates or converts to his own use that property, or dishonestly uses or disposes of that property in "
+                    "violation of any direction of law prescribing the mode in which such trust is to be discharged, or of any legal "
+                    "contract, express or implied, which he has made touching the discharge of such trust, or wilfully suffers any "
+                    "other person so to do, commits criminal breach of trust. Whoever commits criminal breach of trust shall be "
+                    "punished with imprisonment of either description for a term which may extend to five years, or with fine, or with both."
+                ),
+            },
+            {
+                "section_number": "Section 318",
+                "clause_heading": "Cheating and dishonestly inducing delivery of property",
+                "chunk_text": (
+                    "Whoever, by deceiving any person, fraudulently or dishonestly induces the person so deceived to deliver any property "
+                    "to any person, or to consent that any person shall retain any property, or intentionally induces the person so "
+                    "deceived to do or omit to do anything which he would not do or omit if he were not so deceived, and which act or "
+                    "omission causes or is likely to cause damage or harm to that person in body, mind, reputation or property, is said "
+                    "to cheat. Whoever cheats and thereby dishonestly induces the person deceived to deliver any property to any person "
+                    "shall be punished with imprisonment of either description for a term which may extend to seven years, and shall "
+                    "also be liable to fine."
+                ),
+            },
+        ],
+    },
+
+    # ──────────────────────────────────────────────────────────────
+    # 7. Law of Evidence: Bharatiya Sakshya Adhiniyam, 2023
+    # ──────────────────────────────────────────────────────────────
+    {
+        "title": "The Bharatiya Sakshya Adhiniyam, 2023",
+        "source_type": "BARE_ACT",
+        "short_code": "BSA_2023",
+        "citation": "Act No. 47 of 2023",
+        "act_or_judgment_identifier": "Act No. 47 of 2023",
+        "jurisdiction": "Union of India",
+        "court": None,
+        "publication_date": date(2023, 12, 25),
+        "last_verified_date": date(2026, 1, 1),
+        "document_version": "2026.1",
+        "official_source_url": "https://www.mha.gov.in/en/acts",
+        "year": 2023,
+        "chunks": [
+            {
+                "section_number": "Section 61",
+                "clause_heading": "Admissibility of electronic or digital records",
+                "chunk_text": (
+                    "Nothing in this Adhiniyam shall apply to deny the admissibility of an electronic or digital record in the evidence "
+                    "on the ground that it is an electronic or digital record and such record shall have the same legal effect, validity "
+                    "and enforceability as any other document."
+                ),
+            },
+            {
+                "section_number": "Section 63",
+                "clause_heading": "Admissibility of electronic records and certificate requirement",
+                "chunk_text": (
+                    "Any information contained in an electronic record which is printed on a paper, stored, recorded or copied in optical "
+                    "or magnetic media or cloud or semiconductor memory produced by a computer shall be deemed to be also a document and "
+                    "shall be admissible in any proceedings, without further proof or production of the original, as evidence of any "
+                    "contents of the original or of any fact stated therein of which direct evidence would be admissible, provided the "
+                    "device producing the record was in regular lawful use and accompanied by a certificate signed by a person occupying "
+                    "a responsible official position in relation to the operation of the relevant device."
+                ),
+            },
+        ],
+    },
+
+    # ──────────────────────────────────────────────────────────────
+    # 8. Family Law: Protection of Women from Domestic Violence Act, 2005
+    # ──────────────────────────────────────────────────────────────
+    {
+        "title": "The Protection of Women from Domestic Violence Act, 2005",
+        "source_type": "BARE_ACT",
+        "short_code": "PWDVA_2005",
+        "citation": "Act No. 43 of 2005",
+        "act_or_judgment_identifier": "Act No. 43 of 2005",
+        "jurisdiction": "Union of India",
+        "court": None,
+        "publication_date": date(2005, 9, 13),
+        "last_verified_date": date(2026, 1, 1),
+        "document_version": "2026.1",
+        "official_source_url": "https://www.indiacode.nic.in/handle/123456789/2012",
+        "year": 2005,
+        "chunks": [
+            {
+                "section_number": "Section 3",
+                "clause_heading": "Definition of domestic violence",
+                "chunk_text": (
+                    "For the purposes of this Act, any act, omission or commission or conduct of the respondent shall constitute domestic "
+                    "violence if it (a) harms or injures or endangers the health, safety, life, limb or well-being, whether mental or physical, "
+                    "of the aggrieved person or tends to do so and includes causing physical abuse, sexual abuse, verbal and emotional abuse "
+                    "and economic abuse; or (b) harasses, harms, injures or endangers the aggrieved person with a view to coerce her or any other "
+                    "person related to her to meet any unlawful demand for any dowry or other property or valuable security; or (c) has the "
+                    "effect of threatening the aggrieved person or any person related to her by any conduct mentioned in clause (a) or clause (b); "
+                    "or (d) otherwise injures or causes harm, whether physical or mental, to the aggrieved person."
+                ),
+            },
+            {
+                "section_number": "Section 12",
+                "clause_heading": "Application to Magistrate for reliefs",
+                "chunk_text": (
+                    "An aggrieved person or a Protection Officer or any other person on behalf of the aggrieved person may present an application "
+                    "to the Magistrate seeking one or more reliefs under this Act: Provided that before passing any order on such application, "
+                    "the Magistrate shall take into consideration any domestic incident report received by him from the Protection Officer or the "
+                    "service provider. The reliefs sought may include orders for protection, residence, monetary relief, custody orders, or compensation."
+                ),
+            },
+            {
+                "section_number": "Section 18",
+                "clause_heading": "Protection orders",
+                "chunk_text": (
+                    "The Magistrate may, after giving the aggrieved person and the respondent an opportunity of being heard and on being prima facie "
+                    "satisfied that domestic violence has taken place or is likely to take place, pass a protection order in favour of the "
+                    "aggrieved person and prohibit the respondent from committing any act of domestic violence, aiding or abetting acts of "
+                    "domestic violence, entering the place of employment of the aggrieved person, attempting to communicate in any form, alienating "
+                    "any assets or operating bank lockers without permission."
+                ),
+            },
+            {
+                "section_number": "Section 19",
+                "clause_heading": "Residence orders in shared household",
+                "chunk_text": (
+                    "While disposing of an application under sub-section (1) of section 12, the Magistrate may, on being satisfied that domestic "
+                    "violence has taken place, pass a residence order restraining the respondent from dispossessing or in any other manner "
+                    "disturbing the possession of the aggrieved person from the shared household, whether or not the respondent has a legal or "
+                    "equitable interest in the shared household; directing the respondent to remove himself from the shared household; or restraining "
+                    "the respondent or any of his relatives from entering any portion of the shared household in which the aggrieved person resides."
+                ),
+            },
+            {
+                "section_number": "Section 20",
+                "clause_heading": "Monetary reliefs and maintenance",
+                "chunk_text": (
+                    "While disposing of an application under sub-section (1) of section 12, the Magistrate may direct the respondent to pay "
+                    "monetary relief to meet the expenses incurred and losses suffered by the aggrieved person and any child of the aggrieved "
+                    "person as a result of the domestic violence, including loss of earnings, medical expenses, loss caused due to destruction or "
+                    "damage of property, and the maintenance for the aggrieved person as well as her children, an order which shall be in addition "
+                    "to an order of maintenance under section 125 of the Code of Criminal Procedure or any other law."
+                ),
+            },
+        ],
+    },
+
+    # ──────────────────────────────────────────────────────────────
+    # 9. Family Law: Hindu Marriage Act, 1955
+    # ──────────────────────────────────────────────────────────────
+    {
+        "title": "The Hindu Marriage Act, 1955",
+        "source_type": "BARE_ACT",
+        "short_code": "HMA_1955",
+        "citation": "Act No. 25 of 1955",
+        "act_or_judgment_identifier": "Act No. 25 of 1955",
+        "jurisdiction": "Union of India",
+        "court": None,
+        "publication_date": date(1955, 5, 18),
+        "last_verified_date": date(2026, 1, 1),
+        "document_version": "2026.1",
+        "official_source_url": "https://www.indiacode.nic.in/handle/123456789/1559",
+        "year": 1955,
+        "chunks": [
+            {
+                "section_number": "Section 13",
+                "clause_heading": "Divorce and grounds for dissolution of marriage",
+                "chunk_text": (
+                    "Any marriage solemnized, whether before or after the commencement of this Act, may, on a petition presented by either the "
+                    "husband or the wife, be dissolved by a decree of divorce on the ground that the other party (i) has, after the solemnization "
+                    "of the marriage, had voluntary sexual intercourse with any person other than his or her spouse; or (ia) has, after the "
+                    "solemnization of the marriage, treated the petitioner with cruelty; or (ib) has deserted the petitioner for a continuous period "
+                    "of not less than two years immediately preceding the presentation of the petition; or (ii) has ceased to be a Hindu by "
+                    "conversion to another religion; or (iii) has been incurably of unsound mind or suffering continuously or intermittently from "
+                    "mental disorder of such a kind that the petitioner cannot reasonably be expected to live with the respondent."
+                ),
+            },
+            {
+                "section_number": "Section 13B",
+                "clause_heading": "Divorce by mutual consent",
+                "chunk_text": (
+                    "Subject to the provisions of this Act, a petition for dissolution of marriage by a decree of divorce may be presented to the "
+                    "district court by both the parties to a marriage together on the ground that they have been living separately for a period "
+                    "of one year or more, that they have not been able to live together and that they have mutually agreed that the marriage should "
+                    "be dissolved. On the motion of both parties made not earlier than six months after the date of the presentation of the petition "
+                    "and not later than eighteen months after the said date, if the petition is not withdrawn in the meantime, the court shall pass a decree."
+                ),
+            },
+            {
+                "section_number": "Section 24",
+                "clause_heading": "Maintenance pendente lite and expenses of proceedings",
+                "chunk_text": (
+                    "Where in any proceeding under this Act it appears to the court that either the wife or the husband, as the case may be, "
+                    "has no independent income sufficient for her or his support and the necessary expenses of the proceeding, it may, on the "
+                    "application of the wife or the husband, order the respondent to pay to the petitioner the expenses of the proceeding, and "
+                    "monthly during the proceeding such sum as, having regard to the petitioner's own income and the income of the respondent, "
+                    "it may seem to the court to be reasonable."
+                ),
+            },
+            {
+                "section_number": "Section 25",
+                "clause_heading": "Permanent alimony and maintenance",
+                "chunk_text": (
+                    "Any court exercising jurisdiction under this Act may, at the time of passing any decree or at any time subsequent thereto, "
+                    "on application made to it for the purpose by either the wife or the husband, as the case may be, order that the respondent "
+                    "shall pay to the applicant for her or his maintenance and support such gross sum or such monthly or periodical sum for a term "
+                    "not exceeding the life of the applicant having regard to the respondent's own income and other property, if any, the income "
+                    "and other property of the applicant, the conduct of the parties and other circumstances of the case."
+                ),
+            },
+        ],
+    },
+
+    # ──────────────────────────────────────────────────────────────
+    # 10. Family Law: Hindu Succession Act, 1956
+    # ──────────────────────────────────────────────────────────────
+    {
+        "title": "The Hindu Succession Act, 1956",
+        "source_type": "BARE_ACT",
+        "short_code": "HSA_1956",
+        "citation": "Act No. 30 of 1956",
+        "act_or_judgment_identifier": "Act No. 30 of 1956",
+        "jurisdiction": "Union of India",
+        "court": None,
+        "publication_date": date(1956, 6, 17),
+        "last_verified_date": date(2026, 1, 1),
+        "document_version": "2026.1",
+        "official_source_url": "https://www.indiacode.nic.in/handle/123456789/1702",
+        "year": 1956,
+        "chunks": [
+            {
+                "section_number": "Section 6",
+                "clause_heading": "Devolution of interest in coparcenary property (Equal rights for daughters)",
+                "chunk_text": (
+                    "On and from the commencement of the Hindu Succession (Amendment) Act, 2005, in a Joint Hindu family governed by the "
+                    "Mitakshara law, the daughter of a coparcener shall (a) by birth become a coparcener in her own right in the same manner "
+                    "as the son; (b) have the same rights in the coparcenary property as she would have had if she had been a son; (c) be subject "
+                    "to the same liabilities in respect of the said coparcenary property as that of a son, and any reference to a Hindu Mitakshara "
+                    "coparcener shall be deemed to include a reference to a daughter of a coparcener."
+                ),
+            },
+            {
+                "section_number": "Section 8",
+                "clause_heading": "General rules of succession in the case of males (Class I and Class II heirs)",
+                "chunk_text": (
+                    "The property of a male Hindu dying intestate shall devolve according to the provisions of this Chapter: (a) firstly, upon "
+                    "the heirs, being the relatives specified in Class I of the Schedule; (b) secondly, if there is no heir of Class I, then upon "
+                    "the heirs, being the relatives specified in Class II of the Schedule; (c) thirdly, if there is no heir of any of the two classes, "
+                    "then upon the agnates of the deceased; and (d) lastly, if there is no agnate, then upon the cognates of the deceased. Class I "
+                    "heirs include son, daughter, widow, mother, and children of predeceased children."
+                ),
+            },
+        ],
+    },
+
+    # ──────────────────────────────────────────────────────────────
+    # 11. Commercial & Contracts: Indian Contract Act, 1872
+    # ──────────────────────────────────────────────────────────────
+    {
+        "title": "The Indian Contract Act, 1872",
+        "source_type": "BARE_ACT",
+        "short_code": "ICA_1872",
+        "citation": "Act No. 9 of 1872",
+        "act_or_judgment_identifier": "Act No. 9 of 1872",
+        "jurisdiction": "Union of India",
+        "court": None,
+        "publication_date": date(1872, 4, 25),
+        "last_verified_date": date(2026, 1, 1),
+        "document_version": "2026.1",
+        "official_source_url": "https://www.indiacode.nic.in/handle/123456789/2187",
+        "year": 1872,
+        "chunks": [
+            {
+                "section_number": "Section 10",
+                "clause_heading": "What agreements are contracts",
+                "chunk_text": (
+                    "All agreements are contracts if they are made by the free consent of parties competent to contract, for a lawful "
+                    "consideration and with a lawful object, and are not hereby expressly declared to be void. Nothing herein contained "
+                    "shall affect any law in force in India, by which any contract is required to be made in writing or in the presence of "
+                    "witnesses, or any law relating to the registration of documents."
+                ),
+            },
+            {
+                "section_number": "Section 73",
+                "clause_heading": "Compensation for loss or damage caused by breach of contract",
+                "chunk_text": (
+                    "When a contract has been broken, the party who suffers by such breach is entitled to receive, from the party who has "
+                    "broken the contract, compensation for any loss or damage caused to him thereby, which naturally arose in the usual course "
+                    "of things from such breach, or which the parties knew, when they made the contract, to be likely to result from the breach "
+                    "of it. Such compensation is not to be given for any remote and indirect loss or damage sustained by reason of the breach."
+                ),
+            },
+            {
+                "section_number": "Section 74",
+                "clause_heading": "Compensation for breach of contract where penalty stipulated for",
+                "chunk_text": (
+                    "When a contract has been broken, if a sum is named in the contract as the amount to be paid in case of such breach, or "
+                    "if the contract contains any other stipulation by way of penalty, the party complaining of the breach is entitled, "
+                    "whether or not actual damage or loss is proved to have been caused thereby, to receive from the party who has broken the "
+                    "contract reasonable compensation not exceeding the amount so named or, as the case may be, the penalty stipulated for."
+                ),
+            },
+        ],
+    },
+
+    # ──────────────────────────────────────────────────────────────
+    # 12. Property Law: Transfer of Property Act, 1882
+    # ──────────────────────────────────────────────────────────────
+    {
+        "title": "The Transfer of Property Act, 1882",
+        "source_type": "BARE_ACT",
+        "short_code": "TPA_1882",
+        "citation": "Act No. 4 of 1882",
+        "act_or_judgment_identifier": "Act No. 4 of 1882",
+        "jurisdiction": "Union of India",
+        "court": None,
+        "publication_date": date(1882, 2, 17),
+        "last_verified_date": date(2026, 1, 1),
+        "document_version": "2026.1",
+        "official_source_url": "https://www.indiacode.nic.in/handle/123456789/2338",
+        "year": 1882,
+        "chunks": [
+            {
+                "section_number": "Section 54",
+                "clause_heading": "Sale defined and how transfer is made",
+                "chunk_text": (
+                    "Sale is a transfer of ownership in exchange for a price paid or promised or part-paid and part-promised. Such transfer, "
+                    "in the case of tangible immovable property of the value of one hundred rupees and upwards, or in the case of a reversion "
+                    "or other intangible thing, can be made only by a registered instrument. A contract for the sale of immovable property is "
+                    "a contract that a sale of such property shall take place on terms settled between the parties. It does not, of itself, "
+                    "create any interest in or charge on such property."
+                ),
+            },
+            {
+                "section_number": "Section 106",
+                "clause_heading": "Duration of certain leases in absence of written contract and notice to terminate",
+                "chunk_text": (
+                    "In the absence of a contract or local law or usage to the contrary, a lease of immovable property for agricultural or "
+                    "manufacturing purposes shall be deemed to be a lease from year to year, terminable, on the part of either lessor or lessee, "
+                    "by six months' notice; and a lease of immovable property for any other purpose shall be deemed to be a lease from month to "
+                    "month, terminable, on the part of either lessor or lessee, by fifteen days' notice. Every notice under sub-section (1) "
+                    "must be in writing, signed by or on behalf of the person giving it, and either sent by post or tendered personally."
+                ),
+            },
+        ],
+    },
+
+    # ──────────────────────────────────────────────────────────────
+    # 13. Civil Procedure & Deadlines: Limitation Act, 1963
+    # ──────────────────────────────────────────────────────────────
+    {
+        "title": "The Limitation Act, 1963",
+        "source_type": "BARE_ACT",
+        "short_code": "LIMITATION_1963",
+        "citation": "Act No. 36 of 1963",
+        "act_or_judgment_identifier": "Act No. 36 of 1963",
+        "jurisdiction": "Union of India",
+        "court": None,
+        "publication_date": date(1963, 10, 5),
+        "last_verified_date": date(2026, 1, 1),
+        "document_version": "2026.1",
+        "official_source_url": "https://www.indiacode.nic.in/handle/123456789/1565",
+        "year": 1963,
+        "chunks": [
+            {
+                "section_number": "Section 5",
+                "clause_heading": "Extension of prescribed period in certain cases (Condonation of delay)",
+                "chunk_text": (
+                    "Any appeal or any application, other than an application under any of the provisions of Order XXI of the Code of Civil "
+                    "Procedure, 1908, may be admitted after the prescribed period, if the appellant or the applicant satisfies the court "
+                    "that he had sufficient cause for not preferring the appeal or making the application within such period. Explanation: "
+                    "The fact that the appellant or applicant was misled by any order, practice or judgment of the High Court in ascertaining "
+                    "or computing the prescribed period may be sufficient cause within the meaning of this section."
+                ),
+            },
+            {
+                "section_number": "Article 54",
+                "clause_heading": "Limitation period for suit for specific performance of contract",
+                "chunk_text": (
+                    "Under Article 54 of the Schedule to the Limitation Act, 1963, the period of limitation for a suit for specific performance "
+                    "of a contract is three years. The time from which the period begins to run is the date fixed for the performance, or, if "
+                    "no such date is fixed, when the plaintiff has notice that performance is refused."
+                ),
+            },
+            {
+                "section_number": "Article 65",
+                "clause_heading": "Limitation period for suit for possession of immovable property based on title",
+                "chunk_text": (
+                    "Under Article 65 of the Schedule to the Limitation Act, 1963, the period of limitation for a suit for possession of "
+                    "immovable property or any interest therein based on title is twelve years. The time from which the period begins to run "
+                    "is when the possession of the defendant becomes adverse to the plaintiff."
+                ),
+            },
+        ],
+    },
+
+    # ──────────────────────────────────────────────────────────────
+    # 14. Cyber Law: Information Technology Act, 2000
+    # ──────────────────────────────────────────────────────────────
+    {
+        "title": "The Information Technology Act, 2000",
+        "source_type": "BARE_ACT",
+        "short_code": "IT_ACT_2000",
+        "citation": "Act No. 21 of 2000",
+        "act_or_judgment_identifier": "Act No. 21 of 2000",
+        "jurisdiction": "Union of India",
+        "court": None,
+        "publication_date": date(2000, 6, 9),
+        "last_verified_date": date(2026, 1, 1),
+        "document_version": "2026.1",
+        "official_source_url": "https://www.indiacode.nic.in/handle/123456789/1999",
+        "year": 2000,
+        "chunks": [
+            {
+                "section_number": "Section 43",
+                "clause_heading": "Penalty and compensation for damage to computer system and data theft",
+                "chunk_text": (
+                    "If any person without permission of the owner or any other person who is incharge of a computer, computer system or "
+                    "computer network accesses or secures access to such computer, downloads, copies or extracts any data, introduces any "
+                    "computer contaminant or virus, damages or causes to be damaged any computer data, disrupts any computer system, or denies "
+                    "access to any person authorized to access any computer system, he shall be liable to pay damages by way of compensation "
+                    "to the person so affected."
+                ),
+            },
+            {
+                "section_number": "Section 66C",
+                "clause_heading": "Punishment for identity theft",
+                "chunk_text": (
+                    "Whoever, fraudulently or dishonestly make use of the electronic signature, password or any other unique identification "
+                    "feature of any other person, shall be punished with imprisonment of either description for a term which may extend to "
+                    "three years and shall also be liable to fine which may extend to rupees one lakh."
+                ),
+            },
+            {
+                "section_number": "Section 66D",
+                "clause_heading": "Punishment for cheating by personation by using computer resource",
+                "chunk_text": (
+                    "Whoever, by means of any communication device or computer resource cheats by personating, shall be punished with "
+                    "imprisonment of either description for a term which may extend to three years and shall also be liable to fine which "
+                    "may extend to one lakh rupees."
+                ),
+            },
+        ],
+    },
+
+    # ──────────────────────────────────────────────────────────────
+    # 15. Data Privacy: Digital Personal Data Protection Act, 2023
+    # ──────────────────────────────────────────────────────────────
+    {
+        "title": "The Digital Personal Data Protection Act, 2023",
+        "source_type": "BARE_ACT",
+        "short_code": "DPDPA_2023",
+        "citation": "Act No. 22 of 2023",
+        "act_or_judgment_identifier": "Act No. 22 of 2023",
+        "jurisdiction": "Union of India",
+        "court": None,
+        "publication_date": date(2023, 8, 11),
+        "last_verified_date": date(2026, 1, 1),
+        "document_version": "2026.1",
+        "official_source_url": "https://www.meity.gov.in/acts",
+        "year": 2023,
+        "chunks": [
+            {
+                "section_number": "Section 6",
+                "clause_heading": "Consent for processing digital personal data",
+                "chunk_text": (
+                    "Consent given by the Data Principal shall be free, specific, informed, unconditional and unambiguous with a clear "
+                    "affirmative action, and shall signify an agreement to the processing of her personal data for the specified purpose "
+                    "and be limited to such personal data as is necessary for such specified purpose. The Data Principal shall have the right "
+                    "to withdraw her consent at any time, with the ease of doing so being comparable to the ease with which such consent was given."
+                ),
+            },
+            {
+                "section_number": "Section 11",
+                "clause_heading": "Rights of Data Principal (Information and Access)",
+                "chunk_text": (
+                    "The Data Principal shall have the right to obtain from the Data Fiduciary to whom she has previously given consent: "
+                    "(a) a summary of personal data which is being processed by such Data Fiduciary and the processing activities undertaken; "
+                    "(b) the identities of all other Data Fiduciaries and Data Processors with whom the personal data has been shared; and "
+                    "(c) any other information as may be prescribed."
+                ),
+            },
+        ],
+    },
+
+    # ──────────────────────────────────────────────────────────────
+    # 16. Motor Vehicle Law: Motor Vehicles Act, 1988 (as amended 2019)
+    # ──────────────────────────────────────────────────────────────
+    {
+        "title": "The Motor Vehicles Act, 1988",
+        "source_type": "BARE_ACT",
+        "short_code": "MV_ACT_1988",
+        "citation": "Act No. 59 of 1988",
+        "act_or_judgment_identifier": "Act No. 59 of 1988",
+        "jurisdiction": "Union of India",
+        "court": None,
+        "publication_date": date(1988, 10, 14),
+        "last_verified_date": date(2026, 1, 1),
+        "document_version": "2026.1",
+        "official_source_url": "https://morth.nic.in/acts-rules-and-notifications",
+        "year": 1988,
+        "chunks": [
+            {
+                "section_number": "Section 164",
+                "clause_heading": "Payment of compensation in case of death or grievous hurt (No-fault liability)",
+                "chunk_text": (
+                    "Notwithstanding anything contained in this Act or in any other law for the time being in force, the owner of the motor "
+                    "vehicle or the authorised insurer shall be liable to pay in the case of death or grievous hurt due to any accident arising "
+                    "out of the use of the motor vehicle, a compensation of five lakh rupees in case of death or two and a half lakh rupees in "
+                    "case of grievous hurt to the legal heirs or victim. In any claim for compensation under this section, the claimant shall "
+                    "not be required to plead or establish wrongful act, neglect or default."
+                ),
+            },
+            {
+                "section_number": "Section 166",
+                "clause_heading": "Application for compensation before Claims Tribunal (MACT)",
+                "chunk_text": (
+                    "An application for compensation arising out of an accident of the nature specified in section 165 may be made by the "
+                    "person who has sustained the injury, by the owner of the property, or where death has resulted from the accident, by all "
+                    "or any of the legal representatives of the deceased before the Motor Accidents Claims Tribunal. No application for "
+                    "compensation shall be entertained unless it is made within six months of the occurrence of the accident."
+                ),
+            },
+        ],
+    },
+
+    # ──────────────────────────────────────────────────────────────
+    # 17. Labour & Employment: Industrial Disputes Act, 1947
+    # ──────────────────────────────────────────────────────────────
+    {
+        "title": "The Industrial Disputes Act, 1947",
+        "source_type": "BARE_ACT",
+        "short_code": "IDA_1947",
+        "citation": "Act No. 14 of 1947",
+        "act_or_judgment_identifier": "Act No. 14 of 1947",
+        "jurisdiction": "Union of India",
+        "court": None,
+        "publication_date": date(1947, 3, 11),
+        "last_verified_date": date(2026, 1, 1),
+        "document_version": "2026.1",
+        "official_source_url": "https://labour.gov.in/acts",
+        "year": 1947,
+        "chunks": [
+            {
+                "section_number": "Section 25F",
+                "clause_heading": "Conditions precedent to retrenchment of workmen",
+                "chunk_text": (
+                    "No workman employed in any industry who has been in continuous service for not less than one year under an employer shall "
+                    "be retrenched by that employer until (a) the workman has been given one month's notice in writing indicating the reasons for "
+                    "retrenchment and the period of notice has expired, or the workman has been paid in lieu of such notice, wages for the period "
+                    "of the notice; (b) the workman has been paid, at the time of retrenchment, compensation which shall be equivalent to fifteen "
+                    "days' average pay for every completed year of continuous service or any part thereof in excess of six months; and (c) notice "
+                    "in the prescribed manner is served on the appropriate Government."
+                ),
+            },
+        ],
+    },
+
+    # ──────────────────────────────────────────────────────────────
+    # 18. Labour & Employment: Payment of Gratuity Act, 1972
+    # ──────────────────────────────────────────────────────────────
+    {
+        "title": "The Payment of Gratuity Act, 1972",
+        "source_type": "BARE_ACT",
+        "short_code": "PGA_1972",
+        "citation": "Act No. 39 of 1972",
+        "act_or_judgment_identifier": "Act No. 39 of 1972",
+        "jurisdiction": "Union of India",
+        "court": None,
+        "publication_date": date(1972, 8, 21),
+        "last_verified_date": date(2026, 1, 1),
+        "document_version": "2026.1",
+        "official_source_url": "https://labour.gov.in/acts",
+        "year": 1972,
+        "chunks": [
+            {
+                "section_number": "Section 4",
+                "clause_heading": "Payment of gratuity and eligibility conditions",
+                "chunk_text": (
+                    "Gratuity shall be payable to an employee on the termination of his employment after he has rendered continuous service "
+                    "for not less than five years: (a) on his superannuation, or (b) on his retirement or resignation, or (c) on his death or "
+                    "disablement due to accident or disease: Provided that the completion of continuous service of five years shall not be "
+                    "necessary where the termination of employment is due to death or disablement. For every completed year of service or part "
+                    "thereof in excess of six months, the employer shall pay gratuity to an employee at the rate of fifteen days' wages based "
+                    "on the rate of wages last drawn."
+                ),
+            },
+        ],
+    },
+
+    # ──────────────────────────────────────────────────────────────
+    # 19. Intellectual Property: Copyright Act, 1957
+    # ──────────────────────────────────────────────────────────────
+    {
+        "title": "The Copyright Act, 1957",
+        "source_type": "BARE_ACT",
+        "short_code": "COPYRIGHT_1957",
+        "citation": "Act No. 14 of 1957",
+        "act_or_judgment_identifier": "Act No. 14 of 1957",
+        "jurisdiction": "Union of India",
+        "court": None,
+        "publication_date": date(1957, 6, 4),
+        "last_verified_date": date(2026, 1, 1),
+        "document_version": "2026.1",
+        "official_source_url": "https://ipindia.gov.in",
+        "year": 1957,
+        "chunks": [
+            {
+                "section_number": "Section 14",
+                "clause_heading": "Meaning of copyright and exclusive rights of owner",
+                "chunk_text": (
+                    "For the purposes of this Act, copyright means the exclusive right, by virtue of and subject to the provisions of this Act, "
+                    "to do or authorise the doing of any of the following acts in respect of a work or any substantial part thereof, namely: in "
+                    "the case of a literary, dramatic or musical work, not being a computer programme, reproducing the work in any material form "
+                    "including storing of it in any medium by electronic means; issuing copies of the work to the public; performing the work "
+                    "in public or communicating it to the public; and making any translation or adaptation of the work."
+                ),
+            },
+            {
+                "section_number": "Section 52",
+                "clause_heading": "Certain acts not to be infringement of copyright (Fair Dealing exceptions)",
+                "chunk_text": (
+                    "The following acts shall not constitute an infringement of copyright, namely: (a) a fair dealing with any work, not being a "
+                    "computer programme, for the purposes of (i) private or personal use, including research; (ii) criticism or review, whether "
+                    "of that work or of any other work; (iii) the reporting of current events and current affairs, including the reporting of a "
+                    "lecture delivered in public; (b) the transient or incidental storage of a work purely in the technical process of electronic "
+                    "transmission; or (c) reproduction of any work for the purpose of a judicial proceeding or legislative reporting."
+                ),
+            },
+        ],
+    },
+
+    # ──────────────────────────────────────────────────────────────
+    # 20. Intellectual Property: Trade Marks Act, 1999
+    # ──────────────────────────────────────────────────────────────
+    {
+        "title": "The Trade Marks Act, 1999",
+        "source_type": "BARE_ACT",
+        "short_code": "TRADEMARKS_1999",
+        "citation": "Act No. 47 of 1999",
+        "act_or_judgment_identifier": "Act No. 47 of 1999",
+        "jurisdiction": "Union of India",
+        "court": None,
+        "publication_date": date(1999, 12, 30),
+        "last_verified_date": date(2026, 1, 1),
+        "document_version": "2026.1",
+        "official_source_url": "https://ipindia.gov.in",
+        "year": 1999,
+        "chunks": [
+            {
+                "section_number": "Section 29",
+                "clause_heading": "Infringement of registered trade marks",
+                "chunk_text": (
+                    "A registered trade mark is infringed by a person who, not being a registered proprietor or a person using by way of "
+                    "permitted use, uses in the course of trade, a mark which is identical with, or deceptively similar to, the trade mark in "
+                    "relation to goods or services in respect of which the trade mark is registered and in such manner as to render the use of "
+                    "the mark likely to be taken as being used as a trade mark. A person shall also be deemed to infringe if using a mark which "
+                    "is likely to cause confusion on the part of the public, or which takes unfair advantage of or is detrimental to the "
+                    "distinctive character or repute of the registered trade mark."
                 ),
             },
         ],

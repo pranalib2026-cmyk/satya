@@ -1,9 +1,12 @@
-# ADR 0001 — Backend stack: Fastify + Drizzle + SQLite
+# ADR 0001 — Backend stack: Fastify + Drizzle + SQLite (Superseded)
 
-- **Status:** Accepted
-- **Date:** 2026-11-17
+> [!NOTE]
+> **Status:** Superseded by Python 3.12 + FastAPI 0.115 + SQLAlchemy 2.0 + PostgreSQL 16. This document is preserved for historical decision context only. See [`../ARCHITECTURE.md`](../ARCHITECTURE.md) for the active production architecture.
+
+- **Status:** Superseded
+- **Date:** 2026-11-17 (Superseded 2026-11-20)
 - **Deciders:** NyayaSetu engineering
-- **Supersedes:** None
+- **Superseded By:** Python FastAPI Modular Monolith
 
 ## Context
 

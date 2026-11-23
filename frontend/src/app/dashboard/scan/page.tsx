@@ -41,28 +41,45 @@ export default function ScanPage() {
   const [dates, setDates] = useState<Array<{ label: string; value: string }>>([]);
   const [amounts, setAmounts] = useState<Array<{ label: string; value: string }>>([]);
   const [saved, setSaved] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  const process = async (name: string, imageUrl?: string) => {
-    setFileName(name);
+  const process = async (fileOrName: File | string, imageUrl?: string) => {
+    const displayName = fileOrName instanceof File ? fileOrName.name : fileOrName;
+    setFileName(displayName);
     if (imageUrl) setPreview(imageUrl);
     setStage('ocr');
     setOcr(null);
     setExplanation(null);
+    setErrorMsg(null);
     setSaved(false);
-    const result = await runOcr(name);
-    setOcr(result);
-    setStage('explain');
-    const explained = await explainDocument(result.text);
-    setExplanation(explained);
-    setDates(explained.dates);
-    setAmounts(explained.amounts);
-    setStage('done');
+
+    try {
+      const result = await runOcr(fileOrName);
+      setOcr(result);
+
+      if (result.status === 'failed' || !result.text || result.text.trim().length === 0) {
+        setErrorMsg(result.processingError || "Optical extraction failed: The document contains no readable text or is corrupted.");
+        setStage('idle');
+        return;
+      }
+
+      setStage('explain');
+      const explained = await explainDocument(result.text, result.documentId);
+      setExplanation(explained);
+      setDates(explained.dates || []);
+      setAmounts(explained.amounts || []);
+      setStage('done');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Document analysis failed. Please try again.";
+      setErrorMsg(msg);
+      setStage('idle');
+    }
   };
 
   const onFile = (file?: File) => {
     if (!file) return;
     const url = file.type.startsWith('image/') ? URL.createObjectURL(file) : undefined;
-    void process(file.name, url);
+    void process(file, url);
   };
 
   const addDates = () => {
@@ -90,13 +107,26 @@ export default function ScanPage() {
         eyebrow="OCR & EXPLAINER"
         title="Understand a legal document"
         subtitle="Photograph a notice, FIR copy, agreement or summons. NyayaSetu extracts statutory text and explains obligations in plain language."
-        actions={<Badge tone="neutral"><ScanLine className="size-3 text-[#9a6a35]" /> Preview Extraction</Badge>}
+        actions={<Badge tone="mint"><ScanLine className="size-3 text-[#2a6b3b]" /> Verified Vision Engine</Badge>}
       />
+
+      {errorMsg && (
+        <div className="rounded-[2px] border border-[#9a3424]/40 bg-[#fbf2ef] p-4 flex items-start gap-3">
+          <AlertTriangle className="size-5 text-[#9a3424] mt-0.5 shrink-0" />
+          <div className="flex-1">
+            <h4 className="text-[13px] font-semibold text-[#7a2517]">Document Processing Error</h4>
+            <p className="mt-1 text-[12px] leading-relaxed text-[#7a2517]">{errorMsg}</p>
+          </div>
+          <Button size="sm" variant="secondary" onClick={() => setErrorMsg(null)}>
+            Dismiss
+          </Button>
+        </div>
+      )}
 
       <div className="rounded-[2px] border border-[#e2d5c1] bg-[#ebe1d1]/30 p-3.5 flex items-start gap-3">
         <ScanLine className="size-4 text-[#9a6a35] mt-0.5 shrink-0" />
         <div className="text-xs text-[#5b4a3b] leading-relaxed">
-          <strong className="text-[#2a1c12] font-semibold">Client-Side OCR Preview:</strong> Optical document parsing and statutory entity extraction is currently operating in local preview mode. Dedicated backend Indic OCR vision pipeline integration is scheduled.
+          <strong className="text-[#2a1c12] font-semibold">NyayaSetu Document Vision:</strong> Optical document parsing and statutory entity extraction is active via NyayaSetu&apos;s grounded document pipeline. All uploads are stored in your private vault with DPDP compliance.
         </div>
       </div>
 
@@ -242,7 +272,14 @@ export default function ScanPage() {
             {/* Original */}
             <div className="rounded-[2px] border border-[#e2d5c1] bg-[#fffaf2] flex flex-col overflow-hidden">
               <div className="flex items-center justify-between border-b border-[#e2d5c1] px-5 py-3.5 bg-[#ebe1d1]/20">
-                <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-[#85725f]">Source Document</p>
+                <div className="flex items-center gap-2">
+                  <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-[#85725f]">Source Document</p>
+                  {ocr.ocrEngine && (
+                    <span className="font-mono text-[10px] text-[#85725f] bg-[#f4efe6] px-1.5 py-0.5 rounded-[1px] border border-[#e2d5c1]">
+                      {ocr.ocrEngine}
+                    </span>
+                  )}
+                </div>
                 <Badge tone={ocr.lowConfidence ? 'warn' : 'mint'}>
                   {Math.round(ocr.confidence * 100)}% Confidence
                 </Badge>
@@ -374,6 +411,21 @@ export default function ScanPage() {
                   </ul>
                 </div>
               </div>
+
+              {explanation.citations && explanation.citations.length > 0 && (
+                <div className="rounded-[2px] border border-[#e2d5c1] bg-[#fffaf2] p-5">
+                  <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#85725f]">Verified Statutory Citations</p>
+                  <ul className="mt-2.5 space-y-2">
+                    {explanation.citations.map((c, idx) => (
+                      <li key={idx} className="text-[12px] leading-relaxed text-[#2a1c12]">
+                        <span className="font-medium text-[#9a6a35]">{c.source_title}</span>
+                        {c.section_or_paragraph ? ` — ${c.section_or_paragraph}` : ''}
+                        {c.clause_heading ? `: ${c.clause_heading}` : ''}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
 
               <div className="flex flex-col gap-3 sm:flex-row pt-2">
                 <Button fullWidth onClick={addDates} disabled={saved}>

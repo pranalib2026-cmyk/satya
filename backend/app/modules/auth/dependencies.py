@@ -85,6 +85,26 @@ async def get_current_active_user(
     return current_user
 
 
+async def get_optional_user(
+    token: str = Depends(oauth2_scheme),
+    db: AsyncSession = Depends(get_db),
+) -> User | None:
+    """Retrieve user if valid Bearer token provided, otherwise return None."""
+    if not token:
+        return None
+    try:
+        payload = decode_jwt(token)
+        user_id_str = payload.get("sub")
+        if user_id_str:
+            res = await db.execute(select(User).where(User.id == uuid.UUID(user_id_str)))
+            user = res.scalar_one_or_none()
+            if user and user.is_active:
+                return user
+    except Exception:
+        pass
+    return None
+
+
 def require_roles(*allowed_roles: str) -> Callable:
     """Enforce backend role-based authorization for protected endpoints.
     

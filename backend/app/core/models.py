@@ -6,25 +6,32 @@ from app.modules.advocates.models import AdvocateProfile, AdvocateVerification, 
 from app.modules.appointments.models import Appointment
 from app.modules.auth.models import RefreshToken
 from app.modules.cases.models import CaseMessage, LegalCase
+from app.modules.communication.models import Conversation, Message
 from app.modules.deadlines.models import Deadline
 from app.modules.documents.models import Document
-from app.modules.legal_knowledge.models import LegalChunk, LegalSource
+from app.modules.legal_knowledge.models import LegalChunk, LegalIngestionJob, LegalSource
+from app.modules.reviews.models import Review
 from app.modules.triage.models import ConsultationRequest
-from app.modules.users.models import User
+from app.modules.users.models import User, UserConsent
 
 __all__ = [
     "Base",
     "User",
+    "UserConsent",
     "RefreshToken",
     "AdvocateProfile",
     "AdvocateVerification",
     "AdvocateVerificationApplication",
     "LegalCase",
     "CaseMessage",
+    "Conversation",
+    "Message",
+    "Review",
     "ConsultationRequest",
     "Appointment",
     "LegalSource",
     "LegalChunk",
+    "LegalIngestionJob",
     "Document",
     "Deadline",
     "AuditLog",

@@ -10,25 +10,28 @@ do not treat unchecked items as implemented.
 - The backend remains the content source of truth once integration begins.
 - Compliance copy ships with the product, not after it.
 - No feature may imply an advocate-client relationship or guaranteed outcome.
-- PostgreSQL is the production database target; SQLite is the local/default path.
+- PostgreSQL 16 (with PostGIS and pgvector) is the database target; SQLite is used for the in-memory test harness.
 
 ---
 
 ## Phase 0 — Foundation (done)
 
 - [x] Next.js 16 frontend with App Router, Tailwind 4, Framer Motion, Three.js.
-- [x] India-focused marketing pages and static content.
-- [x] Fastify 5 + TypeScript backend scaffold.
-- [x] Zod validation and typed route schemas.
-- [x] Drizzle schema with 9 tables and generated migration.
-- [x] Seed data for practices, advocates, matters, insights, FAQs, testimonials,
-      and fixed fees.
-- [x] Read APIs for content.
-- [x] Intake API with three kinds and reference tracking.
-- [x] Newsletter subscription with idempotent upsert.
-- [x] Helmet, CORS, rate limiting, Pino logging, Swagger UI.
-- [x] Vitest integration tests with in-memory SQLite.
-- [x] Architecture, API, database, frontend, content, and development docs.
+- [x] India-focused marketing pages and editorial design system.
+- [x] Python 3.12 + FastAPI 0.115 Modular Monolith backend.
+- [x] Pydantic v2 validation and typed request/response schemas.
+- [x] SQLAlchemy 2.0 async engine with PostgreSQL 16, PostGIS, and pgvector.
+- [x] Alembic migration environment with 8 applied revisions.
+- [x] Seed data for Bare Acts (NI Act, CPA 2019, RERA, BNSS, Legal Services Authorities Act).
+- [x] Grounded Legal AI Assistant with pgvector semantic retrieval and citation validation.
+- [x] Deterministic legal triage matrix and case intake reference tracking.
+- [x] Multi-factor advocate matching under Bar Council of India Rule 36.
+- [x] Argon2id password hashing and PyJWT authentication with refresh token rotation.
+- [x] Evidence document vault with SHA-256 validation and 15-minute signed download tokens.
+- [x] Limitation Act 1963 statutory deadline tracking and advocate review confirmations.
+- [x] Consultation appointments booking with conflict detection and RFC 5545 `.ics` export.
+- [x] Pytest async integration test suite (79 passing tests).
+- [x] Architecture, API contract, database schema, and agent verification documentation.
 
 ---
 
@@ -231,22 +234,18 @@ Ordered suggestions for the next backend iteration:
 
 ---
 
-## Known gaps
+## Known gaps & next steps
 
-| Area | Gap |
+| Area | Status / Remaining Gap |
 | --- | --- |
-| Auth | No users, roles, sessions, or API keys |
-| Admin | No content or intake management API |
-| AI | No assessment service; frontend interactions are simulated |
-| Matching | No advocate ranking or availability model |
-| Court tracking | Not implemented |
-| Payments | Not implemented; fee text is display-only |
-| Notifications | No email/WhatsApp delivery or outbox |
-| Localization | Language list exists; no translated content |
-| Testing | Backend integration tests only; no frontend/E2E suite |
-| CI/CD | No pipeline in the repository |
-| Production DB | SQLite only; PostgreSQL migration not started |
-| Content | Legacy Chicago/Illinois copy and USD fees remain |
+| Auth & OTP | Email/password auth & JWT implemented; SMS gateway integration (Twilio/MSG91) pending |
+| Messaging | Chambers dispatch chat currently runs in consultation relay; persistent WebSocket/messages table pending |
+| Document OCR | Client-side OCR preview active; dedicated Indic vision OCR backend service integration scheduled |
+| Reviews | Consultation rating collected on frontend; backend `POST /api/v1/reviews` endpoint pending |
+| Storage | Documents stored in local private vault (`storage/vault`); S3/R2 cloud storage adapter recommended for cloud deployment |
+| Corpus Ingestion | 5 foundational Bare Acts seeded; automated IndiaCode statutory ingestion pipeline planned |
+| Testing | Backend Pytest (79 tests) and frontend functional checks passing; frontend E2E (Playwright) suite pending |
+| CI/CD | GitHub Actions pipeline for automated pytest, lint, and build verification pending |
 
 ## Definition of done (general)
 

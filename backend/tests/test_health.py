@@ -37,6 +37,7 @@ async def test_module_skeletons(async_client: AsyncClient):
     modules = [
         "auth",
         "users",
+        "dashboard",
         "advocates",
         "cases",
         "triage",

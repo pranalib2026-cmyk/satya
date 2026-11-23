@@ -176,10 +176,10 @@ The backend contract is documented in [`API.md`](API.md).
 Create `frontend/.env.local`:
 
 ```dotenv
-NEXT_PUBLIC_API_URL=http://localhost:4000
+NEXT_PUBLIC_API_URL=http://localhost:8000
 ```
 
-Use a server-only variable if the client never calls the API directly.
+Use a server-only variable if the client never calls the API directly. Note: `next.config.ts` automatically proxies `/api/v1/:path*` to `http://localhost:8000/api/v1/:path*`.
 
 ### 2. Add a typed client
 
@@ -187,7 +187,7 @@ Suggested `src/lib/api.ts`:
 
 ```ts
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
+  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
 type ApiEnvelope<T> = {
   data: T;

@@ -1,8 +1,9 @@
 """Document entity model for evidence vault and legal filings."""
 
 import uuid
+from datetime import datetime
 from typing import TYPE_CHECKING, Optional
-from sqlalchemy import BigInteger, Boolean, ForeignKey, Index, JSON, String, Text
+from sqlalchemy import BigInteger, Boolean, DateTime, Float, ForeignKey, Index, JSON, String, Text
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -49,10 +50,23 @@ class Document(Base, TimestampMixin):
         nullable=False,
         comment="application/pdf, image/jpeg, application/vnd.openxmlformats-officedocument.wordprocessingml.document",
     )
+    storage_backend: Mapped[str] = mapped_column(
+        String(32),
+        default="local",
+        nullable=False,
+        index=True,
+        comment="Storage backend identifier: 'local' or 'r2'",
+    )
+    storage_key: Mapped[Optional[str]] = mapped_column(
+        Text,
+        nullable=True,
+        index=True,
+        comment="Provider-independent object storage key (e.g. vault/cases/{case_id}/{doc_id}_{filename})",
+    )
     storage_path: Mapped[str] = mapped_column(
         Text,
         nullable=False,
-        comment="Encrypted object storage URI / Supabase storage path",
+        comment="Encrypted object storage URI / filesystem path for backward compatibility",
     )
     checksum_sha256: Mapped[str] = mapped_column(
         String(64),
@@ -71,6 +85,38 @@ class Document(Base, TimestampMixin):
         nullable=False,
         index=True,
         comment="PETITION | WRITTEN_STATEMENT | AFFIDAVIT | CONTRACT | EVIDENCE | COURT_ORDER",
+    )
+    processing_status: Mapped[str] = mapped_column(
+        String(32),
+        default="uploaded",
+        nullable=False,
+        index=True,
+        comment="uploaded | processing | completed | failed",
+    )
+    extracted_text: Mapped[Optional[str]] = mapped_column(
+        Text,
+        nullable=True,
+        comment="Extracted raw text from native PDF or OCR engine",
+    )
+    ocr_confidence: Mapped[Optional[float]] = mapped_column(
+        Float,
+        nullable=True,
+        comment="OCR confidence score 0.0 to 1.0",
+    )
+    ocr_engine: Mapped[Optional[str]] = mapped_column(
+        String(64),
+        nullable=True,
+        comment="pdf_embedded | gemini_vision | rapidocr | tesseract",
+    )
+    processing_error: Mapped[Optional[str]] = mapped_column(
+        Text,
+        nullable=True,
+        comment="Detailed error message if extraction or processing failed",
+    )
+    processed_at: Mapped[Optional[datetime]] = mapped_column(
+        DateTime(timezone=True),
+        nullable=True,
+        comment="Timestamp when OCR extraction finished",
     )
     metadata_json: Mapped[Optional[dict]] = mapped_column(
         JSONB().with_variant(JSON, "sqlite"),

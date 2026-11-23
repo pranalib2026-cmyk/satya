@@ -54,6 +54,7 @@ export default function HomePage() {
   const lastReviewed = formatDate(today);
   const { user } = useAuth();
   const [summary, setSummary] = React.useState<DashboardSummary | null>(null);
+  const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState("");
   const [problem, setProblem] = React.useState("");
 
@@ -65,7 +66,10 @@ export default function HomePage() {
       })
       .catch((err) =>
         setError(err instanceof Error ? err.message : "Could not load your dashboard.")
-      );
+      )
+      .finally(() => {
+        setLoading(false);
+      });
   }, []);
 
   React.useEffect(() => {
@@ -81,22 +85,28 @@ export default function HomePage() {
     router.push(`${dh("/chat")}?question=${encodeURIComponent(question)}`);
   };
 
-  const nextDeadline = summary?.deadlines[0];
+  const nextDeadline = summary?.deadlines?.[0];
   const nextDeadlineDays = nextDeadline ? daysUntil(nextDeadline.date, today) : null;
   const nextDeadlineLabel =
-    nextDeadlineDays === null || nextDeadlineDays < 0
+    nextDeadlineDays === null
       ? "—"
-      : nextDeadlineDays === 0
-        ? "Today"
-        : `${nextDeadlineDays} Day${nextDeadlineDays === 1 ? "" : "s"}`;
+      : nextDeadlineDays < 0
+        ? "Elapsed"
+        : nextDeadlineDays === 0
+          ? "Today"
+          : `${nextDeadlineDays} Day${nextDeadlineDays === 1 ? "" : "s"}`;
 
   return (
     <div className="space-y-7 animate-fade">
       {/* Editorial Greeting Header */}
       <div className="pb-5 border-b border-[#e2d5c1] flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="mb-1.5 flex items-center gap-1.5 text-xs font-sans uppercase tracking-[0.14em] font-medium text-[#85725f]">
-            <Sun className="size-3.5 text-[#9a6a35]" aria-hidden="true" /> {todayLabel}
+          <p
+            suppressHydrationWarning
+            className="mb-1.5 flex items-center gap-1.5 text-xs font-sans uppercase tracking-[0.14em] font-medium text-[#85725f]"
+          >
+            <Sun className="size-3.5 text-[#9a6a35]" aria-hidden="true" />
+            <span suppressHydrationWarning>{todayLabel}</span>
           </p>
           <h1 className="font-serif text-[32px] sm:text-[38px] font-normal tracking-[-0.035em] text-[#2a1c12] leading-tight">
             Namaste, {user?.name?.split(" ")[0] ?? "Rahul"}
@@ -110,9 +120,11 @@ export default function HomePage() {
           className="inline-flex h-8 items-center gap-1.5 rounded-[2px] border border-[#e2d5c1] bg-[#fff8e7] px-3 text-[11px] font-sans uppercase tracking-[0.1em] font-semibold text-[#b54708] transition hover:border-[#cfbe9e]"
         >
           <span className="size-1.5 rounded-full bg-[#b54708]" aria-hidden="true" />
-          {summary
-            ? `${summary.deadlines.filter((d) => !d.confirmed).length} dates require confirmation`
-            : "Reviewing calendar…"}
+          {loading
+            ? "Reviewing calendar…"
+            : summary && summary.deadlines.length > 0
+              ? `${summary.deadlines.filter((d) => !d.confirmed).length} dates require confirmation`
+              : "Limitation schedules verified"}
         </Link>
       </div>
 
@@ -184,7 +196,7 @@ export default function HomePage() {
 
       {/* Summary KPI Cards */}
       <section aria-label="Account Summary Metrics">
-        {!summary ? (
+        {loading || !summary ? (
           <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
             {[0, 1, 2, 3].map((i) => (
               <SkeletonCard key={i} />
@@ -196,7 +208,7 @@ export default function HomePage() {
               icon={FolderLock}
               label="Active Matters"
               value={summary.activeCases}
-              hint="Enrolled across 2 court forums"
+              hint={summary.activeCases > 0 ? `${summary.activeCases} matters in court docket` : "No active court proceedings"}
               onClick={() => router.push(dh("/cases"))}
             />
             <StatCard
@@ -210,14 +222,14 @@ export default function HomePage() {
               icon={MessagesSquare}
               label="Advocate Messages"
               value={summary.unreadMessages}
-              hint="2 counsel responses received"
+              hint={summary.unreadMessages > 0 ? `${summary.unreadMessages} counsel dispatches` : "All dispatches reviewed"}
               onClick={() => router.push(dh("/messages"))}
             />
             <StatCard
               icon={Stethoscope}
               label="Pending Actions"
               value={summary.pendingActions}
-              hint="Statutory timeline review required"
+              hint={summary.pendingActions > 0 ? "Statutory timeline review required" : "All procedural steps up to date"}
               onClick={() => router.push(dh("/deadlines"))}
             />
           </div>
@@ -227,58 +239,93 @@ export default function HomePage() {
       {/* Active Matter Ledger + Deadlines Split */}
       <div className="grid gap-5 lg:grid-cols-[1.55fr_1fr]">
         <section className="rounded-[2px] border border-[#e2d5c1] bg-[#fffaf2] p-6 shadow-[0_1px_2px_rgba(42,28,18,0.04)]">
-          <div className="flex items-start justify-between gap-4 pb-4 border-b border-[#e2d5c1]/60">
-            <div className="space-y-1">
-              <span className="text-[10.5px] font-sans uppercase tracking-[0.14em] font-medium text-[#85725f]">
-                Active Matter Ledger
-              </span>
-              <h2 className="font-serif text-[20px] sm:text-[22px] font-normal leading-snug text-[#2a1c12]">
-                {summary?.recentCase.title ?? "Security deposit recovery under State Tenancy Act"}
-              </h2>
+          {loading ? (
+            <div className="space-y-4">
+              <div className="h-6 w-48 bg-[#ebe1d1]/50 rounded animate-pulse" />
+              <div className="h-24 bg-[#ebe1d1]/30 rounded animate-pulse" />
             </div>
-            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 text-[11px] font-sans uppercase tracking-[0.12em] font-medium border border-[#e2d5c1] bg-[#dceada]/60 text-[#2e7d32] rounded-[2px] shrink-0">
-              <span className="size-1.5 rounded-full bg-[#2e7d32]" aria-hidden="true" /> Pre-Filing
-            </span>
-          </div>
-
-          <div className="mt-4 grid gap-3 sm:grid-cols-3">
-            {[
-              ["Category", summary?.recentCase.category ?? "Tenancy Dispute"],
-              ["Jurisdiction Forum", "Rent Controller / Small Causes"],
-              ["Ledger Updated", "2 days ago"],
-            ].map(([label, value]) => (
-              <div key={label} className="rounded-[2px] border border-[#e2d5c1] bg-[#ebe1d1]/30 p-3">
-                <p className="text-[10px] font-sans uppercase tracking-[0.12em] text-[#85725f] font-semibold">{label}</p>
-                <p className="mt-1 truncate text-xs font-semibold text-[#2a1c12]">{value}</p>
+          ) : summary?.recentCase ? (
+            <div>
+              <div className="flex items-start justify-between gap-4 pb-4 border-b border-[#e2d5c1]/60">
+                <div className="space-y-1">
+                  <span className="text-[10.5px] font-sans uppercase tracking-[0.14em] font-medium text-[#85725f]">
+                    Active Matter Ledger
+                  </span>
+                  <h2 className="font-serif text-[20px] sm:text-[22px] font-normal leading-snug text-[#2a1c12]">
+                    {summary.recentCase.title}
+                  </h2>
+                </div>
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 text-[11px] font-sans uppercase tracking-[0.12em] font-medium border border-[#e2d5c1] bg-[#dceada]/60 text-[#2e7d32] rounded-[2px] shrink-0">
+                  <span className="size-1.5 rounded-full bg-[#2e7d32]" aria-hidden="true" />
+                  {summary.recentCase.subCategory || "Pre-Filing"}
+                </span>
               </div>
-            ))}
-          </div>
 
-          <div className="mt-5 space-y-2">
-            <div className="flex items-center justify-between text-xs">
-              <span className="font-sans uppercase tracking-[0.08em] text-[#85725f] font-medium">Matter Progress</span>
-              <span className="font-mono font-semibold text-[#9a6a35]">Stage 4 of 5</span>
-            </div>
-            <div className="h-1.5 overflow-hidden rounded-[1px] bg-[#ebe1d1]">
-              <div className="h-full w-[75%] bg-[#9a6a35]" />
-            </div>
-            <p className="text-xs text-[#5b4a3b] leading-relaxed pt-1">
-              <span className="mr-1.5 inline-block size-1.5 rounded-full bg-[#2e7d32] align-middle" />
-              Notice response period completed. Advocate brief ready for formal petition filing.
-            </p>
-          </div>
+              <div className="mt-4 grid gap-3 sm:grid-cols-3">
+                {[
+                  ["Category", summary.recentCase.category || "General Legal"],
+                  ["Jurisdiction Forum", summary.recentCase.probableForum || "Jurisdictional Court"],
+                  ["Ledger Updated", summary.recentCase.updatedAt ? formatDate(summary.recentCase.updatedAt) : "Recently"],
+                ].map(([label, value]) => (
+                  <div key={label} className="rounded-[2px] border border-[#e2d5c1] bg-[#ebe1d1]/30 p-3">
+                    <p className="text-[10px] font-sans uppercase tracking-[0.12em] text-[#85725f] font-semibold">{label}</p>
+                    <p className="mt-1 truncate text-xs font-semibold text-[#2a1c12]">{value}</p>
+                  </div>
+                ))}
+              </div>
 
-          <div className="mt-6 pt-4 border-t border-[#e2d5c1]/60 flex flex-wrap gap-2.5">
-            <Button size="sm" variant="primary" onClick={() => router.push(dh("/cases/case_2041/progress"))}>
-              Inspect Matter Progress <ArrowUpRight className="size-3.5 ml-1" />
-            </Button>
-            <Button size="sm" variant="secondary" onClick={() => router.push(dh("/brief"))}>
-              Review Case Brief
-            </Button>
-            <Button size="sm" variant="ghost" onClick={() => router.push(dh("/advocates"))}>
-              Match Advocate
-            </Button>
-          </div>
+              <div className="mt-5 space-y-2">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-sans uppercase tracking-[0.08em] text-[#85725f] font-medium">Matter Progress</span>
+                  <span className="font-mono font-semibold text-[#9a6a35]">
+                    {Math.round((summary.recentCase.confidence || 0.2) * 100)}% Complete
+                  </span>
+                </div>
+                <div className="h-1.5 overflow-hidden rounded-[1px] bg-[#ebe1d1]">
+                  <div
+                    className="h-full bg-[#9a6a35] transition-all duration-300"
+                    style={{ width: `${Math.round((summary.recentCase.confidence || 0.2) * 100)}%` }}
+                  />
+                </div>
+                <p className="text-xs text-[#5b4a3b] leading-relaxed pt-1">
+                  <span className="mr-1.5 inline-block size-1.5 rounded-full bg-[#2e7d32] align-middle" />
+                  {summary.recentCase.summary || "Case proceedings enrolled in docket."}
+                </p>
+              </div>
+
+              <div className="mt-6 pt-4 border-t border-[#e2d5c1]/60 flex flex-wrap gap-2.5">
+                <Button size="sm" variant="primary" onClick={() => router.push(dh(`/cases/${summary.recentCase?.id}/progress`))}>
+                  Inspect Matter Progress <ArrowUpRight className="size-3.5 ml-1" />
+                </Button>
+                <Button size="sm" variant="secondary" onClick={() => router.push(dh("/cases"))}>
+                  View All Matters
+                </Button>
+                <Button size="sm" variant="ghost" onClick={() => router.push(dh("/advocates"))}>
+                  Match Advocate
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <div className="py-8 text-center space-y-3">
+              <span className="grid size-10 place-items-center rounded-[2px] border border-[#e2d5c1] bg-[#ebe1d1]/40 text-[#9a6a35] mx-auto">
+                <FolderLock className="size-5" />
+              </span>
+              <div className="space-y-1">
+                <h3 className="font-serif text-[18px] text-[#2a1c12]">No Active Matters Enrolled</h3>
+                <p className="text-xs text-[#5b4a3b] max-w-md mx-auto">
+                  You have not filed any legal matters yet. Input your situation above or begin a structured intake assessment to open your first matter docket.
+                </p>
+              </div>
+              <div className="pt-2 flex justify-center gap-2">
+                <Button size="sm" variant="primary" onClick={() => router.push(dh("/intake"))}>
+                  Start Case Intake <ArrowRight className="size-3.5 ml-1" />
+                </Button>
+                <Button size="sm" variant="secondary" onClick={() => router.push(dh("/chat"))}>
+                  Consult AI Assistant
+                </Button>
+              </div>
+            </div>
+          )}
         </section>
 
         {/* Next Statutory Deadlines */}
@@ -293,38 +340,51 @@ export default function HomePage() {
               </Link>
             </div>
 
-            <ul className="mt-4 divide-y divide-[#e2d5c1]/60">
-              {(summary?.deadlines ?? []).map((d) => {
-                const days = daysUntil(d.date, today);
-                const urgent = days <= 4;
-                return (
-                  <li key={d.id} className="flex gap-3 py-3 first:pt-0 last:pb-0 items-start">
-                    <div
-                      className={cn(
-                        "grid size-10 shrink-0 place-items-center rounded-[2px] border text-center font-mono",
-                        urgent
-                          ? "border-[#c0392b]/30 bg-[#fdf2f0] text-[#c0392b]"
-                          : "border-[#e2d5c1] bg-[#ebe1d1]/50 text-[#2a1c12]"
+            {loading ? (
+              <div className="mt-4 space-y-3">
+                <div className="h-10 bg-[#ebe1d1]/30 rounded animate-pulse" />
+                <div className="h-10 bg-[#ebe1d1]/30 rounded animate-pulse" />
+              </div>
+            ) : (summary?.deadlines ?? []).length === 0 ? (
+              <div className="py-8 text-center text-xs text-[#85725f] space-y-1">
+                <CalendarClock className="size-6 text-[#9a6a35]/60 mx-auto mb-2" />
+                <p className="font-semibold text-[#2a1c12]">No Pending Limitation Dates</p>
+                <p className="text-[11px] text-[#5b4a3b]">No statutory limitation bars or court hearing windows recorded.</p>
+              </div>
+            ) : (
+              <ul className="mt-4 divide-y divide-[#e2d5c1]/60">
+                {(summary?.deadlines ?? []).map((d) => {
+                  const days = daysUntil(d.date, today);
+                  const urgent = days <= 4;
+                  return (
+                    <li key={d.id} className="flex gap-3 py-3 first:pt-0 last:pb-0 items-start">
+                      <div
+                        className={cn(
+                          "grid size-10 shrink-0 place-items-center rounded-[2px] border text-center font-mono",
+                          urgent
+                            ? "border-[#c0392b]/30 bg-[#fdf2f0] text-[#c0392b]"
+                            : "border-[#e2d5c1] bg-[#ebe1d1]/50 text-[#2a1c12]"
+                        )}
+                      >
+                        <span className="text-[13px] leading-none font-bold">{new Date(d.date).getDate()}</span>
+                        <span className="text-[8.5px] uppercase font-sans font-semibold">
+                          {new Date(d.date).toLocaleDateString("en-IN", { month: "short" })}
+                        </span>
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-xs font-semibold text-[#2a1c12] leading-snug">{d.title}</p>
+                        <p className="mt-0.5 text-[11px] text-[#85725f]">
+                          {relativeDay(d.date, today)} · {d.basis}
+                        </p>
+                      </div>
+                      {!d.confirmed && (
+                        <span className="mt-1 size-1.5 shrink-0 rounded-full bg-[#b54708]" title="Statutory confirmation pending" />
                       )}
-                    >
-                      <span className="text-[13px] leading-none font-bold">{new Date(d.date).getDate()}</span>
-                      <span className="text-[8.5px] uppercase font-sans font-semibold">
-                        {new Date(d.date).toLocaleDateString("en-IN", { month: "short" })}
-                      </span>
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="text-xs font-semibold text-[#2a1c12] leading-snug">{d.title}</p>
-                      <p className="mt-0.5 text-[11px] text-[#85725f]">
-                        {relativeDay(d.date, today)} · {d.basis}
-                      </p>
-                    </div>
-                    {!d.confirmed && (
-                      <span className="mt-1 size-1.5 shrink-0 rounded-full bg-[#b54708]" title="Statutory confirmation pending" />
-                    )}
-                  </li>
-                );
-              })}
-            </ul>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
           </div>
 
           <Link
@@ -365,6 +425,7 @@ export default function HomePage() {
       </section>
 
       <Disclaimer
+        suppressHydrationWarning
         text={`Advocate roll entries and statutory limitation summaries verified as of ${lastReviewed}. Preliminary assessments do not replace advocate consultation.`}
       />
     </div>

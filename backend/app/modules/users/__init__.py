@@ -1,5 +1,5 @@
 """Users & Profiles Module."""
 
-from app.modules.users.router import router as users_router
+from app.modules.users.models import User, UserConsent
 
-__all__ = ["users_router"]
+__all__ = ["User", "UserConsent"]

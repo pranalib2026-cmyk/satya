@@ -6,16 +6,18 @@ and landmark judicial decisions into PostgreSQL with pgvector.
 
 import hashlib
 import re
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple, Union
 import uuid
 
 from sqlalchemy import delete, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
+from app.core.config import settings
 from app.core.logging import logger
 from app.modules.legal_assistant.embedding_provider import get_embedding_provider
 from app.modules.legal_assistant.schemas import LegalChunkCreate, LegalSourceCreate
-from app.modules.legal_knowledge.models import LegalChunk, LegalSource
+from app.modules.legal_knowledge.models import LegalChunk, LegalIngestionJob, LegalSource
 from app.modules.legal_knowledge.seed_data import CURATED_LEGAL_SOURCES
 
 
@@ -58,6 +60,8 @@ class LegalIngestionService:
                     content_checksum=source_checksum,
                     official_source_url=src_data.get("official_source_url"),
                     year=src_data.get("year"),
+                    verification_status="VERIFIED",
+                    ingestion_status="COMPLETED",
                     metadata_json={},
                 )
                 db.add(source)
@@ -69,8 +73,9 @@ class LegalIngestionService:
                     token_est = int(len(re.findall(r"\w+", c_text)) * 1.3)
 
                     # Generate embedding incorporating source context
-                    embed_vector = embedding_provider.get_embedding(
-                        f"{src_data['title']} {src_data.get('short_code', '')} {chunk_data.get('section_number', '')} {chunk_data.get('clause_heading', '')}: {c_text}"
+                    embed_vector = embedding_provider.embed_document(
+                        text=f"{chunk_data.get('section_number', '')} {chunk_data.get('clause_heading', '')}: {c_text}",
+                        title=src_data["title"],
                     )
 
                     chunk = LegalChunk(
@@ -80,6 +85,7 @@ class LegalIngestionService:
                         chunk_text=c_text,
                         token_count=token_est,
                         content_checksum=c_checksum,
+                        embedding_status="COMPLETED",
                         embedding=embed_vector,
                         metadata_json={"short_code": src_data.get("short_code")},
                     )
@@ -89,6 +95,32 @@ class LegalIngestionService:
         await db.commit()
         logger.info(f"Seeded {total_chunks_seeded} curated legal chunks into knowledge base.")
         return total_chunks_seeded
+
+    @classmethod
+    async def ingest_document(
+        cls,
+        db: AsyncSession,
+        source_metadata: Dict[str, Any],
+        raw_content: Union[bytes, str],
+        file_format: str,
+        filename: Optional[str] = None,
+        force_reprocess: bool = False,
+        require_verified_source: bool = True,
+        batch_size: int = 50,
+    ) -> Tuple[LegalSource, LegalIngestionJob]:
+        """Execute end-to-end legal document ingestion using LegalDocumentIngestionPipeline."""
+        from app.modules.legal_knowledge.ingestion_pipeline import LegalDocumentIngestionPipeline
+
+        return await LegalDocumentIngestionPipeline.ingest_document(
+            db=db,
+            source_metadata=source_metadata,
+            raw_content=raw_content,
+            file_format=file_format,
+            filename=filename,
+            force_reprocess=force_reprocess,
+            require_verified_source=require_verified_source,
+            batch_size=batch_size,
+        )
 
     @classmethod
     async def create_source(cls, db: AsyncSession, payload: LegalSourceCreate) -> LegalSource:
@@ -125,8 +157,9 @@ class LegalIngestionService:
         c_checksum = compute_sha256(c_text)
         token_est = int(len(re.findall(r"\w+", c_text)) * 1.3)
 
-        embed_vector = embedding_provider.get_embedding(
-            f"{payload.section_number or ''} {payload.clause_heading or ''}: {c_text}"
+        embed_vector = embedding_provider.embed_document(
+            text=f"{payload.section_number or ''} {payload.clause_heading or ''}: {c_text}",
+            title=payload.clause_heading or payload.section_number,
         )
 
         chunk = LegalChunk(
@@ -143,3 +176,29 @@ class LegalIngestionService:
         await db.commit()
         await db.refresh(chunk)
         return chunk
+
+    @classmethod
+    async def reembed_all_chunks(cls, db: AsyncSession) -> int:
+        """Re-embed all existing legal chunks using the active embedding provider.
+        
+        Preserves all document metadata, sources, section numbers, and integrity checksums.
+        Ensures consistency across all stored vectors and validates vector dimensions.
+        """
+        embedding_provider = get_embedding_provider()
+        res = await db.execute(select(LegalChunk).options(selectinload(LegalChunk.source)))
+        chunks = res.scalars().all()
+
+        reembedded_count = 0
+        for chunk in chunks:
+            title = chunk.source.title if chunk.source else None
+            new_vector = embedding_provider.embed_document(chunk.chunk_text, title=title)
+            if len(new_vector) != settings.EMBEDDING_VECTOR_DIMENSION:
+                raise ValueError(
+                    f"Re-embedding failed: vector dimension {len(new_vector)} != {settings.EMBEDDING_VECTOR_DIMENSION}"
+                )
+            chunk.embedding = new_vector
+            reembedded_count += 1
+
+        await db.commit()
+        logger.info(f"Successfully re-embedded {reembedded_count} chunks using {embedding_provider.provider_name}.")
+        return reembedded_count

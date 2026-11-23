@@ -45,6 +45,8 @@ next-env.d.ts
 *.md
 !README.md
 !AGENTS.md
+!PAGE_CONSOLIDATION_PLAN.md
+!NYAYASETU_FINAL_AUDIT.md
 !docs/**/*.md
 !backend/**/*.md
 !frontend/**/*.md
@@ -54,3 +56,11 @@ next-env.d.ts
 *.blend@
 LadyJustice_checkpoint_*.blend
 LadyJustice_pre_upgrade.blend
+
+# python virtual environment & cache
+venv/
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/

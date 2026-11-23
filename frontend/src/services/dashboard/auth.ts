@@ -1,4 +1,5 @@
 import { delay, DEMO_OTP } from './api'
+import { api, clearStoredTokens } from '@/lib/api-client'
 import { demoUser } from '@/data/dashboard-mock-data'
 import type { Language, User } from '@/types/dashboard'
 
@@ -73,26 +74,39 @@ export function logout() {
   localStorage.removeItem(ONBOARDED_KEY)
 }
 
-/** Mock soft delete. TODO: call DELETE /users/me on the backend. */
-export async function deleteAccount() {
-  await delay(600)
-  if (typeof window !== 'undefined') localStorage.setItem('legal_deleted', 'true')
+/** Real account deletion via DELETE /api/v1/users/me */
+export async function deleteAccount(confirmation: string = 'CONFIRM_DELETE_NYAYASETU_ACCOUNT') {
+  await api.delete('/api/v1/users/me', {
+    body: JSON.stringify({ confirmation }),
+  })
   logout()
+  clearStoredTokens()
 }
 
-/** Mock DPDP data export. TODO: backend export endpoint returning a signed URL. */
+/** Real DPDP statutory data export via POST /api/v1/users/me/data-export */
 export async function downloadMyData() {
-  await delay(500)
-  const payload = {
-    user: loadSession()?.user ?? demoUser,
-    exportedAt: new Date().toISOString(),
-    note: 'Demo export. In production this is generated server-side and delivered as a signed download.',
+  const exportRes = await api.post<{
+    export_id: string
+    status: string
+    user_id: string
+    exported_at: string
+    download_url?: string
+    data: Record<string, unknown>
+  }>('/api/v1/users/me/data-export', {})
+
+  if (!exportRes || !exportRes.data) {
+    throw new Error('Server returned an empty data export')
   }
-  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' })
+
+  const blob = new Blob([JSON.stringify(exportRes.data, null, 2)], { type: 'application/json' })
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
   a.href = url
-  a.download = 'legal-my-data.json'
-  a.click()
+  a.download = `nyayasetu-statutory-export-${exportRes.export_id}.json`
+  if (typeof document !== 'undefined') {
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+  }
   URL.revokeObjectURL(url)
 }

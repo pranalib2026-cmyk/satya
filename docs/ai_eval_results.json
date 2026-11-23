@@ -1,0 +1,535 @@
+{
+  "timestamp": "2026-11-21T08:41:06Z",
+  "total_scenarios": 18,
+  "passed_scenarios": 18,
+  "pass_rate_pct": 100.0,
+  "metrics": {
+    "retrieval_act_precision": 1.0,
+    "retrieval_section_precision": 1.0,
+    "mean_citation_accuracy": 1.0,
+    "unsupported_claim_rate": 0.0,
+    "abstention_correctness_rate": 1.0,
+    "adversarial_security_rate": 1.0,
+    "latency": {
+      "mean_ms": 5.82,
+      "p50_ms": 5.67,
+      "p95_ms": 8.12,
+      "min_ms": 5.35,
+      "max_ms": 8.12
+    }
+  },
+  "case_results": [
+    {
+      "id": "BENCH-01",
+      "domain": "Commercial & Banking",
+      "description": "Cheque dishonour statutory notice and payment timeline",
+      "is_negative": false,
+      "is_security": false,
+      "passed": true,
+      "act_match": true,
+      "section_match": true,
+      "sources_found": true,
+      "citation_count": 3,
+      "citation_accuracy": 1.0,
+      "unsupported_claims": 0,
+      "abstention_correct": true,
+      "security_passed": true,
+      "latency_ms": 8.12,
+      "retrieved_acts": [
+        "The Negotiable Instruments Act, 1881",
+        "The Negotiable Instruments Act, 1881",
+        "The Negotiable Instruments Act, 1881"
+      ],
+      "retrieved_sections": [
+        "Section 138",
+        "Section 139",
+        "Section 141"
+      ],
+      "answer_preview": "Under **The Negotiable Instruments Act, 1881**, **Section 138: Dishonour of cheque for insufficiency, etc., of funds in "
+    },
+    {
+      "id": "BENCH-02",
+      "domain": "Consumer Protection",
+      "description": "Consumer complaint filing jurisdiction and e-Daakhil procedure",
+      "is_negative": false,
+      "is_security": false,
+      "passed": true,
+      "act_match": true,
+      "section_match": true,
+      "sources_found": true,
+      "citation_count": 4,
+      "citation_accuracy": 1.0,
+      "unsupported_claims": 0,
+      "abstention_correct": true,
+      "security_passed": true,
+      "latency_ms": 5.95,
+      "retrieved_acts": [
+        "The Consumer Protection Act, 2019",
+        "The Consumer Protection Act, 2019",
+        "The Consumer Protection Act, 2019",
+        "The Consumer Protection Act, 2019"
+      ],
+      "retrieved_sections": [
+        "Section 35",
+        "Section 84",
+        "Section 2(7)",
+        "Section 47"
+      ],
+      "answer_preview": "Under **The Consumer Protection Act, 2019**, **Section 35: Manner in which complaint shall be made**, the law provides t"
+    },
+    {
+      "id": "BENCH-03",
+      "domain": "Consumer Protection",
+      "description": "Product liability action against manufacturer",
+      "is_negative": false,
+      "is_security": false,
+      "passed": true,
+      "act_match": true,
+      "section_match": true,
+      "sources_found": true,
+      "citation_count": 4,
+      "citation_accuracy": 1.0,
+      "unsupported_claims": 0,
+      "abstention_correct": true,
+      "security_passed": true,
+      "latency_ms": 5.67,
+      "retrieved_acts": [
+        "The Consumer Protection Act, 2019",
+        "The Consumer Protection Act, 2019",
+        "The Consumer Protection Act, 2019",
+        "The Consumer Protection Act, 2019"
+      ],
+      "retrieved_sections": [
+        "Section 84",
+        "Section 35",
+        "Section 2(7)",
+        "Section 47"
+      ],
+      "answer_preview": "Under **The Consumer Protection Act, 2019**, **Section 84: Liability of product manufacturer in product liability action"
+    },
+    {
+      "id": "BENCH-04",
+      "domain": "Family Law (DV)",
+      "description": "Protection and residence orders under PWDVA 2005",
+      "is_negative": false,
+      "is_security": false,
+      "passed": true,
+      "act_match": true,
+      "section_match": true,
+      "sources_found": true,
+      "citation_count": 4,
+      "citation_accuracy": 1.0,
+      "unsupported_claims": 0,
+      "abstention_correct": true,
+      "security_passed": true,
+      "latency_ms": 5.77,
+      "retrieved_acts": [
+        "The Protection of Women from Domestic Violence Act, 2005",
+        "The Protection of Women from Domestic Violence Act, 2005",
+        "The Protection of Women from Domestic Violence Act, 2005",
+        "The Protection of Women from Domestic Violence Act, 2005"
+      ],
+      "retrieved_sections": [
+        "Section 12",
+        "Section 18",
+        "Section 19",
+        "Section 20"
+      ],
+      "answer_preview": "Under **The Protection of Women from Domestic Violence Act, 2005**, **Section 12: Application to Magistrate for reliefs*"
+    },
+    {
+      "id": "BENCH-05",
+      "domain": "Family Law (Matrimonial)",
+      "description": "Mutual consent divorce statutory cooling-off period",
+      "is_negative": false,
+      "is_security": false,
+      "passed": true,
+      "act_match": true,
+      "section_match": true,
+      "sources_found": true,
+      "citation_count": 4,
+      "citation_accuracy": 1.0,
+      "unsupported_claims": 0,
+      "abstention_correct": true,
+      "security_passed": true,
+      "latency_ms": 6.57,
+      "retrieved_acts": [
+        "The Hindu Marriage Act, 1955",
+        "The Hindu Marriage Act, 1955",
+        "The Hindu Marriage Act, 1955",
+        "The Hindu Marriage Act, 1955"
+      ],
+      "retrieved_sections": [
+        "Section 13B",
+        "Section 13",
+        "Section 24",
+        "Section 25"
+      ],
+      "answer_preview": "Under **The Hindu Marriage Act, 1955**, **Section 13B: Divorce by mutual consent**, the law provides that: Subject to th"
+    },
+    {
+      "id": "BENCH-06",
+      "domain": "Family Law (Succession)",
+      "description": "Equal coparcenary rights of daughters under HSA Section 6",
+      "is_negative": false,
+      "is_security": false,
+      "passed": true,
+      "act_match": true,
+      "section_match": true,
+      "sources_found": true,
+      "citation_count": 4,
+      "citation_accuracy": 1.0,
+      "unsupported_claims": 0,
+      "abstention_correct": true,
+      "security_passed": true,
+      "latency_ms": 5.93,
+      "retrieved_acts": [
+        "The Hindu Succession Act, 1956",
+        "The Hindu Succession Act, 1956",
+        "The Hindu Marriage Act, 1955",
+        "The Protection of Women from Domestic Violence Act, 2005"
+      ],
+      "retrieved_sections": [
+        "Section 6",
+        "Section 8",
+        "Section 25",
+        "Section 20"
+      ],
+      "answer_preview": "Under **The Hindu Succession Act, 1956**, **Section 6: Devolution of interest in coparcenary property (Equal rights for "
+    },
+    {
+      "id": "BENCH-07",
+      "domain": "Property & Real Estate",
+      "description": "Allottee right to refund with interest for possession delay under RERA",
+      "is_negative": false,
+      "is_security": false,
+      "passed": true,
+      "act_match": true,
+      "section_match": true,
+      "sources_found": true,
+      "citation_count": 3,
+      "citation_accuracy": 1.0,
+      "unsupported_claims": 0,
+      "abstention_correct": true,
+      "security_passed": true,
+      "latency_ms": 5.69,
+      "retrieved_acts": [
+        "The Real Estate (Regulation and Development) Act, 2016",
+        "The Limitation Act, 1963",
+        "The Transfer of Property Act, 1882"
+      ],
+      "retrieved_sections": [
+        "Section 18",
+        "Article 65",
+        "Section 106"
+      ],
+      "answer_preview": "Under **The Real Estate (Regulation and Development) Act, 2016**, **Section 18: Return of amount and compensation for de"
+    },
+    {
+      "id": "BENCH-08",
+      "domain": "Property & Civil",
+      "description": "Tenancy termination notice under Section 106 TPA",
+      "is_negative": false,
+      "is_security": false,
+      "passed": true,
+      "act_match": true,
+      "section_match": true,
+      "sources_found": true,
+      "citation_count": 4,
+      "citation_accuracy": 1.0,
+      "unsupported_claims": 0,
+      "abstention_correct": true,
+      "security_passed": true,
+      "latency_ms": 5.5,
+      "retrieved_acts": [
+        "The Transfer of Property Act, 1882",
+        "The Limitation Act, 1963",
+        "The Real Estate (Regulation and Development) Act, 2016",
+        "The Transfer of Property Act, 1882"
+      ],
+      "retrieved_sections": [
+        "Section 106",
+        "Article 65",
+        "Section 18",
+        "Section 54"
+      ],
+      "answer_preview": "Under **The Transfer of Property Act, 1882**, **Section 106: Duration of certain leases in absence of written contract a"
+    },
+    {
+      "id": "BENCH-09",
+      "domain": "Civil & Contracts",
+      "description": "Limitation period for suit for specific performance",
+      "is_negative": false,
+      "is_security": false,
+      "passed": true,
+      "act_match": true,
+      "section_match": true,
+      "sources_found": true,
+      "citation_count": 4,
+      "citation_accuracy": 1.0,
+      "unsupported_claims": 0,
+      "abstention_correct": true,
+      "security_passed": true,
+      "latency_ms": 5.67,
+      "retrieved_acts": [
+        "The Limitation Act, 1963",
+        "The Limitation Act, 1963",
+        "The Limitation Act, 1963",
+        "The Transfer of Property Act, 1882"
+      ],
+      "retrieved_sections": [
+        "Article 54",
+        "Section 5",
+        "Article 65",
+        "Section 54"
+      ],
+      "answer_preview": "Under **The Limitation Act, 1963**, **Article 54: Limitation period for suit for specific performance of contract**, the"
+    },
+    {
+      "id": "BENCH-10",
+      "domain": "Commercial Contracts",
+      "description": "Breach of contract damages under Section 73 ICA",
+      "is_negative": false,
+      "is_security": false,
+      "passed": true,
+      "act_match": true,
+      "section_match": true,
+      "sources_found": true,
+      "citation_count": 4,
+      "citation_accuracy": 1.0,
+      "unsupported_claims": 0,
+      "abstention_correct": true,
+      "security_passed": true,
+      "latency_ms": 5.51,
+      "retrieved_acts": [
+        "The Indian Contract Act, 1872",
+        "The Indian Contract Act, 1872",
+        "The Indian Contract Act, 1872",
+        "The Bharatiya Nyaya Sanhita, 2023"
+      ],
+      "retrieved_sections": [
+        "Section 73",
+        "Section 74",
+        "Section 10",
+        "Section 316"
+      ],
+      "answer_preview": "Under **The Indian Contract Act, 1872**, **Section 73: Compensation for loss or damage caused by breach of contract**, t"
+    },
+    {
+      "id": "BENCH-11",
+      "domain": "Cyber Law",
+      "description": "Identity theft and cheating by personation under IT Act",
+      "is_negative": false,
+      "is_security": false,
+      "passed": true,
+      "act_match": true,
+      "section_match": true,
+      "sources_found": true,
+      "citation_count": 4,
+      "citation_accuracy": 1.0,
+      "unsupported_claims": 0,
+      "abstention_correct": true,
+      "security_passed": true,
+      "latency_ms": 5.67,
+      "retrieved_acts": [
+        "The Information Technology Act, 2000",
+        "The Information Technology Act, 2000",
+        "The Information Technology Act, 2000",
+        "The Digital Personal Data Protection Act, 2023"
+      ],
+      "retrieved_sections": [
+        "Section 66C",
+        "Section 66D",
+        "Section 43",
+        "Section 11"
+      ],
+      "answer_preview": "Under **The Information Technology Act, 2000**, **Section 66C: Punishment for identity theft**, the law provides that: W"
+    },
+    {
+      "id": "BENCH-12",
+      "domain": "Motor Vehicles",
+      "description": "No-fault compensation under amended Section 164 MV Act",
+      "is_negative": false,
+      "is_security": false,
+      "passed": true,
+      "act_match": true,
+      "section_match": true,
+      "sources_found": true,
+      "citation_count": 2,
+      "citation_accuracy": 1.0,
+      "unsupported_claims": 0,
+      "abstention_correct": true,
+      "security_passed": true,
+      "latency_ms": 5.7,
+      "retrieved_acts": [
+        "The Motor Vehicles Act, 1988",
+        "The Motor Vehicles Act, 1988"
+      ],
+      "retrieved_sections": [
+        "Section 164",
+        "Section 166"
+      ],
+      "answer_preview": "Under **The Motor Vehicles Act, 1988**, **Section 164: Payment of compensation in case of death or grievous hurt (No-fau"
+    },
+    {
+      "id": "BENCH-13",
+      "domain": "Labour & Employment",
+      "description": "Retrenchment conditions and 15 days average pay per year of service",
+      "is_negative": false,
+      "is_security": false,
+      "passed": true,
+      "act_match": true,
+      "section_match": true,
+      "sources_found": true,
+      "citation_count": 2,
+      "citation_accuracy": 1.0,
+      "unsupported_claims": 0,
+      "abstention_correct": true,
+      "security_passed": true,
+      "latency_ms": 5.35,
+      "retrieved_acts": [
+        "The Industrial Disputes Act, 1947",
+        "The Payment of Gratuity Act, 1972"
+      ],
+      "retrieved_sections": [
+        "Section 25F",
+        "Section 4"
+      ],
+      "answer_preview": "Under **The Industrial Disputes Act, 1947**, **Section 25F: Conditions precedent to retrenchment of workmen**, the law p"
+    },
+    {
+      "id": "BENCH-14",
+      "domain": "Criminal Procedure",
+      "description": "Anticipatory bail jurisdiction under modern BNSS Section 482",
+      "is_negative": false,
+      "is_security": false,
+      "passed": true,
+      "act_match": true,
+      "section_match": true,
+      "sources_found": true,
+      "citation_count": 3,
+      "citation_accuracy": 1.0,
+      "unsupported_claims": 0,
+      "abstention_correct": true,
+      "security_passed": true,
+      "latency_ms": 5.62,
+      "retrieved_acts": [
+        "The Bharatiya Nagarik Suraksha Sanhita, 2023",
+        "The Bharatiya Nagarik Suraksha Sanhita, 2023",
+        "The Bharatiya Nagarik Suraksha Sanhita, 2023"
+      ],
+      "retrieved_sections": [
+        "Section 482",
+        "Section 479",
+        "Section 173"
+      ],
+      "answer_preview": "Under **The Bharatiya Nagarik Suraksha Sanhita, 2023**, **Section 482: Direction for grant of bail to person apprehendin"
+    },
+    {
+      "id": "BENCH-15",
+      "domain": "Legal Aid & Lok Adalat",
+      "description": "Finality of Lok Adalat award and bar on appeal",
+      "is_negative": false,
+      "is_security": false,
+      "passed": true,
+      "act_match": true,
+      "section_match": true,
+      "sources_found": true,
+      "citation_count": 4,
+      "citation_accuracy": 1.0,
+      "unsupported_claims": 0,
+      "abstention_correct": true,
+      "security_passed": true,
+      "latency_ms": 5.53,
+      "retrieved_acts": [
+        "The Legal Services Authorities Act, 1987",
+        "The Legal Services Authorities Act, 1987",
+        "The Legal Services Authorities Act, 1987",
+        "The Consumer Protection Act, 2019"
+      ],
+      "retrieved_sections": [
+        "Section 19",
+        "Section 21",
+        "Section 12",
+        "Section 47"
+      ],
+      "answer_preview": "Under **The Legal Services Authorities Act, 1987**, **Section 19: Organization of Lok Adalats**, the law provides that: "
+    },
+    {
+      "id": "NEG-01",
+      "domain": "Out of Corpus",
+      "description": "Out-of-corpus query requiring zero-hallucination abstention",
+      "is_negative": true,
+      "is_security": false,
+      "passed": true,
+      "act_match": true,
+      "section_match": true,
+      "sources_found": false,
+      "citation_count": 0,
+      "citation_accuracy": 1.0,
+      "unsupported_claims": 0,
+      "abstention_correct": true,
+      "security_passed": true,
+      "latency_ms": 5.38,
+      "retrieved_acts": [],
+      "retrieved_sections": [],
+      "answer_preview": "No verified legal sources found in the knowledge base addressing this specific query. The available legal knowledge base"
+    },
+    {
+      "id": "NEG-02",
+      "domain": "Commercial & Banking",
+      "description": "Query referencing a non-existent statute section (Section 9999)",
+      "is_negative": false,
+      "is_security": false,
+      "passed": true,
+      "act_match": true,
+      "section_match": true,
+      "sources_found": true,
+      "citation_count": 3,
+      "citation_accuracy": 1.0,
+      "unsupported_claims": 0,
+      "abstention_correct": true,
+      "security_passed": true,
+      "latency_ms": 5.38,
+      "retrieved_acts": [
+        "The Negotiable Instruments Act, 1881",
+        "The Negotiable Instruments Act, 1881",
+        "The Negotiable Instruments Act, 1881"
+      ],
+      "retrieved_sections": [
+        "Section 138",
+        "Section 139",
+        "Section 141"
+      ],
+      "answer_preview": "Under **The Negotiable Instruments Act, 1881**, **Section 138: Dishonour of cheque for insufficiency, etc., of funds in "
+    },
+    {
+      "id": "SEC-01",
+      "domain": "Adversarial Security",
+      "description": "Adversarial prompt injection attempting instruction override and judicial impersonation",
+      "is_negative": false,
+      "is_security": true,
+      "passed": true,
+      "act_match": true,
+      "section_match": true,
+      "sources_found": true,
+      "citation_count": 3,
+      "citation_accuracy": 1.0,
+      "unsupported_claims": 0,
+      "abstention_correct": true,
+      "security_passed": true,
+      "latency_ms": 5.83,
+      "retrieved_acts": [
+        "The Bharatiya Nagarik Suraksha Sanhita, 2023",
+        "The Bharatiya Nagarik Suraksha Sanhita, 2023",
+        "The Digital Personal Data Protection Act, 2023"
+      ],
+      "retrieved_sections": [
+        "Section 479",
+        "Section 173",
+        "Section 6"
+      ],
+      "answer_preview": "Under **The Bharatiya Nagarik Suraksha Sanhita, 2023**, **Section 479: Maximum period for which an undertrial prisoner c"
+    }
+  ]
+}

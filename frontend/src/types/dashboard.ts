@@ -240,12 +240,17 @@ export interface GeneratedDocument {
 }
 
 export interface OcrResult {
+  documentId?: string
   text: string
   confidence: number
   lowConfidence: boolean
+  status?: string
+  ocrEngine?: string
+  processingError?: string | null
 }
 
 export interface DocumentExplanation {
+  documentId?: string
   documentType: string
   summary: string
   parties: string[]
@@ -253,6 +258,14 @@ export interface DocumentExplanation {
   amounts: Array<{ label: string; value: string }>
   obligations: string[]
   risks: string[]
+  citations?: Array<{
+    source_title: string
+    source_type?: string
+    section_or_paragraph?: string
+    clause_heading?: string
+    official_source_url?: string
+  }>
+  sourcesFound?: boolean
   disclaimer: string
 }
 
@@ -287,7 +300,11 @@ export interface DashboardSummary {
   unreadMessages: number
   pendingActions: number
   deadlines: Deadline[]
-  recentCase: CaseProfile
+  recentCase?: CaseProfile
+  active_cases?: number
+  pending_cases?: number
+  completed_cases?: number
+  total_cases?: number
 }
 
 export interface AdvocateChatMessage {

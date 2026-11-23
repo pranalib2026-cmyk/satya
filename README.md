@@ -1,227 +1,210 @@
-# NyayaSetu
+# NyayaSetu (न्यायसेतु)
 
 **Legal Help Should Be Clear. Justice Should Be Accessible.**
 
-NyayaSetu is an India-focused legal platform concept: a public marketing site, a
-preliminary legal-assessment and intake flow, a verified advocate directory, and
-a content API for practice areas, representative matters, legal guides, FAQs,
-testimonials, and newsletters.
+NyayaSetu is an India-focused legal technology platform bridging citizens and verified advocates, established in 2026. The platform combines an editorial-grade client application with a resilient Python FastAPI modular monolith, providing deterministic legal triage, geospatial advocate matching under Bar Council of India (BCI) Rule 36, secure evidence vaults, statutory limitation tracking, and grounded retrieval-augmented generation (RAG) over verified Indian Bare Acts.
 
-> **Important:** NyayaSetu provides an AI-assisted preliminary legal assessment
-> and advocate-discovery platform. It is **not** a law firm and does not replace
-> independent advice from a licensed advocate under the Advocates Act, 1961.
-> Submitting an intake request does **not** create an advocate-client
-> relationship. Advocates listed on the platform do not solicit work or
-> advertise, in compliance with Rule 36, Chapter II, Part VI of the Bar Council
-> of India Rules.
+> [!IMPORTANT]
+> **Mandatory Statutory Disclosure:** NyayaSetu provides an AI-assisted preliminary legal assessment and advocate-discovery platform. It is **not** a law firm and does not provide legal advice under the Advocates Act, 1961. Submitting an intake request does **not** create an advocate-client relationship. Advocates listed on the platform do not solicit work or advertise fee schedules, in compliance with Rule 36, Chapter II, Part VI of the Bar Council of India Rules.
 
 ---
 
-## Repository map
+## 1. System Architecture & Repository Map
 
-This repository is a lightweight monorepo with two independent applications.
-There is no root `package.json`; install and run each app from its own folder.
+This repository is structured as a two-tier monorepo with independent frontend and backend workspaces. There is **no root `package.json`**. Commands must be run from `frontend/` or `backend/`.
 
 ```text
 NyayaSetu/
-├── frontend/                 Next.js 16 marketing site and intake UI
-│   ├── src/app/              App Router pages
-│   ├── src/components/       Layout, sections, and UI primitives
-│   ├── src/data/             Static content (migration source for the API)
-│   └── scripts/predev.js     Frees port 3000 before `next dev`
-├── backend/                  Fastify 5 + TypeScript + Drizzle + SQLite API
-│   ├── src/modules/          Feature modules (routes + services + schemas)
-│   ├── src/db/               Drizzle schema, migrations, seed data
-│   ├── drizzle/              Generated SQL migrations and snapshots
-│   └── test/                 Vitest integration tests (in-memory SQLite)
-├── docs/                     Architecture, API, database, frontend, roadmap
-└── .gitignore
+├── frontend/                   Next.js 16 (React 19) Editorial Client Application (:3000)
+│   ├── src/app/                App Router routes, layouts, and workspaces
+│   ├── src/components/         Editorial UI primitives, layout, and 3D Lady Justice Canvas
+│   ├── src/services/dashboard/ Strongly typed API integration clients
+│   ├── src/lib/                AuthContext, unified API client, design tokens
+│   ├── src/types/              TypeScript domain definitions
+│   └── scripts/predev.js       Port 3000 lifecycle hygiene
+├── backend/                    Python 3.12 FastAPI Modular Monolith API (:8000)
+│   ├── app/                    FastAPI factory, core config, 12 domain packages
+│   ├── migrations/             Alembic database migration revisions & env.py
+│   ├── scripts/                Operational scripts (run_dev.sh, verify_health.py)
+│   ├── tests/                  Pytest async integration test suites
+│   ├── docs/                   API Contract and Database Schema specifications
+│   ├── requirements.txt        Pinned Python production dependencies
+│   ├── alembic.ini             Alembic configuration
+│   └── run.py                  Uvicorn development server launcher
+├── docs/                       Architecture, API contract, database schema, roadmaps
+└── .gitignore                  Git tracking rules
 ```
 
-| App | Stack | Local URL |
-| --- | --- | --- |
-| `frontend/` | Next.js 16.4.5, React 19.3, TypeScript, Tailwind CSS 4, Framer Motion, Three.js | <http://localhost:3000> |
-| `backend/` | Node.js 22+, Fastify 5, TypeScript, Zod 4, Drizzle ORM, SQLite (`better-sqlite3`), Pino, Vitest | <http://localhost:4000> |
+| Application | Technology Stack | Local URL | Primary Responsibility |
+|---|---|---|---|
+| **`frontend/`** | Next.js 16.4.5, React 19.3, TypeScript 5, Tailwind CSS 4, Three.js | <http://localhost:3000> | Citizen matter intake, dashboard dockets, evidence vault UI, advocate discovery |
+| **`backend/`** | Python 3.12, FastAPI 0.115, SQLAlchemy 2.0, PostgreSQL 16, PostGIS, pgvector | <http://localhost:8000> | Authentication, case management, deterministic triage, geospatial matching, RAG |
 
 ---
 
-## Quick start
+## 2. Prerequisites
 
-### Prerequisites
+Ensure the following runtimes and database engines are installed before setting up the project:
 
-- Node.js **22 or newer** (verified with Node 24)
-- npm 10 or newer
-- Optional: a C++ build toolchain for `better-sqlite3` if no prebuilt binary is
-  available for your platform
+1. **Node.js:** `v22.0.0` or newer (tested on Node v24).
+2. **npm:** `v10.0.0` or newer.
+3. **Python:** `3.12` or newer (Python 3.12 recommended).
+4. **PostgreSQL:** Version 16 or newer with extensions:
+   * `postgis` (for geospatial coordinate calculations)
+   * `vector` (for pgvector semantic embeddings)
+   * *(Optional: A free [Supabase](https://supabase.com) project includes both PostGIS and pgvector out of the box).*
 
-### 1. Backend
+---
+
+## 3. Quick Start Guide
+
+### Step 1: Set Up & Launch the Backend (`backend/`)
+
+Open a terminal and navigate to `backend/`:
 
 ```bash
 cd backend
-npm install
-cp .env.example .env        # Windows PowerShell: Copy-Item .env.example .env
-npm run setup               # apply migrations + seed content
-npm run dev                 # http://localhost:4000
+
+# 1. Create and activate a Python 3.12 virtual environment
+python3.12 -m venv ../venv
+source ../venv/bin/activate
+# Windows PowerShell: ..\venv\Scripts\Activate.ps1
+
+# 2. Install pinned dependencies
+pip install -r requirements.txt
+
+# 3. Configure environment variables
+cp .env.example .env
+# Edit .env to supply your PostgreSQL DATABASE_URL if not using localhost default
+
+# 4. Run database migrations
+alembic upgrade head
+
+# 5. Launch development server (Port 8000)
+python run.py
+# Or directly via Uvicorn:
+# uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
-`npm run dev` also runs `predev`, which applies pending migrations before the
-server starts. It does **not** re-seed, so local intake data is preserved.
+#### Backend Verification Endpoints
+* **API Health Check:** <http://localhost:8000/api/v1/health>
+* **Interactive OpenAPI Swagger Docs:** <http://localhost:8000/docs>
+* **Alternative ReDoc UI:** <http://localhost:8000/redoc>
+* **OpenAPI JSON Contract:** <http://localhost:8000/api/v1/openapi.json>
 
-Useful backend commands:
+---
 
-```bash
-npm run typecheck
-npm run lint
-npm test
-npm run build
-npm run start
-npm run db:reset            # destructive: recreate DB + reseed
-```
+### Step 2: Set Up & Launch the Frontend (`frontend/`)
 
-- Swagger UI: <http://localhost:4000/docs>
-- OpenAPI JSON: <http://localhost:4000/docs/json>
-- Liveness: <http://localhost:4000/health>
-- Readiness: <http://localhost:4000/health/ready>
-
-### 2. Frontend
-
-In a second terminal:
+Open a second terminal and navigate to `frontend/`:
 
 ```bash
 cd frontend
+
+# 1. Install Node dependencies
 npm install
-npm run dev                 # http://localhost:3000
+
+# 2. Launch Next.js development server (Port 3000)
+npm run dev
 ```
 
-`predev` clears a stale `.next/dev/lock` and kills whatever is listening on port
-3000 before starting Next.js. This is intentional for this project; do not run
-two frontend dev servers on the same machine.
-
-### 3. Run both
-
-- Keep the backend on port **4000** and the frontend on port **3000**.
-- The backend CORS allow-list defaults to `http://localhost:3000`.
-- The frontend currently reads static content from `frontend/src/data/`; API
-  integration is the next milestone. See `docs/FRONTEND.md`.
+* Next.js automatically proxies API calls: all requests made to `http://localhost:3000/api/v1/:path*` are rewritten to `http://localhost:8000/api/v1/:path*` via `next.config.ts`.
+* Visit the application in your browser at: <http://localhost:3000>
 
 ---
 
-## API at a glance
+## 4. Database Setup & Migrations
 
-All business endpoints are mounted under `/api/v1`.
+### PostgreSQL Extensions
+NyayaSetu requires `uuid-ossp`, `postgis`, and `vector`. Migration `0001_enable_postgresql_extensions.py` automatically enables them on your database:
 
-| Method | Endpoint | Purpose |
-| --- | --- | --- |
-| `GET` | `/health` | Liveness probe |
-| `GET` | `/health/ready` | Database readiness probe |
-| `GET` | `/api/v1/site` | Brand, offices, languages, support, legal notices |
-| `GET` | `/api/v1/practices` | List practice areas |
-| `GET` | `/api/v1/practices/:slug` | Practice area by slug or id |
-| `GET` | `/api/v1/advocates` | Paginated advocate directory |
-| `GET` | `/api/v1/advocates/:id` | Advocate by id |
-| `GET` | `/api/v1/matters` | Paginated representative matters |
-| `GET` | `/api/v1/matters/categories` | Matter categories |
-| `GET` | `/api/v1/matters/:slug` | Matter by slug or id |
-| `GET` | `/api/v1/insights` | Paginated legal guides |
-| `GET` | `/api/v1/insights/categories` | Insight categories |
-| `GET` | `/api/v1/insights/:slug` | Insight by slug or id |
-| `GET` | `/api/v1/catalog` | FAQs + testimonials + fixed fees |
-| `GET` | `/api/v1/faqs` | FAQs |
-| `GET` | `/api/v1/testimonials` | Testimonials |
-| `GET` | `/api/v1/fixed-fees` | Fixed-fee packages (legacy content, see below) |
-| `POST` | `/api/v1/intake` | Legal assessment, conflict check, or consultation |
-| `GET` | `/api/v1/intake/:reference` | Limited intake status by reference |
-| `POST` | `/api/v1/newsletter` | Idempotent newsletter subscription |
+```sql
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+CREATE EXTENSION IF NOT EXISTS "postgis";
+CREATE EXTENSION IF NOT EXISTS "vector";
+```
 
-Success responses use `{ "data": ..., "meta"?: ... }`. Errors use
-`{ "error": { "code", "message", "details"? }, "requestId" }`. Full request and
-response documentation lives in [`docs/API.md`](docs/API.md) and the live
-Swagger UI.
+### Alembic Migration Commands
+Run all migration commands from inside `backend/`:
 
----
+```bash
+cd backend
+source ../venv/bin/activate
 
-## Environment
+# Apply all pending forward migrations
+alembic upgrade head
 
-Backend variables are validated with Zod at boot. Copy
-[`backend/.env.example`](backend/.env.example) and adjust as needed.
+# Roll back the most recent migration
+alembic downgrade -1
 
-| Variable | Default | Notes |
-| --- | --- | --- |
-| `NODE_ENV` | `development` | `development`, `test`, or `production` |
-| `HOST` | `0.0.0.0` | Bind address |
-| `PORT` | `4000` | API port |
-| `DATABASE_URL` | `./data/nyayasetu.db` | SQLite file or `:memory:` |
-| `CORS_ORIGINS` | `http://localhost:3000` | Comma-separated allow-list |
-| `PUBLIC_BASE_URL` | `http://localhost:4000` | Used in OpenAPI metadata |
-| `API_PREFIX` | `/api/v1` | Must start with `/` |
-| `LOG_LEVEL` | `info` | Pino level |
-| `RATE_LIMIT_MAX` | `120` | Global requests per window per IP |
-| `RATE_LIMIT_WINDOW` | `1 minute` | Global rate-limit window |
-| `ENABLE_SWAGGER` | `true` | Set `false` to disable `/docs` |
+# Generate a new migration after editing SQLAlchemy models in app/modules/
+alembic revision --autogenerate -m "describe_your_change"
 
-The frontend has no environment contract yet. When API integration begins, add
-`NEXT_PUBLIC_API_URL` and document it in `docs/FRONTEND.md`.
+# Check migration history
+alembic history --verbose
+```
 
 ---
 
-## Documentation
+## 5. Testing & Code Quality
 
-| Document | What it covers |
-| --- | --- |
-| [`docs/README.md`](docs/README.md) | Documentation index and recommended reading paths |
-| [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | System design, request lifecycle, deployment topology |
-| [`docs/API.md`](docs/API.md) | Endpoint contract, parameters, envelopes, examples |
-| [`docs/DATABASE.md`](docs/DATABASE.md) | Tables, relationships, migrations, seeding, Postgres path |
-| [`docs/DEVELOPMENT.md`](docs/DEVELOPMENT.md) | Setup, scripts, workflows, troubleshooting |
-| [`docs/FRONTEND.md`](docs/FRONTEND.md) | Routes, components, data layer, API migration plan |
-| [`docs/CONTENT.md`](docs/CONTENT.md) | Canonical copy, content-debt register, compliance guardrails |
-| [`docs/ROADMAP.md`](docs/ROADMAP.md) | Phased delivery plan and known gaps |
-| [`docs/adr/0001-backend-stack.md`](docs/adr/0001-backend-stack.md) | Why Fastify + Drizzle + SQLite |
-| [`backend/README.md`](backend/README.md) | Backend-specific setup and module conventions |
-| [`backend/AGENTS.md`](backend/AGENTS.md) | Rules for AI agents working in the backend |
-| [`frontend/README.md`](frontend/README.md) | Frontend-specific setup and structure |
-| [`frontend/AGENTS.md`](frontend/AGENTS.md) | Rules for AI agents working in the frontend |
+Before committing changes, execute the verification checks for both applications:
 
----
+### Backend Tests
+```bash
+cd backend
+source ../venv/bin/activate
 
-## Current status
+# Run full integration test suite (79 async tests)
+pytest -v
 
-- ✅ Backend scaffold with 9 tables, generated migration, and seed data.
-- ✅ Read-only content API for site config, practices, advocates, matters,
-  insights, catalog, and categories.
-- ✅ Intake API for legal assessment, conflict check, and consultation, with
-  human-readable reference tracking.
-- ✅ Newsletter subscription with idempotent upsert.
-- ✅ Swagger/OpenAPI, CORS, Helmet, rate limiting, structured logging.
-- ✅ Vitest integration tests using in-memory SQLite.
-- ⏳ Frontend still consumes static arrays in `frontend/src/data/`.
-- ⏳ No authentication or admin write API yet.
-- ⚠️ Mixed legacy content: several pages still contain "Ellery Kowal LLP"
-  Chicago/Illinois copy, and seeded fixed-fee packages use USD. Treat this as
-  content debt, not as canonical product copy. See
-  [`docs/CONTENT.md`](docs/CONTENT.md).
+# Run live health check verification script
+python scripts/verify_health.py
+```
+*(Backend tests use an in-memory SQLite database via `aiosqlite`, requiring no external PostgreSQL service).*
+
+### Frontend Quality Checks
+```bash
+cd frontend
+
+# Run ESLint check
+npm run lint
+
+# Run production Webpack build verification
+npm run build:webpack
+
+# Run functional service tests
+node scripts/test-services.mjs
+```
 
 ---
 
-## Conventions
+## 6. Troubleshooting Common Issues
 
-- **API envelope:** `{ data, meta? }` for success, `{ error, requestId }` for
-  failures.
-- **Validation:** Zod schemas at the route boundary; services accept plain typed
-  input.
-- **Database:** SQLite locally; use Drizzle migrations, never ad-hoc schema
-  changes.
-- **Backend module layout:** `src/modules/<feature>/<feature>.routes.ts`,
-  `<feature>.service.ts`, optional `<feature>.schema.ts`.
-- **TypeScript imports:** backend uses NodeNext, so relative imports include the
-  `.js` extension.
-- **Testing:** add or update Vitest coverage for any behavior change.
-- **Compliance:** never remove the "not legal advice" and "no advocate-client
-  relationship" notices from public copy or API descriptions.
+### 1. Port 3000 or Port 8000 Already in Use
+* **Port 3000:** The frontend script `npm run dev` automatically clears stale Next.js lockfiles and frees port 3000 via `scripts/predev.js`.
+* **Port 8000:** If Uvicorn fails with `Address already in use`, identify and terminate the process:
+  ```bash
+  lsof -ti:8000 | xargs kill -9
+  ```
+
+### 2. Missing `postgis` or `pgvector` Extension in PostgreSQL
+* If `alembic upgrade head` fails on `0001_extensions` with `type "geography" does not exist` or `type "vector" does not exist`:
+  * Ensure PostGIS and pgvector packages are installed on your PostgreSQL server (e.g., `brew install postgis pgvector` on macOS, or `apt-get install postgresql-16-postgis-3 postgresql-16-pgvector` on Ubuntu).
+  * Alternatively, connect to a free [Supabase](https://supabase.com) PostgreSQL instance where both extensions are pre-installed.
+
+### 3. Frontend Cannot Connect to Backend
+* Ensure the backend is running on `http://localhost:8000`.
+* Check `frontend/next.config.ts`: the rewrite rule proxies `/api/v1/:path*` to `http://localhost:8000/api/v1/:path*`.
+* Verify that your browser can open <http://localhost:8000/api/v1/health>.
 
 ---
 
-## License
+## 7. Documentation Directory
 
-No license has been declared for this repository. Treat it as private and
-proprietary until a license is added.
+* **System Architecture:** [`docs/ARCHITECTURE.md`](file:///Users/yashodhan/Documents/Projects/NyayaSetu/docs/ARCHITECTURE.md)
+* **API Specification & Endpoints:** [`docs/API.md`](file:///Users/yashodhan/Documents/Projects/NyayaSetu/docs/API.md) and [`backend/docs/API_CONTRACT.md`](file:///Users/yashodhan/Documents/Projects/NyayaSetu/backend/docs/API_CONTRACT.md)
+* **Database Models & Alembic Schema:** [`docs/DATABASE.md`](file:///Users/yashodhan/Documents/Projects/NyayaSetu/docs/DATABASE.md) and [`backend/docs/DATABASE_SCHEMA.md`](file:///Users/yashodhan/Documents/Projects/NyayaSetu/backend/docs/DATABASE_SCHEMA.md)
+* **Developer Guidelines & Code Rules:** [`AGENTS.md`](file:///Users/yashodhan/Documents/Projects/NyayaSetu/AGENTS.md)
+* **Architecture Verification Baseline:** [`docs/ARCHITECTURE_VERIFICATION.md`](file:///Users/yashodhan/Documents/Projects/NyayaSetu/docs/ARCHITECTURE_VERIFICATION.md)
+* **Complete Final Audit Report:** [`NYAYASETU_FINAL_AUDIT.md`](file:///Users/yashodhan/Documents/Projects/NyayaSetu/NYAYASETU_FINAL_AUDIT.md)

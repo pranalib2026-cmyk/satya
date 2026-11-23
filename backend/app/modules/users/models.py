@@ -1,9 +1,10 @@
-"""User entity model."""
+"""User entity and DPDP Consent models."""
 
 import uuid
+from datetime import datetime
 from typing import TYPE_CHECKING, List, Optional
-from sqlalchemy import Boolean, String, text
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy import Boolean, DateTime, ForeignKey, JSON, String, Text, text
+from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base, TimestampMixin
@@ -82,7 +83,18 @@ class User(Base, TimestampMixin):
         default="en",
         server_default=text("'en'"),
         nullable=False,
-        comment="en, hi, mr, ta, te, bn",
+        comment="en, hi, mr, ta, te, bn, kn",
+    )
+    city: Mapped[Optional[str]] = mapped_column(
+        String(100),
+        nullable=True,
+        index=True,
+        comment="Jurisdictional city / district",
+    )
+    state: Mapped[Optional[str]] = mapped_column(
+        String(100),
+        nullable=True,
+        comment="Jurisdictional state / territory",
     )
 
     # Relationships
@@ -111,3 +123,84 @@ class User(Base, TimestampMixin):
         "ConsultationRequest",
         back_populates="client",
     )
+    consents: Mapped[List["UserConsent"]] = relationship(
+        "UserConsent",
+        back_populates="user",
+        cascade="all, delete-orphan",
+    )
+
+
+class UserConsent(Base, TimestampMixin):
+    """Digital Personal Data Protection (DPDP) Act, 2023 Consent and Audit Ledger."""
+
+    __tablename__ = "user_consents"
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        primary_key=True,
+        default=uuid.uuid4,
+        index=True,
+    )
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    consent_type: Mapped[str] = mapped_column(
+        String(64),
+        nullable=False,
+        index=True,
+        comment="terms | privacy | dpdp | share_brief | share_documents",
+    )
+    version: Mapped[str] = mapped_column(
+        String(20),
+        nullable=False,
+        default="1.0",
+        server_default=text("'1.0'"),
+    )
+    purpose: Mapped[str] = mapped_column(
+        Text,
+        nullable=False,
+        comment="Explicit statutory processing purpose",
+    )
+    action: Mapped[str] = mapped_column(
+        String(32),
+        nullable=False,
+        default="GRANTED",
+        server_default=text("'GRANTED'"),
+        comment="GRANTED | WITHDRAWN",
+    )
+    advocate_id: Mapped[Optional[str]] = mapped_column(
+        String(64),
+        nullable=True,
+        comment="Advocate identifier if scope is case-sharing",
+    )
+    items_shared: Mapped[Optional[list]] = mapped_column(
+        JSONB().with_variant(JSON, "sqlite"),
+        nullable=True,
+        comment="Array of document names or scope identifiers",
+    )
+    is_revoked: Mapped[bool] = mapped_column(
+        Boolean,
+        default=False,
+        server_default=text("false"),
+        nullable=False,
+        index=True,
+    )
+    revoked_at: Mapped[Optional[datetime]] = mapped_column(
+        DateTime(timezone=True),
+        nullable=True,
+    )
+    ip_address: Mapped[Optional[str]] = mapped_column(
+        String(45),
+        nullable=True,
+    )
+    user_agent: Mapped[Optional[str]] = mapped_column(
+        String(512),
+        nullable=True,
+    )
+
+    # Relationship
+    user: Mapped["User"] = relationship("User", back_populates="consents")
+

@@ -35,12 +35,18 @@ class CitationValidator:
         for chunk in retrieved_chunks:
             sec = (chunk.get("section_number") or "").strip().lower()
             title = (chunk.get("source_title") or "").strip().lower()
+            chunk_body = (chunk.get("chunk_text") or "").lower()
             if sec:
                 authentic_sections.add(sec)
                 chunk_map[sec] = chunk
             if title:
                 authentic_titles.add(title)
                 chunk_map[title] = chunk
+
+            # Also register authentic statutory cross-references appearing in the verified Bare Act chunk text
+            for cross_ref in re.findall(r"\bsection\s+(\d+[a-z]?)\b", chunk_body):
+                authentic_sections.add(f"section {cross_ref}")
+                authentic_sections.add(cross_ref)
 
         verified_citations: List[CitationItem] = []
         unverified_detected: List[str] = []
@@ -61,6 +67,12 @@ class CitationValidator:
                 if cit_key not in seen_citations:
                     seen_citations.add(cit_key)
                     matching_chunk = chunk_map.get(sec_lower) or chunk_map.get(title_lower) or {}
+                    raw_text_snippet = matching_chunk.get("relevant_text") or (
+                        matching_chunk.get("chunk_text")[:280] + "..."
+                        if matching_chunk.get("chunk_text") and len(matching_chunk.get("chunk_text")) > 280
+                        else matching_chunk.get("chunk_text")
+                    )
+
                     verified_citations.append(
                         CitationItem(
                             source_title=title or matching_chunk.get("source_title", "Official Bare Act"),
@@ -69,6 +81,9 @@ class CitationValidator:
                             section_or_paragraph=sec or matching_chunk.get("section_number"),
                             clause_heading=ref.get("clause_heading") or matching_chunk.get("clause_heading"),
                             official_source_url=ref.get("official_source_url") or matching_chunk.get("official_source_url"),
+                            jurisdiction=matching_chunk.get("jurisdiction", "Union of India"),
+                            document_version=matching_chunk.get("document_version", "1.0"),
+                            relevant_text=raw_text_snippet,
                             content_checksum=ref.get("content_checksum") or matching_chunk.get("content_checksum"),
                             is_verified_in_corpus=True,
                         )

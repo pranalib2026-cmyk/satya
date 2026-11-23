@@ -86,8 +86,17 @@ class Settings(BaseSettings):
     SUPABASE_PUBLISHABLE_KEY: str = "sb_publishable_AghcSMNgQd1JlABKevbIGA_wROA32fu"
 
     # AI & Legal Embeddings Configuration
-    EMBEDDING_VECTOR_DIMENSION: int = 768
+    AI_PROVIDER: str = "mock"  # "gemini" or "mock"
     GEMINI_API_KEY: str = ""
+    GEMINI_LLM_MODEL: str = "gemini-2.5-flash"
+    GEMINI_EMBEDDING_MODEL: str = "text-embedding-004"
+    EMBEDDING_VECTOR_DIMENSION: int = 768
+
+    # Grounded RAG Retrieval Parameters
+    RAG_RELEVANCE_THRESHOLD: float = 0.45
+    RAG_SEMANTIC_WEIGHT: float = 0.70
+    RAG_LEXICAL_WEIGHT: float = 0.30
+    RAG_MAX_SOURCES_LIMIT: int = 10
 
     # Logging
     LOG_LEVEL: str = "INFO"
@@ -106,6 +115,82 @@ class Settings(BaseSettings):
     MATCHING_WEIGHT_PROXIMITY: float = 0.10
     MATCHING_WEIGHT_AVAILABILITY: float = 0.10
 
+    # Document Vault Storage Configuration (Cloudflare R2 / S3-Compatible)
+    # Read exclusively from environment variables:
+    # STORAGE_PROVIDER: "local" (default for development/tests) or "r2" (production)
+    STORAGE_PROVIDER: str = "local"
+    STORAGE_BUCKET: str = ""
+    STORAGE_ENDPOINT_URL: Optional[str] = None
+    STORAGE_REGION: str = "auto"
+    STORAGE_ACCESS_KEY_ID: str = ""
+    STORAGE_SECRET_ACCESS_KEY: str = ""
+    STORAGE_PRESIGNED_EXPIRY_SECONDS: int = 900
+
+    # Storage Capacity, Quotas and Rate Limits (Application-level limits)
+    STORAGE_MAX_FILE_SIZE_BYTES: int = 10 * 1024 * 1024  # 10 MB per individual upload
+    STORAGE_TOTAL_CAPACITY_BYTES: int = 8 * 1024 * 1024 * 1024  # 8 GB total application vault capacity
+    STORAGE_USER_QUOTA_BYTES: int = 500 * 1024 * 1024  # 500 MB per user quota
+    STORAGE_USER_MAX_DOCUMENTS: int = 50  # Max 50 documents per user
+    STORAGE_USER_UPLOAD_RATE_LIMIT_PER_HOUR: int = 30  # Max 30 uploads per hour per user
+
+    # Backward compatibility fields for legacy configuration/tests
+    STORAGE_BACKEND: Optional[str] = None
+    R2_ACCOUNT_ID: Optional[str] = None
+    R2_ACCESS_KEY_ID: Optional[str] = None
+    R2_SECRET_ACCESS_KEY: Optional[str] = None
+    R2_BUCKET_NAME: Optional[str] = None
+    R2_ENDPOINT_URL: Optional[str] = None
+    R2_PRESIGNED_EXPIRY_SECONDS: Optional[int] = None
+
+    @property
+    def effective_storage_provider(self) -> str:
+        """Resolve active storage provider identifier ('local' or 'r2')."""
+        if self.STORAGE_PROVIDER and self.STORAGE_PROVIDER.strip().lower() != "local":
+            return self.STORAGE_PROVIDER.strip().lower()
+        if self.STORAGE_BACKEND and self.STORAGE_BACKEND.strip():
+            return self.STORAGE_BACKEND.strip().lower()
+        return (self.STORAGE_PROVIDER or "local").strip().lower()
+
+    @property
+    def effective_storage_bucket(self) -> str:
+        """Resolve active bucket name."""
+        if self.STORAGE_BUCKET and self.STORAGE_BUCKET.strip():
+            return self.STORAGE_BUCKET.strip()
+        if self.R2_BUCKET_NAME and self.R2_BUCKET_NAME.strip():
+            return self.R2_BUCKET_NAME.strip()
+        return ""
+
+    @property
+    def effective_storage_access_key_id(self) -> str:
+        """Resolve S3 / R2 access key ID."""
+        return (self.STORAGE_ACCESS_KEY_ID or self.R2_ACCESS_KEY_ID or "").strip()
+
+    @property
+    def effective_storage_secret_access_key(self) -> str:
+        """Resolve S3 / R2 secret access key."""
+        return (self.STORAGE_SECRET_ACCESS_KEY or self.R2_SECRET_ACCESS_KEY or "").strip()
+
+    @property
+    def effective_storage_region(self) -> str:
+        """Resolve S3 / R2 region ('auto' for Cloudflare R2)."""
+        return (self.STORAGE_REGION or "auto").strip()
+
+    @property
+    def effective_storage_endpoint_url(self) -> Optional[str]:
+        """Derive full S3 endpoint URL for Cloudflare R2 if set."""
+        if self.STORAGE_ENDPOINT_URL and self.STORAGE_ENDPOINT_URL.strip():
+            return self.STORAGE_ENDPOINT_URL.strip()
+        if self.R2_ENDPOINT_URL and self.R2_ENDPOINT_URL.strip():
+            return self.R2_ENDPOINT_URL.strip()
+        if self.R2_ACCOUNT_ID and self.R2_ACCOUNT_ID.strip():
+            return f"https://{self.R2_ACCOUNT_ID.strip()}.r2.cloudflarestorage.com"
+        return None
+
+    @property
+    def effective_r2_endpoint_url(self) -> Optional[str]:
+        """Backward-compatible alias for effective_storage_endpoint_url."""
+        return self.effective_storage_endpoint_url
+
     @property
     def is_production(self) -> bool:
         return self.ENVIRONMENT.lower() == "production"
@@ -113,6 +198,113 @@ class Settings(BaseSettings):
     @property
     def is_development(self) -> bool:
         return self.ENVIRONMENT.lower() == "development"
+
+    @property
+    def is_testing(self) -> bool:
+        return self.ENVIRONMENT.lower() in ("test", "testing")
+
+
+def validate_ai_configuration(settings_obj: Optional[Settings] = None) -> None:
+    """Validate AI provider configuration for current environment.
+
+    Enforces strict production safety:
+    1. Production mode MUST NOT silently use mock AI providers.
+    2. In production, AI_PROVIDER must be 'gemini'.
+    3. In production, GEMINI_API_KEY must be provided and non-empty.
+    4. Required SDK ('google-genai') must be installed.
+    5. In development, explicit mock provider is allowed and handled gracefully without crashes.
+    """
+    cfg = settings_obj or settings
+    provider = cfg.AI_PROVIDER.lower().strip() if cfg.AI_PROVIDER else "mock"
+
+    if cfg.is_production:
+        if provider == "mock":
+            raise RuntimeError(
+                "Production startup failed: AI_PROVIDER cannot be 'mock' in production. "
+                "Set AI_PROVIDER='gemini' and configure a valid GEMINI_API_KEY."
+            )
+        if provider != "gemini":
+            raise ValueError(
+                f"Production startup failed: Unsupported AI_PROVIDER '{cfg.AI_PROVIDER}'. "
+                f"Supported production provider is 'gemini'."
+            )
+        if not cfg.GEMINI_API_KEY or not cfg.GEMINI_API_KEY.strip():
+            raise RuntimeError(
+                "Production startup failed: GEMINI_API_KEY is required in production when AI_PROVIDER='gemini'. "
+                "Please set GEMINI_API_KEY in your environment variables or production secrets."
+            )
+        try:
+            from google import genai  # noqa: F401
+        except ImportError as exc:
+            raise RuntimeError(
+                "Production startup failed: Required SDK 'google-genai' is not installed. "
+                "Please run 'pip install google-genai' or 'pip install -r requirements.txt'."
+            ) from exc
+    else:
+        # Development / Test mode validations
+        if provider not in ("gemini", "mock"):
+            import logging
+            logging.getLogger("uvicorn.error").warning(
+                f"Unknown AI_PROVIDER '{cfg.AI_PROVIDER}' in development. Falling back to deterministic mock."
+            )
+
+
+def validate_storage_configuration(settings_obj: Optional[Settings] = None) -> None:
+    """Validate storage provider configuration for the current environment.
+
+    Enforces strict production safety without leaking credentials:
+    1. Production mode MUST NOT silently use or fall back to local filesystem storage.
+    2. In production, STORAGE_PROVIDER must be 'r2'.
+    3. In production, STORAGE_ACCESS_KEY_ID, STORAGE_SECRET_ACCESS_KEY, STORAGE_BUCKET,
+       and STORAGE_ENDPOINT_URL must be configured and non-empty.
+    4. Required SDK ('boto3' and 'botocore') must be installed.
+    5. In development/testing, 'local' storage is allowed.
+    """
+    cfg = settings_obj or settings
+    provider = cfg.effective_storage_provider
+
+    if cfg.is_production:
+        if provider == "local":
+            raise RuntimeError(
+                "Production startup failed: STORAGE_PROVIDER cannot be 'local' in production. "
+                "Local filesystem storage is prohibited in production to prevent ephemeral data loss. "
+                "Set STORAGE_PROVIDER='r2' and configure Cloudflare R2 credentials."
+            )
+        if provider != "r2":
+            raise ValueError(
+                f"Production startup failed: Unsupported STORAGE_PROVIDER '{provider}'. "
+                f"Supported production storage provider is 'r2'."
+            )
+        if not cfg.effective_storage_access_key_id:
+            raise RuntimeError(
+                "Production startup failed: STORAGE_ACCESS_KEY_ID is required in production when STORAGE_PROVIDER='r2'."
+            )
+        if not cfg.effective_storage_secret_access_key:
+            raise RuntimeError(
+                "Production startup failed: STORAGE_SECRET_ACCESS_KEY is required in production when STORAGE_PROVIDER='r2'."
+            )
+        if not cfg.effective_storage_bucket:
+            raise RuntimeError(
+                "Production startup failed: STORAGE_BUCKET is required in production when STORAGE_PROVIDER='r2'."
+            )
+        if not cfg.effective_storage_endpoint_url:
+            raise RuntimeError(
+                "Production startup failed: STORAGE_ENDPOINT_URL must be configured for Cloudflare R2 in production."
+            )
+        try:
+            import boto3  # noqa: F401
+            import botocore  # noqa: F401
+        except ImportError as exc:
+            raise RuntimeError(
+                "Production startup failed: Required SDK 'boto3'/'botocore' is not installed. "
+                "Please run 'pip install -r requirements.txt'."
+            ) from exc
+    else:
+        if provider not in ("local", "r2"):
+            import logging
+            logging.getLogger("uvicorn.error").warning(
+                f"Unknown STORAGE_PROVIDER '{provider}' in development. Falling back to local filesystem."
+            )
 
 
 settings = Settings()

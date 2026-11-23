@@ -92,6 +92,25 @@ class LegalSource(Base, TimestampMixin):
         Text,
         nullable=True,
     )
+    verification_status: Mapped[str] = mapped_column(
+        String(32),
+        default="VERIFIED",
+        nullable=False,
+        index=True,
+        comment="PENDING_VERIFICATION | VERIFIED | REJECTED",
+    )
+    ingestion_status: Mapped[str] = mapped_column(
+        String(32),
+        default="COMPLETED",
+        nullable=False,
+        index=True,
+        comment="PENDING | PROCESSING | COMPLETED | FAILED",
+    )
+    raw_content_path: Mapped[Optional[str]] = mapped_column(
+        String(512),
+        nullable=True,
+        comment="File path to raw ingested document artifact",
+    )
     metadata_json: Mapped[Optional[dict]] = mapped_column(
         JSONB().with_variant(JSON, "sqlite"),
         nullable=True,
@@ -104,6 +123,11 @@ class LegalSource(Base, TimestampMixin):
         back_populates="source",
         cascade="all, delete-orphan",
         order_by="LegalChunk.section_number",
+    )
+    ingestion_jobs: Mapped[List["LegalIngestionJob"]] = relationship(
+        "LegalIngestionJob",
+        back_populates="source",
+        cascade="all, delete-orphan",
     )
 
 
@@ -148,6 +172,13 @@ class LegalChunk(Base, TimestampMixin):
         nullable=True,
         comment="SHA-256 hash of chunk content",
     )
+    embedding_status: Mapped[str] = mapped_column(
+        String(32),
+        default="COMPLETED",
+        nullable=False,
+        index=True,
+        comment="PENDING | COMPLETED | FAILED",
+    )
     metadata_json: Mapped[Optional[dict]] = mapped_column(
         JSONB().with_variant(JSON, "sqlite"),
         nullable=True,
@@ -170,4 +201,78 @@ class LegalChunk(Base, TimestampMixin):
 
     __table_args__ = (
         Index("idx_legal_chunks_source_section", "source_id", "section_number"),
+        Index(
+            "ix_legal_chunks_embedding_hnsw",
+            "embedding",
+            postgresql_using="hnsw",
+            postgresql_with={"m": 16, "ef_construction": 64},
+            postgresql_ops={"embedding": "vector_cosine_ops"},
+        ),
+    )
+
+
+class LegalIngestionJob(Base, TimestampMixin):
+    """Tracks legal document ingestion runs, extraction metrics, and error logs."""
+
+    __tablename__ = "legal_ingestion_jobs"
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        primary_key=True,
+        default=uuid.uuid4,
+        index=True,
+    )
+    source_id: Mapped[Optional[uuid.UUID]] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("legal_sources.id", ondelete="SET NULL"),
+        nullable=True,
+        index=True,
+    )
+    source_title: Mapped[str] = mapped_column(
+        String(255),
+        nullable=False,
+        index=True,
+    )
+    file_format: Mapped[str] = mapped_column(
+        String(32),
+        nullable=False,
+        comment="PDF | HTML | TXT | JSON",
+    )
+    status: Mapped[str] = mapped_column(
+        String(32),
+        default="PENDING",
+        nullable=False,
+        index=True,
+        comment="PENDING | PROCESSING | COMPLETED | FAILED | DUPLICATE_SKIPPED",
+    )
+    content_checksum: Mapped[Optional[str]] = mapped_column(
+        String(64),
+        nullable=True,
+        index=True,
+        comment="SHA-256 of raw source payload",
+    )
+    chunks_extracted: Mapped[int] = mapped_column(
+        Integer,
+        default=0,
+        nullable=False,
+    )
+    chunks_embedded: Mapped[int] = mapped_column(
+        Integer,
+        default=0,
+        nullable=False,
+    )
+    error_message: Mapped[Optional[str]] = mapped_column(
+        Text,
+        nullable=True,
+    )
+    details_json: Mapped[Optional[dict]] = mapped_column(
+        JSONB().with_variant(JSON, "sqlite"),
+        nullable=True,
+        default=dict,
+    )
+
+    # Relationships
+    source: Mapped[Optional["LegalSource"]] = relationship(
+        "LegalSource",
+        back_populates="ingestion_jobs",
     )

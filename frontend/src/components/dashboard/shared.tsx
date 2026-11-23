@@ -160,23 +160,25 @@ export function Disclaimer({
   className,
   variant = "inline",
   text = "Legal information only. Not legal advice.",
+  suppressHydrationWarning,
 }: {
   className?: string;
   variant?: "inline" | "banner";
   text?: string;
+  suppressHydrationWarning?: boolean;
 }) {
   if (variant === "banner") {
     return (
       <div className={cn("flex items-start gap-2.5 rounded-[2px] border border-[#e2d5c1] bg-[#fffaf2] px-4 py-3 text-xs leading-relaxed text-[#5b4a3b]", className)}>
         <ShieldCheck className="mt-0.5 size-4 shrink-0 text-[#9a6a35]" aria-hidden="true" />
-        <p className="text-xs leading-5 text-[#5b4a3b]">{text}</p>
+        <p suppressHydrationWarning={suppressHydrationWarning} className="text-xs leading-5 text-[#5b4a3b]">{text}</p>
       </div>
     );
   }
   return (
-    <p className={cn("flex items-start gap-1.5 text-xs leading-5 text-[#85725f]", className)}>
+    <p suppressHydrationWarning={suppressHydrationWarning} className={cn("flex items-start gap-1.5 text-xs leading-5 text-[#85725f]", className)}>
       <Info className="mt-0.5 size-3.5 shrink-0 text-[#9a6a35]" aria-hidden="true" />
-      <span>{text}</span>
+      <span suppressHydrationWarning={suppressHydrationWarning}>{text}</span>
     </p>
   );
 }

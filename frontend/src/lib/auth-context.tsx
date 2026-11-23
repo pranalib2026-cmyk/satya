@@ -42,6 +42,8 @@ interface BackendUserResponse {
   is_verified: boolean;
   is_active: boolean;
   preferred_language: string;
+  city?: string | null;
+  state?: string | null;
   created_at: string;
 }
 
@@ -66,8 +68,8 @@ function mapBackendUserToFrontend(bu: BackendUserResponse): User {
     phone: bu.phone,
     role: normRole,
     language: lang,
-    city: "Bengaluru",
-    state: "Karnataka",
+    city: bu.city || "Bengaluru",
+    state: bu.state || "Karnataka",
     createdAt: bu.created_at,
   };
 }
@@ -82,7 +84,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const syncBackendProfile = useCallback(async (jwtToken: string) => {
     try {
-      const liveUser = await api.get<BackendUserResponse>("/api/v1/auth/me", {
+      const liveUser = await api.get<BackendUserResponse>("/api/v1/users/me", {
         token: jwtToken,
       });
       const mapped = mapBackendUserToFrontend(liveUser);

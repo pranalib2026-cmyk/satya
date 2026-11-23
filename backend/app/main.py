@@ -7,7 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from app.api.v1.router import api_v1_router
-from app.core.config import settings
+from app.core.config import settings, validate_ai_configuration, validate_storage_configuration
 from app.core.errors import register_exception_handlers
 from app.core.logging import logger, setup_logging
 
@@ -16,12 +16,18 @@ from app.core.logging import logger, setup_logging
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     """Application startup and graceful shutdown lifecycle handler."""
     setup_logging()
+    # Validate AI provider & security configuration
+    validate_ai_configuration(settings)
+    # Validate Document Storage backend configuration
+    validate_storage_configuration(settings)
     logger.info(
         f"Starting {settings.APP_NAME} v{settings.APP_VERSION} in [{settings.ENVIRONMENT}] mode",
         extra={
             "debug": settings.DEBUG,
             "cors_origins": settings.CORS_ORIGINS,
             "api_prefix": settings.API_V1_PREFIX,
+            "ai_provider": settings.AI_PROVIDER,
+            "storage_backend": settings.STORAGE_BACKEND,
         },
     )
     yield

@@ -38,13 +38,12 @@ To run against the backend, start the API first:
 
 ```bash
 cd ../backend
-npm install
-npm run setup
-npm run dev          # http://localhost:4000
+source ../venv/bin/activate
+alembic upgrade head
+python run.py          # http://localhost:8000
 ```
 
-The frontend does not call the API yet. When it does, add
-`NEXT_PUBLIC_API_URL=http://localhost:4000` to `.env.local`.
+Requests to `/api/v1/:path*` are automatically proxied to `http://localhost:8000` via Next.js rewrites in `next.config.ts`. If running on a different port, set `BACKEND_API_URL` in `frontend/.env.local`.
 
 ## Scripts
 

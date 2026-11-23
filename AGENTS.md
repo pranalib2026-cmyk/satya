@@ -1,188 +1,262 @@
-# AGENTS.md — NyayaSetu repository guide
+# AGENTS.md — NyayaSetu Repository Guide
 
-This file is the entry point for any AI coding agent working in this repository.
-Read it before editing. Then read the document that matches your task.
+This file is the single source of truth and entry point for any developer or AI coding agent working in this repository.
+Read it completely before inspecting or modifying code.
 
-## What this project is
+---
 
-NyayaSetu is an India-focused legal platform with two independent apps:
+## 1. Project Overview & Architecture
 
-- `frontend/` — Next.js 16 marketing site, advocate directory, matter ledger,
-  insights, and a multi-step intake UI. Content is still static in
-  `frontend/src/data/`.
-- `backend/` — Fastify 5 + TypeScript API with Drizzle ORM over SQLite. It
-  serves public content, intake requests, and newsletter subscriptions.
+NyayaSetu (न्यायसेतु) is an India-focused legal technology platform designed to bridge citizens and verified advocates, established in 2026. The platform comprises two independent applications:
 
-There is **no root package manager workspace**. Run commands from `frontend/`
-or `backend/`.
+* **`frontend/`** — Next.js 16 (App Router), React 19, TypeScript, and Tailwind CSS 4 client application featuring an editorial design language, public legal information directories, citizen matter intake, case tracking dockets, evidence vault, and advocate discovery.
+* **`backend/`** — Python 3.12 + FastAPI 0.115 Modular Monolith API with SQLAlchemy 2.0 (Asyncio) over PostgreSQL 16 (powered by PostGIS geospatial indexing and pgvector semantic embeddings). It manages authentication, advocate credentials, case dossiers, deterministic triage, limitation deadlines, secure document vault, and grounded statutory RAG assistance.
 
-## Read order
+> [!CRITICAL]
+> **Single Backend Rule:** The Python FastAPI backend in `backend/` is the sole authoritative server application. Do **not** introduce a second backend framework (e.g., Express, Fastify, NestJS) or duplicate database ORM layer (e.g., Prisma, Drizzle). All server features, migrations, and database entities must remain in `backend/`.
 
-1. `README.md` — product and quick start.
-2. `docs/ARCHITECTURE.md` — how the pieces fit.
-3. `docs/API.md` — endpoint contract if touching API or integration.
-4. `docs/DATABASE.md` — schema and migration rules.
-5. `docs/FRONTEND.md` — routes, components, migration plan.
-6. `docs/CONTENT.md` — canonical copy and known content debt.
-7. `docs/ROADMAP.md` — current scope and sequencing.
-8. `backend/AGENTS.md` or `frontend/AGENTS.md` — stack-specific rules.
+---
 
-## Repository map
+## 2. Repository Map
 
 ```text
-frontend/src/app/            App Router pages
-frontend/src/components/     layout/, sections/, ui/, 3d/
-frontend/src/data/           static content arrays
-frontend/src/types/          shared frontend types
-backend/src/modules/         feature modules (routes + services + schemas)
-backend/src/db/              schema, client, migrate, seed, seed-data
-backend/src/shared/          HTTP helpers, pagination, errors, references
-backend/drizzle/             generated migrations (commit these)
-backend/test/                Vitest integration tests
-docs/                        project documentation and ADRs
+NyayaSetu/
+├── frontend/                   Next.js 16 client application
+│   ├── src/app/                App Router routes & layouts
+│   ├── src/components/         Editorial UI primitives, layout, 3D Canvas
+│   ├── src/services/dashboard/ API integration clients & typed service layer
+│   ├── src/lib/                AuthContext, unified API client, design tokens
+│   ├── src/types/              TypeScript domain definitions
+│   └── scripts/predev.js       Port 3000 lifecycle hygiene
+├── backend/                    Python 3.12 FastAPI Modular Monolith API
+│   ├── app/
+│   │   ├── main.py             ASGI factory, CORS, exception handlers
+│   │   ├── core/               Config, SQLAlchemy async engine, Argon2/JWT security
+│   │   ├── api/v1/             Central API router & health diagnostics
+│   │   ├── modules/            12 cohesive domain packages (routes, services, models)
+│   │   ├── integrations/       AI providers, SMS gateways, external adapters
+│   │   └── shared/             Shared pagination models & response schemas
+│   ├── migrations/             Alembic migration revisions (`versions/`) & env.py
+│   ├── scripts/                Operational scripts (`run_dev.sh`, `verify_health.py`)
+│   ├── tests/                  Pytest async integration test suites
+│   ├── docs/                   Detailed API contract and DB specifications
+│   ├── requirements.txt        Pinned Python dependencies
+│   ├── alembic.ini             Alembic configuration
+│   └── run.py                  Uvicorn development server launcher
+├── docs/                       Architecture, API contract, database schema, roadmaps
+└── .gitignore                  Git tracking rules
 ```
 
-## Commands
+There is **no root package manager workspace**. Run frontend commands from `frontend/` and backend commands from `backend/`.
 
-### Backend (`backend/`)
+---
 
-```bash
-npm install
-npm run setup          # migrate + seed
-npm run dev            # predev migrates, then tsx watch on :4000
-npm run typecheck
-npm run lint
-npm test
-npm run build
-npm run start
-npm run db:generate    # generate migration after schema change
-npm run db:migrate
-npm run db:seed        # destructive for content tables only
-npm run db:reset       # destructive for everything (drops DB file)
-```
+## 3. Technology Stack & Verification Commands
 
-### Frontend (`frontend/`)
+### 3.1 Backend (`backend/`)
 
-```bash
-npm install
-npm run dev            # predev clears port 3000 / stale Next lock
-npm run build
-npm run start
-npm run lint
-```
+* **Runtime:** Python 3.12
+* **Framework:** FastAPI 0.115 + Pydantic v2
+* **ORM:** SQLAlchemy 2.0 (Asyncio)
+* **Driver:** Psycopg 3 (`psycopg[binary]>=3.2.0`)
+* **Database:** PostgreSQL 16 with PostGIS (`geoalchemy2`) and pgvector (`pgvector.sqlalchemy`)
+* **Migrations:** Alembic
+* **Password Hashing:** Argon2id (`argon2-cffi`)
+* **Tokens:** PyJWT (HS256) with database-tracked refresh rotation
+* **Testing:** Pytest 8.2 + pytest-asyncio + HTTPX (uses SQLite `:memory:` via `aiosqlite`)
 
-## Non-negotiable conventions
-
-### API
-
-- Business routes live under `/api/v1` (`env.API_PREFIX`). Health routes are
-  outside the prefix.
-- Success: `{ "data": ..., "meta"?: ... }`.
-- Error: `{ "error": { "code", "message", "details"? }, "requestId" }`.
-- Pagination metadata comes from `buildPageMeta` in
-  `backend/src/shared/http/pagination.ts`.
-- Throw `AppError` helpers (`notFound`, `badRequest`, `conflict`) from services
-  or routes; never hand-roll a divergent error body.
-- Validate input with Zod at the route boundary. Do not trust raw request data.
-- Register new route plugins in `backend/src/routes.ts`.
-
-### Backend code
-
-- NodeNext ESM: relative imports **must end in `.js`**, even in TypeScript.
-- Use `FastifyPluginAsyncZod` for route plugins.
-- Access the database through `request.server.db`; it is decorated in
-  `backend/src/app.ts`.
-- Keep route handlers thin. Put filtering/query logic in the module's service.
-- Use `drizzle-kit generate` to create migrations. Commit the generated SQL and
-  snapshot in `backend/drizzle/`.
-- Never commit `backend/data/`, `backend/dist/`, `backend/.env`, or WAL files.
-- Seed content changes belong in `backend/src/db/seed-data/`, and the seed must
-  remain idempotent for public content tables.
-- Intake and newsletter rows are user data: `seedDatabase` must not delete them.
-
-### Frontend code
-
-- This is **Next.js 16**, which has breaking changes relative to many training
-  corpora. Before using an unfamiliar API, read the bundled docs under
-  `frontend/node_modules/next/dist/docs/` as instructed by
-  `frontend/AGENTS.md`.
-- Preserve the existing visual system: warm paper palette, serif display type,
-  mono labels, square borders, restrained motion.
-- `frontend/scripts/predev.js` intentionally kills processes on port 3000.
-  Do not remove it without replacing the behavior.
-- Static data is the current source of truth. If you switch a page to the API,
-  keep the static data until the API path is verified end-to-end.
-- Do not add a client-side data fetch for content that can be rendered on the
-  server.
-
-### Content and compliance
-
-- Canonical identity: **NyayaSetu (न्यायसेतु)**, India, established 2026.
-- Do not reintroduce Chicago/Illinois "Ellery Kowal LLP" copy. It is legacy
-  template content and is tracked in `docs/CONTENT.md`.
-- Never remove or weaken:
-  - "preliminary AI assessment is not legal advice"
-  - "submitting an intake does not create an advocate-client relationship"
-  - the Bar Council of India non-solicitation/non-advertising position
-- Fixed-fee packages currently use USD and legacy firm language. Do not present
-  them as approved India pricing; see content debt.
-- Do not invent advocates, bar enrollments, office addresses, phone numbers, or
-  case results. Use existing seed/test data unless the user supplies new facts.
-
-## Verification gates
-
-Before reporting work complete, run the checks relevant to your change.
-
-Backend change:
+#### Backend Commands
 
 ```bash
 cd backend
-npm run typecheck
-npm run lint
-npm test
-npm run build
+
+# Setup Python 3.12 Virtual Environment
+python3.12 -m venv ../venv
+source ../venv/bin/activate
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Environment configuration
+cp .env.example .env
+
+# Database Migrations (PostgreSQL)
+alembic upgrade head
+
+# Generate new migration after editing SQLAlchemy models
+alembic revision --autogenerate -m "describe_change"
+
+# Launch Development Server (Port 8000)
+python run.py
+# Or directly via Uvicorn:
+uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+# Operational Verification & Diagnostics
+python scripts/verify_health.py
+
+# Run Integration Test Suite
+pytest -v
 ```
 
-Frontend change:
+* **Interactive OpenAPI Swagger Docs:** <http://localhost:8000/docs>
+* **Alternative ReDoc UI:** <http://localhost:8000/redoc>
+* **System Health Probe:** <http://localhost:8000/api/v1/health>
+
+---
+
+### 3.2 Frontend (`frontend/`)
+
+* **Framework:** Next.js 16.4.5 (App Router)
+* **UI Runtime:** React 19.3.0
+* **Language:** TypeScript 5
+* **Styling:** Tailwind CSS 4 + custom warm editorial CSS tokens in `src/app/globals.css`
+* **Motion & 3D:** Framer Motion 14, Three.js, `@react-three/fiber`, `@react-three/drei`
+* **Icons:** `lucide-react`
+* **API Proxy:** Next.js rewrites in `next.config.ts` route `/api/v1/:path*` to `http://localhost:8000`
+
+#### Frontend Commands
 
 ```bash
 cd frontend
+
+# Install Node dependencies
+npm install
+
+# Start Development Server (Port 3000)
+npm run dev
+
+# Code Quality & Type Checks
 npm run lint
+
+# Production Webpack Build
+npm run build:webpack
+# Or standard build:
 npm run build
+
+# Start Production Server
+npm run start
 ```
 
-Documentation-only change: verify links and command accuracy; no build needed.
+---
 
-## Working with the database
+## 4. Non-Negotiable Architecture & Coding Conventions
 
-- Local DB path: `backend/data/nyayasetu.db` (gitignored).
-- Tests use `:memory:` via `createTestApp()` in `backend/test/helpers.ts`.
-- `db:seed` clears and reinserts only content tables, preserving intake and
-  newsletter data.
-- `db:reset` deletes the SQLite file (plus `-wal`/`-shm`) and recreates it.
+### 4.1 Backend Code Conventions
 
-## Known traps
+1. **Modular Monolith Boundaries:**
+   * Business domains reside in `backend/app/modules/<module_name>/`.
+   * Each module encapsulates its own:
+     * `router.py` (FastAPI route declarations)
+     * `schemas.py` (Pydantic v2 request/response models)
+     * `models.py` (SQLAlchemy 2 mapped entities)
+     * `service.py` (business logic, queries, and transactions)
+     * `dependencies.py` (role guards, query parameters)
+   * Cross-module interaction must occur through exported service methods, never via raw cross-table SQL joins across domain boundaries.
+2. **Thin Route Handlers:**
+   * Route handlers must only validate request payloads, inject dependencies (`db: AsyncSession = Depends(get_db)`, `current_user = Depends(get_current_active_user)`), and delegate to the domain `Service`.
+3. **Database Access & Transactions:**
+   * Always inject `AsyncSession` via `Depends(get_db)`.
+   * `get_db()` automatically commits transactions upon normal completion and triggers an automatic rollback if an unhandled exception or `SQLAlchemyError` occurs.
+4. **Standardized Error Handling:**
+   * Throw typed exceptions from `backend/app/core/errors.py`:
+     * `NotFoundException` (HTTP 404)
+     * `BadRequestException` (HTTP 400)
+     * `ConflictException` (HTTP 409)
+     * `UnauthorizedException` (HTTP 401)
+     * `ForbiddenException` (HTTP 403)
+   * Never hand-roll inconsistent JSON error bodies. Centralized handlers in `app/main.py` format all exceptions into:
+     `{"error": {"code": "...", "message": "...", "details": {...}}, "request_id": "..."}`.
+5. **Alembic Migrations:**
+   * All entity models must inherit from `app.core.database.Base` and be imported into `app.core.models` so Alembic can discover metadata.
+   * Never modify existing, committed migration scripts in `backend/migrations/versions/`. Always create a new forward migration with `alembic revision --autogenerate -m "..."`.
 
-- **Markdown gitignore:** root `.gitignore` ignores `*.md` with explicit
-  negations. New documentation must live under `docs/`, `backend/`, or
-  `frontend/`, or be named `README.md` / `AGENTS.md`, otherwise Git ignores it.
-- **Env example:** `.env*` is ignored, but `**/.env.example` is explicitly
-  unignored.
-- **Pre-existing changes:** the working tree may already contain unrelated
-  edits (for example `frontend/package-lock.json`,
-  `frontend/src/app/globals.css`, `frontend/src/components/sections/
-  practices-slider.tsx`). Do not revert unrelated work.
-- **Native module:** `better-sqlite3` needs a prebuilt binary or a C++ toolchain.
-- **Rate limits:** global 120/min; intake 10/min; newsletter 5/min.
-- **Swagger:** enabled by default in development; disable with
-  `ENABLE_SWAGGER=false`.
+---
 
-## When you change behavior
+### 4.2 Authentication & Security Conventions
 
-Update the matching documentation in the same change:
+1. **Password Security:**
+   * Plaintext passwords must be hashed using Argon2id (`app.core.security.hash_password`) before storage. Plain passwords are never logged or stored.
+2. **JWT Sessions:**
+   * Access tokens expire in 60 minutes (`ACCESS_TOKEN_EXPIRE_MINUTES`).
+   * Refresh tokens expire in 7 days and must be tracked in the `refresh_tokens` database table with their SHA-256 fingerprint (`hash_token`). Tokens are rotated upon each refresh; reuse invalidates all related sessions.
+3. **Role-Based Access Control (RBAC):**
+   * Three distinct system roles exist: `CITIZEN`, `ADVOCATE`, `ADMIN`.
+   * Protect sensitive routes using FastAPI dependencies:
+     * `require_roles("CITIZEN")`
+     * `require_roles("ADVOCATE")`
+     * `require_roles("ADMIN")`
+   * Self-assignment of the `ADMIN` role is strictly rejected at the route and service level.
+4. **Document Vault Security:**
+   * Private client evidence files must be stored outside public frontend directories.
+   * File downloads must be authenticated via Bearer JWT or short-lived, signed download tokens (15-minute expiry). Public static URLs for vault files are strictly prohibited.
 
-- Route or payload → `docs/API.md` and Swagger schema.
-- Table, column, or migration → `docs/DATABASE.md`.
-- Architecture or integration pattern → `docs/ARCHITECTURE.md`.
-- Page, data source, or env var → `docs/FRONTEND.md`.
-- Scope or sequencing → `docs/ROADMAP.md`.
+---
+
+### 4.3 Frontend Code Conventions
+
+1. **Next.js 16 & React 19 Compliance:**
+   * Follow Next.js 16 App Router patterns. Keep data fetches on the server where appropriate.
+   * In React 19, avoid `setState` calls directly inside top-level `useEffect` hooks for prop synchronization; prefer render-phase state adjustment.
+2. **Visual Design Integrity (The Homepage Reference):**
+   * The visual standard is defined by the homepage (`frontend/src/app/page.tsx`):
+     * Backgrounds: Warm ivory (`#f4efe6`) and card paper (`#fffaf2`).
+     * Typography: Gambetta editorial serif (`font-serif`) for headings; clean sans-serif for body text; monospace for dockets.
+     * Accents: Antique bronze (`#9a6a35`) and warm gold (`#d1a46a`).
+     * Geometry: Classical rectangular borders (`rounded-[2px]`).
+     * **Prohibited:** Never introduce modern SaaS neon hues (`bg-blue-600`, `bg-purple-600`) or pill-shaped buttons (`rounded-full`, `rounded-2xl`).
+3. **API Integration Standards:**
+   * Use the centralized client `api` in `frontend/src/lib/api-client.ts`.
+   * Automatically injects Bearer JWT from `localStorage` and unwraps FastAPI standardized errors into typed `ApiError` instances.
+   * Preserve offline fallback data while developing until endpoints are fully verified.
+
+---
+
+### 4.4 Indian Legal Compliance Standards
+
+1. **Bar Council of India (BCI) Rule 36:**
+   * Advocates are prohibited from soliciting clients or advertising fee structures.
+   * Maintain the prominent non-advertising notice on all public pages.
+   * Advocate directory matching must remain transparent, objective, and merit-based (scoring by practice fit, court proximity, language, and verified bar roll). Never introduce paid priority placements.
+2. **Statutory Legal Disclaimer:**
+   * Never weaken or remove the mandatory disclosure:
+     *"NyayaSetu provides an AI-assisted preliminary legal assessment and advocate-discovery platform. It is not a law firm and does not provide legal advice. Submitting an intake does not create an advocate-client relationship."*
+3. **Limitation Act, 1963 Disclaimers:**
+   * Statutory limitation calculations must indicate their statutory basis (e.g., Section 138 NI Act 30-day notice, Consumer Protection Act 2-year filing) and state that they require review by an empanelled advocate.
+4. **Digital Personal Data Protection Act, 2023 (DPDP):**
+   * Maintain transparent purpose limitation, consent logging, and data privacy disclosures across citizen intake and document sharing.
+
+---
+
+## 5. Verification Gates Before Reporting Complete
+
+Before declaring any task or PR complete, execute the verification commands for your affected area:
+
+### Backend Checks
+```bash
+cd backend
+source ../venv/bin/activate
+pytest -v
+python scripts/verify_health.py
+```
+
+### Frontend Checks
+```bash
+cd frontend
+npm run lint
+npm run build:webpack
+```
+
+### Documentation Checks
+* Verify that command snippets and paths correspond to active files on disk.
+* Verify links use the `file://` scheme or accurate relative markdown references.
+
+---
+
+## 6. Documentation Directory Index
+
+When changing behavior, update the matching specification:
+* **API Endpoints & Contracts:** [`docs/API.md`](file:///Users/yashodhan/Documents/Projects/NyayaSetu/docs/API.md) and [`backend/docs/API_CONTRACT.md`](file:///Users/yashodhan/Documents/Projects/NyayaSetu/backend/docs/API_CONTRACT.md)
+* **Database Models & Alembic Schema:** [`docs/DATABASE.md`](file:///Users/yashodhan/Documents/Projects/NyayaSetu/docs/DATABASE.md) and [`backend/docs/DATABASE_SCHEMA.md`](file:///Users/yashodhan/Documents/Projects/NyayaSetu/backend/docs/DATABASE_SCHEMA.md)
+* **System Architecture:** [`docs/ARCHITECTURE.md`](file:///Users/yashodhan/Documents/Projects/NyayaSetu/docs/ARCHITECTURE.md)
+* **Frontend Specifications:** [`docs/FRONTEND.md`](file:///Users/yashodhan/Documents/Projects/NyayaSetu/docs/FRONTEND.md)
+* **Architecture Verification Baseline:** [`docs/ARCHITECTURE_VERIFICATION.md`](file:///Users/yashodhan/Documents/Projects/NyayaSetu/docs/ARCHITECTURE_VERIFICATION.md)

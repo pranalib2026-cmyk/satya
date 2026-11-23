@@ -25,6 +25,9 @@ class CitationItem(BaseModel):
     section_or_paragraph: Optional[str] = Field(None, description="Specific statutory section or judgment paragraph")
     clause_heading: Optional[str] = Field(None, description="Official section heading or ratio headline")
     official_source_url: Optional[str] = Field(None, description="Government gazette, e-Courts, or IndiaCode URL")
+    jurisdiction: Optional[str] = Field("Union of India", description="Territorial jurisdiction of the legal source")
+    document_version: Optional[str] = Field("1.0", description="Version or effective date information")
+    relevant_text: Optional[str] = Field(None, description="Verbatim statutory text snippet extracted from source chunk")
     content_checksum: Optional[str] = Field(None, description="SHA-256 checksum of verified source chunk")
     is_verified_in_corpus: bool = Field(True, description="Strictly verified against retrieved knowledge base records")
 

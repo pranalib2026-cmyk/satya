@@ -14,8 +14,10 @@ import {
   ShieldCheck,
   Trash2,
   UserRound,
+  XCircle,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
+import { api } from "@/lib/api-client";
 import { consentLabel, listConsents, revokeConsent } from "@/services/dashboard/consent";
 import { deleteAccount, downloadMyData } from "@/services/dashboard/auth";
 import { languageLabels } from "@/data/dashboard-mock-data";
@@ -26,7 +28,7 @@ import { PageHeader, Disclaimer } from "@/components/dashboard/shared";
 
 export default function ProfilePage() {
   const router = useRouter();
-  const { user, logout, updateUser, setLanguage } = useAuth();
+  const { user, logout, refreshProfile, setLanguage } = useAuth();
   const language = user?.language ?? "en";
   const [name, setName] = useState(user?.name ?? "");
   const [email, setEmail] = useState(user?.email ?? "");
@@ -40,30 +42,110 @@ export default function ProfilePage() {
     setCity(user.city ?? "");
   }
 
+  const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
   const [consents, setConsents] = useState<Consent[]>([]);
+  const [loadingConsents, setLoadingConsents] = useState(true);
+
   const [deleting, setDeleting] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [revokeTarget, setRevokeTarget] = useState<Consent | null>(null);
+  const [revoking, setRevoking] = useState(false);
+
   const [exporting, setExporting] = useState(false);
+  const [exportSuccess, setExportSuccess] = useState(false);
 
   useEffect(() => {
-    void Promise.resolve().then(() => setConsents(listConsents()));
+    let mounted = true;
+    listConsents()
+      .then((items) => {
+        if (mounted) setConsents(items);
+      })
+      .catch((err) => {
+        console.error("Failed to load DPDP consents", err);
+      })
+      .finally(() => {
+        if (mounted) setLoadingConsents(false);
+      });
+    return () => {
+      mounted = false;
+    };
   }, []);
 
-  const save = () => {
-    updateUser({ name, email, city });
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2500);
+  const save = async () => {
+    setSaving(true);
+    setError(null);
+    try {
+      await api.put("/api/v1/users/me", {
+        full_name: name.trim(),
+        email: email.trim(),
+        city: city.trim() || undefined,
+      });
+      await refreshProfile();
+      setSaved(true);
+      setTimeout(() => setSaved(false), 3000);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Failed to update profile record.";
+      setError(msg);
+    } finally {
+      setSaving(false);
+    }
   };
 
-  const changeLanguage = (lang: Language) => {
+  const changeLanguage = async (lang: Language) => {
     setLanguage(lang);
+    try {
+      await api.put("/api/v1/users/me", { preferred_language: lang });
+      await refreshProfile();
+    } catch (err) {
+      console.error("Failed to synchronize language preference with backend", err);
+    }
   };
 
   const revoke = async (id: string) => {
-    const next = await revokeConsent(id);
-    setConsents(next);
+    setRevoking(true);
+    setError(null);
+    try {
+      const next = await revokeConsent(id);
+      setConsents(next);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Failed to revoke DPDP consent.";
+      setError(msg);
+    } finally {
+      setRevoking(false);
+      setRevokeTarget(null);
+    }
+  };
+
+  const handleExport = async () => {
+    setExporting(true);
+    setError(null);
+    try {
+      await downloadMyData();
+      setExportSuccess(true);
+      setTimeout(() => setExportSuccess(false), 4000);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Failed to generate statutory data export archive.";
+      setError(msg);
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    setDeleting(true);
+    setError(null);
+    try {
+      await deleteAccount("CONFIRM_DELETE_NYAYASETU_ACCOUNT");
+      logout();
+      router.push("/login");
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Failed to purge citizen account.";
+      setError(msg);
+      setDeleting(false);
+    }
   };
 
   return (
@@ -84,6 +166,22 @@ export default function ProfilePage() {
           </Button>
         }
       />
+
+      {error && (
+        <div className="flex items-center justify-between rounded-[2px] border border-[#9a3424]/40 bg-[#fbf2ef] p-4 text-[#7a2517] animate-fade">
+          <div className="flex items-center gap-3">
+            <XCircle className="size-5 shrink-0 text-[#9a3424]" aria-hidden />
+            <p className="text-[13px] font-medium">{error}</p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setError(null)}
+            className="cursor-pointer text-[12px] font-mono uppercase tracking-wider text-[#9a3424] hover:underline"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
 
       <div className="grid gap-6 lg:grid-cols-[1fr_340px]">
         <div className="space-y-6">
@@ -123,8 +221,12 @@ export default function ProfilePage() {
             </div>
 
             <div className="mt-5 flex items-center gap-3">
-              <Button size="sm" onClick={save}>Update Dossier</Button>
-              {saved && <span className="flex items-center gap-1.5 font-mono text-[11px] font-medium text-[#2a6b3b]"><Check className="size-3.5" aria-hidden /> Updated & Synced</span>}
+              <Button size="sm" onClick={save} loading={saving}>Update Dossier</Button>
+              {saved && (
+                <span className="flex items-center gap-1.5 font-mono text-[11px] font-medium text-[#2a6b3b]">
+                  <Check className="size-3.5" aria-hidden /> Updated & Synced
+                </span>
+              )}
             </div>
           </Card>
 
@@ -158,35 +260,48 @@ export default function ProfilePage() {
               <h2 className="flex items-center gap-2 font-serif text-[18px] font-normal text-[#2a1c12]">
                 <ShieldCheck className="size-4 text-[#2a6b3b]" aria-hidden /> Digital Personal Data Protection (DPDP) Ledger
               </h2>
-              <span className="font-mono text-[10px] uppercase tracking-wider text-[#85725f]">Cryptographic Audit Log</span>
+              <span className="font-mono text-[10px] uppercase tracking-wider text-[#85725f]">Statutory Notice & Consent (§6)</span>
             </div>
-            <div className="mt-4 divide-y divide-[#e2d5c1]">
-              {consents.map((c) => (
-                <div key={c.id} className="flex flex-wrap items-start justify-between gap-3 py-3.5 first:pt-0 last:pb-0">
-                  <div className="min-w-0 flex-1">
-                    <p className="font-serif text-[14px] font-normal text-[#2a1c12]">{consentLabel(c.consentType)}</p>
-                    <p className="mt-0.5 font-mono text-[10px] uppercase tracking-wider text-[#85725f]">
-                      Version {c.version} · {formatDateTime(c.grantedAt)}
-                      {c.advocateId && " · Authorized Counsel: " + c.advocateId}
-                    </p>
-                    {c.itemsShared && (
-                      <p className="mt-1 text-[11px] text-[#5b4a3b]">Transmitted records: {c.itemsShared.join(", ")}</p>
+            {loadingConsents ? (
+              <div className="py-8 text-center font-mono text-[12px] text-[#85725f]">
+                Synchronizing consent ledger from backend...
+              </div>
+            ) : consents.length === 0 ? (
+              <div className="py-8 text-center font-mono text-[12px] text-[#85725f]">
+                No explicit DPDP consent authorizations recorded.
+              </div>
+            ) : (
+              <div className="mt-4 divide-y divide-[#e2d5c1]">
+                {consents.map((c) => (
+                  <div key={c.id} className="flex flex-wrap items-start justify-between gap-3 py-3.5 first:pt-0 last:pb-0">
+                    <div className="min-w-0 flex-1">
+                      <p className="font-serif text-[14px] font-normal text-[#2a1c12]">{consentLabel(c.consentType)}</p>
+                      <p className="mt-0.5 font-mono text-[10px] uppercase tracking-wider text-[#85725f]">
+                        Version {c.version} · {formatDateTime(c.grantedAt)}
+                        {c.advocateId && " · Authorized Counsel: " + c.advocateId}
+                      </p>
+                      {c.purpose && (
+                        <p className="mt-1 text-[11.5px] italic text-[#5b4a3b]">Purpose: {c.purpose}</p>
+                      )}
+                      {c.itemsShared && (
+                        <p className="mt-1 text-[11px] text-[#5b4a3b]">Transmitted records: {c.itemsShared.join(", ")}</p>
+                      )}
+                    </div>
+                    {c.revoked ? (
+                      <Badge tone="neutral">WITHDRAWN</Badge>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => setRevokeTarget(c)}
+                        className="cursor-pointer rounded-[2px] border border-[#9a3424]/30 px-2.5 py-1 font-mono text-[10px] uppercase tracking-wider text-[#9a3424] hover:bg-[#fbf2ef] transition-colors"
+                      >
+                        Revoke Grant
+                      </button>
                     )}
                   </div>
-                  {c.revoked ? (
-                    <Badge tone="neutral">REVOKED</Badge>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={() => setRevokeTarget(c)}
-                      className="cursor-pointer rounded-[2px] border border-[#9a3424]/30 px-2.5 py-1 font-mono text-[10px] uppercase tracking-wider text-[#9a3424] hover:bg-[#fbf2ef] transition-colors"
-                    >
-                      Revoke Grant
-                    </button>
-                  )}
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </Card>
         </div>
 
@@ -197,30 +312,31 @@ export default function ProfilePage() {
               <Download className="size-4 text-[#9a6a35]" aria-hidden /> Statutory Data Export
             </h2>
             <p className="mt-1 text-[12px] leading-relaxed text-[#5b4a3b]">
-              Receive a cryptographically signed JSON archive of your personal ledger, DPDP grants, and court schedules under Indian data sovereignty mandates.
+              Receive a cryptographically signed JSON archive of your personal dossier, DPDP grants, case filings, and court schedules under Indian data sovereignty mandates.
             </p>
             <Button
               variant="secondary"
               fullWidth
               className="mt-4"
               loading={exporting}
-              onClick={async () => {
-                setExporting(true);
-                await downloadMyData();
-                setExporting(false);
-              }}
+              onClick={handleExport}
             >
               <Download className="size-4" aria-hidden /> Request Signed Archive
             </Button>
+            {exportSuccess && (
+              <p className="mt-2 text-center font-mono text-[10.5px] font-medium text-[#2a6b3b]">
+                ✓ Signed archive generated and downloaded.
+              </p>
+            )}
           </Card>
 
           <Card className="border-[#9a3424]/30 bg-[#fbf2ef]/40 p-6">
-            <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#9a3424]">Right to be Forgotten</p>
+            <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#9a3424]">Right to Erasure</p>
             <h2 className="mt-1 flex items-center gap-2 font-serif text-[16px] font-normal text-[#9a3424]">
               <Trash2 className="size-4" aria-hidden /> Purge Citizen Account
             </h2>
             <p className="mt-1 text-[12px] leading-relaxed text-[#5b4a3b]">
-              Initiates permanent removal of all personal records, vault holdings, and matching telemetry in compliance with DPDP rules.
+              Initiates permanent removal of all personal records, active sessions, and DPDP authorizations in compliance with Section 12 of the DPDP Act.
             </p>
             <Button variant="danger" fullWidth className="mt-4" onClick={() => setConfirmDelete(true)}>
               Purge Account
@@ -243,7 +359,7 @@ export default function ProfilePage() {
             </div>
           </Card>
 
-          <Disclaimer variant="banner" text="NyayaSetu operates under Section 5 of the Digital Personal Data Protection Act, 2023. Notice and consent logs are maintained in an immutable ledger." />
+          <Disclaimer variant="banner" text="NyayaSetu operates under Section 5 & 6 of the Digital Personal Data Protection Act, 2023. Notice and consent logs are maintained in an immutable backend ledger." />
         </aside>
       </div>
 
@@ -258,13 +374,7 @@ export default function ProfilePage() {
             <Button
               variant="danger"
               loading={deleting}
-              onClick={async () => {
-                setDeleting(true);
-                await deleteAccount();
-                logout();
-                setDeleting(false);
-                router.push("/login");
-              }}
+              onClick={handleDeleteAccount}
             >
               <Trash2 className="size-4" aria-hidden /> Confirm Immediate Purge
             </Button>
@@ -274,7 +384,7 @@ export default function ProfilePage() {
         <div className="flex items-start gap-3 rounded-[2px] border border-[#9a3424]/30 bg-[#fbf2ef] p-4">
           <AlertTriangle className="mt-0.5 size-5 shrink-0 text-[#9a3424]" aria-hidden />
           <p className="text-[12.5px] leading-relaxed text-[#7a2517]">
-            This operation severs access to active matters, stored legal notices, consultation transcripts, and advocate dispatches. Mandatory tax and judicial audit records may be retained in restricted statutory escrow.
+            This operation severs access to active matters, stored legal notices, consultation transcripts, and advocate dispatches. In accordance with Section 12(3) of the DPDP Act and the Limitation Act 1963, active court proceedings and tax records are sealed in restricted statutory escrow while personal identifiers and active credentials are permanently purged.
           </p>
         </div>
       </Modal>
@@ -290,10 +400,10 @@ export default function ProfilePage() {
             <Button variant="secondary" onClick={() => setRevokeTarget(null)}>Cancel</Button>
             <Button
               variant="danger"
+              loading={revoking}
               onClick={() => {
                 if (!revokeTarget) return;
                 void revoke(revokeTarget.id);
-                setRevokeTarget(null);
               }}
             >
               Revoke Authorization
@@ -302,7 +412,7 @@ export default function ProfilePage() {
         }
       >
         <p className="text-[13px] leading-relaxed text-[#5b4a3b]">
-          All external read permissions for this grant terminate immediately. The audit log preserves the original timestamped record verifying historical authorization and subsequent revocation.
+          All external read permissions for this grant terminate immediately. The audit log preserves the original timestamped record verifying historical authorization and subsequent revocation pursuant to DPDP Section 6.
         </p>
       </Modal>
     </div>
