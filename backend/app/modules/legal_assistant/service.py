@@ -34,14 +34,21 @@ class LegalAssistantService:
 
     @staticmethod
     def detect_language(query: str, preferred: str = "en") -> str:
-        """Identify question language: English, Hindi, or Kannada."""
+        """Identify question language: English, Hindi, Marathi, or Kannada."""
         # Devanagari Unicode block (0900-097F) -> Hindi / Marathi
         if re.search(r"[\u0900-\u097F]", query):
+            marathi_markers = (
+                "आहे", "आहेत", "नाही", "माझा", "माझी", "माझे", "माझ्या",
+                "काय", "कसे", "करावे", "मिळेल", "हक्क", "तक्रार", "न्यायालय",
+                "धनादेश", "भाडेकरू", "घरमालक", "जामीन", "अटक",
+            )
+            if preferred == "mr" or any(m in query for m in marathi_markers):
+                return "mr"
             return "hi"
         # Kannada Unicode block (0C80-0CFF) -> Kannada
         if re.search(r"[\u0C80-\u0CFF]", query):
             return "kn"
-        if preferred in ["hi", "kn"]:
+        if preferred in ["hi", "kn", "mr"]:
             return preferred
         return "en"
 
@@ -88,7 +95,12 @@ class LegalAssistantService:
             retrieved_chunks=retrieved_chunks,
         )
 
-        sources_found = llm_output.get("sources_found", False) and len(verified_citations) > 0
+        llm_sources_found = bool(llm_output.get("sources_found", False))
+        if not llm_sources_found:
+            # Never return contradictory citations when the LLM concluded context does not answer the query
+            verified_citations = []
+
+        sources_found = llm_sources_found and len(verified_citations) > 0
 
         # 6. Audit Query & Response
         audit = AuditLog(

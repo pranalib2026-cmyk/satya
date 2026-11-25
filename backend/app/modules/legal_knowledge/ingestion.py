@@ -202,3 +202,141 @@ class LegalIngestionService:
         await db.commit()
         logger.info(f"Successfully re-embedded {reembedded_count} chunks using {embedding_provider.provider_name}.")
         return reembedded_count
+
+    @classmethod
+    async def ingest_processed_corpus(
+        cls,
+        db: AsyncSession,
+        chunks_jsonl_path: str,
+        dataset_filter: Optional[List[str]] = None,
+        max_documents: Optional[int] = None,
+        batch_size: int = 50,
+    ) -> Dict[str, Any]:
+        """Ingest preprocessed, RAG-ready chunks from rag_chunks.jsonl into LegalSource/LegalChunk.
+
+        Preserves exact provenance, verification_status, legal_currency_status, and amendment notes
+        without silently promoting unverified third-party records to VERIFIED status.
+        """
+        from datetime import date as date_cls
+        import json
+        from pathlib import Path
+
+        path = Path(chunks_jsonl_path)
+        if not path.is_file():
+            raise FileNotFoundError(f"Processed chunks file not found: {chunks_jsonl_path}")
+
+        docs_by_id: Dict[str, List[Dict[str, Any]]] = {}
+        with path.open("r", encoding="utf-8") as f:
+            for line in f:
+                if not line.strip():
+                    continue
+                rec = json.loads(line)
+                if dataset_filter and rec.get("source_dataset") not in dataset_filter:
+                    continue
+                doc_id = rec["document_id"]
+                if doc_id not in docs_by_id:
+                    if max_documents is not None and len(docs_by_id) >= max_documents:
+                        continue
+                    docs_by_id[doc_id] = []
+                docs_by_id[doc_id].append(rec)
+
+        embedding_provider = get_embedding_provider()
+        if settings.is_production and embedding_provider.is_mock:
+            raise RuntimeError("Production mode cannot use mock embedding provider for corpus ingestion.")
+
+        sources_created = 0
+        sources_skipped = 0
+        chunks_created = 0
+
+        for doc_id, chunk_list in docs_by_id.items():
+            head = chunk_list[0]
+            doc_checksum = compute_sha256("".join(c["chunk_text"] for c in chunk_list))
+            short_code = (head.get("short_code") or "")[:64] or None
+
+            existing_res = await db.execute(
+                select(LegalSource).where(
+                    (LegalSource.content_checksum == doc_checksum)
+                    | ((LegalSource.short_code == short_code) if short_code else False)
+                )
+            )
+            existing = existing_res.scalar_one_or_none()
+            if existing:
+                sources_skipped += 1
+                continue
+
+            pub_date = None
+            raw_pub = head.get("publication_date")
+            if isinstance(raw_pub, str) and re.match(r"^\d{4}-\d{2}-\d{2}$", raw_pub):
+                try:
+                    pub_date = date_cls.fromisoformat(raw_pub)
+                except ValueError:
+                    pub_date = None
+
+            source_meta = {
+                "document_id": doc_id,
+                "source_dataset": head.get("source_dataset"),
+                "original_repo_url": head.get("original_repo_url"),
+                "original_file": head.get("original_file"),
+                "legal_currency_status": head.get("legal_currency_status"),
+                "amendment_notes": head.get("amendment_notes"),
+                "license": (head.get("metadata_json") or {}).get("license"),
+            }
+
+            source = LegalSource(
+                source_type=head.get("source_type", "BARE_ACT"),
+                title=(head.get("title") or "Untitled Legal Document")[:255],
+                short_code=short_code,
+                citation=(head.get("citation") or "")[:255] or None,
+                jurisdiction=(head.get("jurisdiction") or "Union of India")[:128],
+                court=(head.get("court") or "")[:128] or None,
+                act_or_judgment_identifier=(head.get("act_or_judgment_identifier") or "")[:128] or None,
+                publication_date=pub_date,
+                document_version=(head.get("document_version") or "1.0")[:32],
+                content_checksum=doc_checksum,
+                year=head.get("year"),
+                official_source_url=head.get("official_source_url"),
+                verification_status=(head.get("verification_status") or "PENDING_VERIFICATION")[:32],
+                ingestion_status="COMPLETED",
+                raw_content_path=(head.get("local_raw_path") or "")[:512] or None,
+                metadata_json=source_meta,
+            )
+            db.add(source)
+            await db.flush()
+            sources_created += 1
+
+            texts_to_embed = [
+                f"{c.get('section_number') or ''} {c.get('clause_heading') or ''}: {c['chunk_text']}"
+                for c in chunk_list
+            ]
+            embeddings: List[List[float]] = []
+            for i in range(0, len(texts_to_embed), batch_size):
+                batch_vecs = embedding_provider.embed_documents(texts_to_embed[i : i + batch_size])
+                embeddings.extend(batch_vecs)
+
+            for c_data, vec in zip(chunk_list, embeddings):
+                db_chunk = LegalChunk(
+                    source_id=source.id,
+                    section_number=(c_data.get("section_number") or "")[:64] or None,
+                    clause_heading=(c_data.get("clause_heading") or "")[:255] or None,
+                    chunk_text=c_data["chunk_text"],
+                    token_count=c_data.get("token_count"),
+                    content_checksum=c_data.get("content_checksum"),
+                    embedding_status="COMPLETED",
+                    embedding=vec,
+                    metadata_json=c_data.get("metadata_json") or {},
+                )
+                db.add(db_chunk)
+                chunks_created += 1
+
+            # Commit per source so partial corpus ingestion resumes idempotently after rate-limit interruptions
+            await db.commit()
+
+        logger.info(
+            f"Ingested processed corpus: sources_created={sources_created}, "
+            f"sources_skipped={sources_skipped}, chunks_created={chunks_created}"
+        )
+        return {
+            "sources_created": sources_created,
+            "sources_skipped": sources_skipped,
+            "chunks_created": chunks_created,
+        }

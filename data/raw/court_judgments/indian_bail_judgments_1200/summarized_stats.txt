@@ -1,0 +1,119 @@
+⚖️ IndianBailJudgments-1200: A curated dataset of 1200 Indian bail judgments from 1975 to 2025, covering 78 courts across 28 regions. Each case is annotated with structured fields including IPC sections, crime type, bail outcomes, legal reasoning, and key judicial parameters.
+
+📦 DATASET SUMMARY
+------------------
+Total Cases: 1200  
+Date Range: 1975-08-18 → 2025-06-02  
+Courts Covered: 78  
+Regions Covered: 28  
+(e.g., Uttar Pradesh, Karnataka, Maharashtra, Delhi, Punjab...)
+
+🧾 CRIME TYPE DISTRIBUTION
+---------------------------
+• Attempt to Murder:      20  
+• Cyber Crime:           116  
+• Domestic Violence:      72  
+• Dowry Harassment:      123  
+• Extortion:             106  
+• Fraud or Cheating:     121  
+• Kidnapping:             95  
+• Murder:                 89  
+• Narcotics:             134  
+• Others:                 75  
+• Sexual Offense:        121  
+• Theft or Robbery:      128  
+
+👤 ACCUSED GENDER DISTRIBUTION
+-------------------------------
+• Male:                      1071  
+• Female:                     123  
+• Unknown:                      3  
+• Multiple (group case):        3  
+
+⚖️ BAIL OUTCOME DISTRIBUTION
+-----------------------------
+• Granted:   736  
+• Rejected:  464  
+
+📑 BAIL TYPE DISTRIBUTION
+--------------------------
+• Regular:           906  
+• Anticipatory:      268  
+• Interim:            19  
+• Not Applicable:      4  
+• Others/Unknown:      3  
+
+📚 LANDMARK VS. REGULAR CASES
+------------------------------
+• Landmark Judgments: 147  
+• Regular Bail Cases: 1053  
+
+🔄 BAIL CANCELLATION CASES
+---------------------------
+• Fresh Applications:  1084  
+• Cancellation Cases:   116  
+
+👥 PARITY ARGUMENT USAGE
+-------------------------
+• Parity Cited:     341  
+• Not Cited:        859  
+
+🚨 CASES FLAGGING BIAS
+-----------------------
+• No Bias Flagged:    1187  
+• Bias Flagged:         13  
+
+🗺️ REGION-WISE CASE COUNT
+---------------------------
+Top 10 regions:
+• Uttar Pradesh:       130  
+• Bihar:               121  
+• Karnataka:           120  
+• Delhi:               119  
+• Maharashtra:         115  
+• Punjab:              100  
+• Madhya Pradesh:       99  
+• Jharkhand:            70  
+• Gujarat:              54  
+• Himachal Pradesh:     36  
+(Full list includes 28 regions.)
+
+🏛️ COURT-WISE DISTRIBUTION
+----------------------------
+Top 10 courts:
+• Punjab and Haryana High Court: 130  
+• Patna High Court:              119  
+• Delhi High Court:              109  
+• Allahabad High Court:          108  
+• Bombay High Court:              86  
+• Jharkhand High Court:           67  
+• Karnataka High Court:           52  
+• Madhya Pradesh High Court:      52  
+• Gujarat High Court:             48  
+• Supreme Court of India:         47  
+(Full list includes 78 unique courts.)
+
+📜 MOST COMMON IPC SECTIONS (TOP 20)
+-------------------------------------
+• IPC 120B: 360 cases  
+• IPC 34:   305  
+• IPC 420:  224  
+• IPC 506:  170  
+• IPC 471:  159  
+• IPC 498A: 158  
+• IPC 468:  154  
+• IPC 467:  144  
+• IPC 302:  137  
+• IPC 323:  130  
+• IPC 307:  102  
+• IPC 363:  102  
+• IPC 419:   99  
+• IPC 504:   89  
+• IPC 304B:  84  
+• IPC 201:   77  
+• IPC 149:   77  
+• IPC 406:   76  
+• IPC 376:   62  
+• IPC 148:   61  
+
+✅ Dataset statistics prepared for open-source release and research citation.

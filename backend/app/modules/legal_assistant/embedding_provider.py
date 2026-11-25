@@ -385,11 +385,19 @@ class GeminiEmbeddingProvider(BaseEmbeddingProvider):
                     for code in ("429", "rate limit", "resource exhausted", "503", "unavailable", "timeout", "deadline")
                 )
                 if is_transient and attempts < self._max_retries:
+                    sleep_for = backoff
+                    if "429" in err_msg or "resource_exhausted" in err_msg or "resource exhausted" in err_msg:
+                        import re as _re
+                        delay_match = _re.search(r"retry in (\d+(?:\.\d+)?)s", err_msg)
+                        if delay_match:
+                            sleep_for = min(float(delay_match.group(1)) + 1.5, 65.0)
+                        else:
+                            sleep_for = max(backoff, 15.0)
                     logger.warning(
                         f"Transient error calling Gemini embedding API (attempt {attempts}/{self._max_retries}): {exc.__class__.__name__}. "
-                        f"Retrying in {backoff}s..."
+                        f"Retrying in {sleep_for:.1f}s..."
                     )
-                    time.sleep(backoff)
+                    time.sleep(sleep_for)
                     backoff *= 2.0
                 else:
                     break

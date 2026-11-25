@@ -1,0 +1,242 @@
+{
+  "generated_at": "2026-11-25T10:33:53.655772+00:00",
+  "total_repositories_inspected": 6,
+  "total_files_in_registry": 33,
+  "pdf_inspection_results": [
+    {
+      "file": "data/raw/central_legislation/constitution_of_india.pdf",
+      "original_filename": "datasets/indian_constitution/constitution_of_india.pdf",
+      "status": "OK",
+      "pages": 256,
+      "page_errors": 0,
+      "extracted_chars": 822258,
+      "malformed_header_prefix_bytes": 0
+    },
+    {
+      "file": "data/raw/central_legislation/bharatiya_nyay_sanhita_2023.pdf",
+      "original_filename": "datasets/indian_constitution/bharatiya_nyay_sanhita_2023.pdf",
+      "status": "OK",
+      "pages": 108,
+      "page_errors": 0,
+      "extracted_chars": 398396,
+      "malformed_header_prefix_bytes": 0
+    },
+    {
+      "file": "data/raw/central_legislation/contract_act_1872.pdf",
+      "original_filename": "datasets/indian_constitution/contract_act_1872.pdf",
+      "status": "OK",
+      "pages": 53,
+      "page_errors": 0,
+      "extracted_chars": 177027,
+      "malformed_header_prefix_bytes": 0
+    },
+    {
+      "file": "data/raw/central_legislation/citizenship_act_1955.pdf",
+      "original_filename": "datasets/indian_constitution/citizenship_act_1955.pdf",
+      "status": "OK",
+      "pages": 18,
+      "page_errors": 0,
+      "extracted_chars": 49857,
+      "malformed_header_prefix_bytes": 0
+    },
+    {
+      "file": "data/raw/central_legislation/epidemic_diseases_act_1897.pdf",
+      "original_filename": "datasets/indian_constitution/epidemic_diseases_act_1897.pdf",
+      "status": "OK",
+      "pages": 5,
+      "page_errors": 0,
+      "extracted_chars": 12400,
+      "malformed_header_prefix_bytes": 0
+    },
+    {
+      "file": "data/raw/central_legislation/information_technology_rules_2021.pdf",
+      "original_filename": "datasets/indian_constitution/information_technology_rules_2021.pdf",
+      "status": "OK",
+      "pages": 30,
+      "page_errors": 0,
+      "extracted_chars": 83432,
+      "malformed_header_prefix_bytes": 0
+    },
+    {
+      "file": "data/raw/central_legislation/prevention_cruelty_animals_1960.pdf",
+      "original_filename": "datasets/indian_constitution/prevention_cruelty_animals_1960.pdf",
+      "status": "OK",
+      "pages": 19,
+      "page_errors": 0,
+      "extracted_chars": 54428,
+      "malformed_header_prefix_bytes": 0
+    },
+    {
+      "file": "data/raw/central_legislation/indian_penal_code_1860_SUPERSEDED.pdf",
+      "original_filename": "datasets/indian_constitution/indian_penal_code_1860.pdf",
+      "status": "OK",
+      "pages": 58,
+      "page_errors": 0,
+      "extracted_chars": 104580,
+      "malformed_header_prefix_bytes": 0
+    },
+    {
+      "file": "data/raw/central_legislation/wealth_tax_act_1957_ABOLISHED.pdf",
+      "original_filename": "datasets/indian_constitution/wealth_tax_act_1957.pdf",
+      "status": "OK",
+      "pages": 113,
+      "page_errors": 0,
+      "extracted_chars": 383613,
+      "malformed_header_prefix_bytes": 0
+    },
+    {
+      "file": "data/raw/central_legislation/mv_act_english.pdf",
+      "original_filename": "datasets/property_and_land/MV Act English.pdf",
+      "status": "OK",
+      "pages": 45,
+      "page_errors": 0,
+      "extracted_chars": 137041,
+      "malformed_header_prefix_bytes": 0
+    },
+    {
+      "file": "data/raw/central_legislation/cmvr_1989.pdf",
+      "original_filename": "datasets/traffic_laws/cmvr-1989.pdf",
+      "status": "OK",
+      "pages": 174,
+      "page_errors": 0,
+      "extracted_chars": 384636,
+      "malformed_header_prefix_bytes": 0
+    },
+    {
+      "file": "data/raw/court_judgments/supreme_court_pdfs/kesavananda_bharati.pdf",
+      "original_filename": "datasets/indian_constitution/kesavananda_bharati.pdf",
+      "status": "RECOVERED_MALFORMED_PREFIX",
+      "pages": 502,
+      "page_errors": 0,
+      "extracted_chars": 2512687,
+      "malformed_header_prefix_bytes": 4
+    },
+    {
+      "file": "data/raw/court_judgments/supreme_court_pdfs/pathapati_subba_reddy.pdf",
+      "original_filename": "datasets/indian_constitution/pathapati_subba_reddy.pdf",
+      "status": "OK",
+      "pages": 22,
+      "page_errors": 0,
+      "extracted_chars": 24186,
+      "malformed_header_prefix_bytes": 0
+    },
+    {
+      "file": "data/raw/court_judgments/supreme_court_pdfs/arbitral_tribunal_2025.pdf",
+      "original_filename": "datasets/indian_constitution/arbitral_tribunal_2025.pdf",
+      "status": "OK",
+      "pages": 26,
+      "page_errors": 0,
+      "extracted_chars": 47180,
+      "malformed_header_prefix_bytes": 0
+    },
+    {
+      "file": "data/raw/court_judgments/supreme_court_pdfs/civil_appeal_property_2025.pdf",
+      "original_filename": "datasets/indian_constitution/civil_appeal_property_2025.pdf",
+      "status": "OK",
+      "pages": 13,
+      "page_errors": 0,
+      "extracted_chars": 19756,
+      "malformed_header_prefix_bytes": 0
+    },
+    {
+      "file": "data/raw/court_judgments/supreme_court_pdfs/criminal_appeal_297_2024.pdf",
+      "original_filename": "datasets/indian_constitution/criminal_appeal_297_2024.pdf",
+      "status": "OK",
+      "pages": 18,
+      "page_errors": 0,
+      "extracted_chars": 26158,
+      "malformed_header_prefix_bytes": 0
+    },
+    {
+      "file": "data/raw/court_judgments/supreme_court_pdfs/supreme_court_sangram_suryavanshi.pdf",
+      "original_filename": "datasets/indian_constitution/supreme_court_sangram_suryavanshi.pdf",
+      "status": "OK",
+      "pages": 3,
+      "page_errors": 0,
+      "extracted_chars": 3958,
+      "malformed_header_prefix_bytes": 0
+    },
+    {
+      "file": "data/raw/government_notifications_and_circulars/policy_reports/national_rehabilitation_policy.pdf",
+      "original_filename": "datasets/property_and_land/national_rehalibaltion_policy.pdf",
+      "status": "OK",
+      "pages": 28,
+      "page_errors": 0,
+      "extracted_chars": 59383,
+      "malformed_header_prefix_bytes": 0
+    },
+    {
+      "file": "data/raw/government_notifications_and_circulars/policy_reports/land_rights_report_final.pdf",
+      "original_filename": "datasets/property_and_land/Land-Rights-Report-Final.pdf",
+      "status": "OK",
+      "pages": 44,
+      "page_errors": 0,
+      "extracted_chars": 133881,
+      "malformed_header_prefix_bytes": 0
+    },
+    {
+      "file": "data/raw/government_notifications_and_circulars/policy_reports/mumbai_traffic.pdf",
+      "original_filename": "datasets/traffic_laws/mumbai.pdf",
+      "status": "OK",
+      "pages": 179,
+      "page_errors": 0,
+      "extracted_chars": 511064,
+      "malformed_header_prefix_bytes": 0
+    },
+    {
+      "file": "data/raw/government_notifications_and_circulars/policy_reports/mumbai_traffic_fines.pdf",
+      "original_filename": "datasets/traffic_laws/mumbai_traffic_fines.pdf",
+      "status": "OK",
+      "pages": 9,
+      "page_errors": 0,
+      "extracted_chars": 34845,
+      "malformed_header_prefix_bytes": 0
+    },
+    {
+      "file": "data/raw/other_legal_documents/land_dispute_pdf/land_dispute.pdf",
+      "original_filename": "datasets/property_and_land/land_dispute.pdf",
+      "status": "OK",
+      "pages": 60,
+      "page_errors": 0,
+      "extracted_chars": 188225,
+      "malformed_header_prefix_bytes": 0
+    }
+  ],
+  "duplicates_removed": 28,
+  "corrupted_or_incomplete_records": [],
+  "outdated_or_superseded_records": 4740,
+  "unverified_records": 4807,
+  "dataset_counts": {
+    "IndianBailJudgments-1200": {
+      "raw_records": 1200,
+      "cleaned_records": 1186,
+      "duplicates_removed": 14,
+      "incomplete_skipped": 0
+    },
+    "IMLJD": {
+      "raw_records": 3613,
+      "cleaned_records": 3599,
+      "duplicates_removed": 14
+    },
+    "gov-myscheme-dataset": {
+      "raw_records": 2066,
+      "cleaned_records": 2066,
+      "duplicates_removed": 0
+    },
+    "AI-Law-Chatbot-Datasets": {
+      "raw_pdfs": 22,
+      "processed_pdfs": 22,
+      "skipped_corrupt_or_scanned": 0
+    }
+  },
+  "processing_errors": [],
+  "total_documents_processed": 6873,
+  "total_chunks_generated": 17202,
+  "toc_stubs_filtered": 1551,
+  "chunks_by_dataset": {
+    "IndianBailJudgments-1200": 1246,
+    "IMLJD": 3599,
+    "gov-myscheme-dataset": 7293,
+    "AI-Law-Chatbot-Datasets": 5064
+  }
+}

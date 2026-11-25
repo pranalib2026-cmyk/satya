@@ -1,0 +1,1511 @@
+{
+  "frontend_ssr_and_proxy": {
+    "public_routes": [
+      {
+        "path": "/",
+        "status": 200,
+        "final_url": "http://localhost:3000/",
+        "latency_ms": 19947.5,
+        "error_marker": false,
+        "bytes": 126090
+      },
+      {
+        "path": "/ask-me",
+        "status": 200,
+        "final_url": "http://localhost:3000/ask-me",
+        "latency_ms": 6581.9,
+        "error_marker": false,
+        "bytes": 44621
+      },
+      {
+        "path": "/login",
+        "status": 200,
+        "final_url": "http://localhost:3000/login",
+        "latency_ms": 3422.2,
+        "error_marker": false,
+        "bytes": 34785
+      },
+      {
+        "path": "/contact",
+        "status": 200,
+        "final_url": "http://localhost:3000/contact",
+        "latency_ms": 2725.4,
+        "error_marker": false,
+        "bytes": 46306
+      },
+      {
+        "path": "/disclaimer",
+        "status": 200,
+        "final_url": "http://localhost:3000/disclaimer",
+        "latency_ms": 2469.0,
+        "error_marker": false,
+        "bytes": 52724
+      },
+      {
+        "path": "/firm",
+        "status": 200,
+        "final_url": "http://localhost:3000/firm",
+        "latency_ms": 2595.7,
+        "error_marker": false,
+        "bytes": 59257
+      },
+      {
+        "path": "/insights",
+        "status": 200,
+        "final_url": "http://localhost:3000/insights",
+        "latency_ms": 2862.6,
+        "error_marker": false,
+        "bytes": 72947
+      },
+      {
+        "path": "/matters",
+        "status": 200,
+        "final_url": "http://localhost:3000/matters",
+        "latency_ms": 3602.2,
+        "error_marker": false,
+        "bytes": 56668
+      },
+      {
+        "path": "/people",
+        "status": 200,
+        "final_url": "http://localhost:3000/people",
+        "latency_ms": 4455.6,
+        "error_marker": false,
+        "bytes": 100500
+      },
+      {
+        "path": "/practices",
+        "status": 200,
+        "final_url": "http://localhost:3000/practices",
+        "latency_ms": 3608.5,
+        "error_marker": false,
+        "bytes": 80638
+      },
+      {
+        "path": "/privacy",
+        "status": 200,
+        "final_url": "http://localhost:3000/privacy",
+        "latency_ms": 3405.1,
+        "error_marker": false,
+        "bytes": 62411
+      }
+    ],
+    "dashboard_unauth_redirects": [
+      {
+        "path": "/dashboard",
+        "status": 200,
+        "final_url": "http://localhost:3000/login?from=%2Fdashboard",
+        "latency_ms": 551.7,
+        "error_marker": false,
+        "bytes": 34821
+      },
+      {
+        "path": "/dashboard/chat",
+        "status": 200,
+        "final_url": "http://localhost:3000/login?from=%2Fdashboard%2Fchat",
+        "latency_ms": 575.0,
+        "error_marker": false,
+        "bytes": 34835
+      }
+    ],
+    "dashboard_auth_routes": [
+      {
+        "path": "/dashboard",
+        "status": 200,
+        "final_url": "http://localhost:3000/dashboard",
+        "latency_ms": 6325.3,
+        "error_marker": false,
+        "bytes": 69762
+      },
+      {
+        "path": "/dashboard/chat",
+        "status": 200,
+        "final_url": "http://localhost:3000/dashboard/chat",
+        "latency_ms": 17591.6,
+        "error_marker": false,
+        "bytes": 69247
+      },
+      {
+        "path": "/dashboard/scan",
+        "status": 200,
+        "final_url": "http://localhost:3000/dashboard/scan",
+        "latency_ms": 8569.8,
+        "error_marker": false,
+        "bytes": 64717
+      },
+      {
+        "path": "/dashboard/brief",
+        "status": 200,
+        "final_url": "http://localhost:3000/dashboard/brief",
+        "latency_ms": 5500.5,
+        "error_marker": false,
+        "bytes": 74005
+      },
+      {
+        "path": "/dashboard/advocates",
+        "status": 200,
+        "final_url": "http://localhost:3000/dashboard/advocates",
+        "latency_ms": 4144.6,
+        "error_marker": false,
+        "bytes": 69314
+      },
+      {
+        "path": "/dashboard/bookings",
+        "status": 200,
+        "final_url": "http://localhost:3000/dashboard/bookings",
+        "latency_ms": 4685.6,
+        "error_marker": false,
+        "bytes": 58817
+      },
+      {
+        "path": "/dashboard/cases",
+        "status": 200,
+        "final_url": "http://localhost:3000/dashboard/cases",
+        "latency_ms": 4764.9,
+        "error_marker": false,
+        "bytes": 58167
+      },
+      {
+        "path": "/dashboard/deadlines",
+        "status": 200,
+        "final_url": "http://localhost:3000/dashboard/deadlines",
+        "latency_ms": 6859.7,
+        "error_marker": false,
+        "bytes": 59465
+      },
+      {
+        "path": "/dashboard/emergency",
+        "status": 200,
+        "final_url": "http://localhost:3000/dashboard/emergency",
+        "latency_ms": 8473.4,
+        "error_marker": false,
+        "bytes": 71064
+      },
+      {
+        "path": "/dashboard/intake",
+        "status": 200,
+        "final_url": "http://localhost:3000/dashboard/intake",
+        "latency_ms": 8774.3,
+        "error_marker": false,
+        "bytes": 58393
+      },
+      {
+        "path": "/dashboard/messages",
+        "status": 200,
+        "final_url": "http://localhost:3000/dashboard/messages",
+        "latency_ms": 4953.7,
+        "error_marker": false,
+        "bytes": 59740
+      },
+      {
+        "path": "/dashboard/profile",
+        "status": 200,
+        "final_url": "http://localhost:3000/dashboard/profile",
+        "latency_ms": 4729.5,
+        "error_marker": false,
+        "bytes": 69920
+      },
+      {
+        "path": "/dashboard/self-help",
+        "status": 200,
+        "final_url": "http://localhost:3000/dashboard/self-help",
+        "latency_ms": 11806.7,
+        "error_marker": false,
+        "bytes": 74491
+      },
+      {
+        "path": "/dashboard/triage",
+        "status": 200,
+        "final_url": "http://localhost:3000/dashboard/triage",
+        "latency_ms": 5823.4,
+        "error_marker": false,
+        "bytes": 66424
+      },
+      {
+        "path": "/dashboard/vault",
+        "status": 200,
+        "final_url": "http://localhost:3000/dashboard/vault",
+        "latency_ms": 16081.0,
+        "error_marker": false,
+        "bytes": 75920
+      }
+    ],
+    "proxy_health": {
+      "status": 200,
+      "latency_ms": 403.3,
+      "body": {
+        "status": "healthy",
+        "app_name": "NyayaSetu Backend API",
+        "version": "0.1.0",
+        "environment": "development",
+        "timestamp": "2026-11-25T13:09:42.547073Z",
+        "database": {
+          "status": "connected",
+          "latency_ms": 9.6,
+          "dialect": "sqlite+aiosqlite",
+          "extensions": {
+            "postgis": "sqlite_fallback",
+            "vector": "sqlite_json_fallback",
+            "uuid-ossp": "sqlite_uuid_fallback"
+          },
+          "error": null
+        }
+      }
+    },
+    "proxy_legal_status": {
+      "status": 200,
+      "latency_ms": 182.1,
+      "body": {
+        "module": "legal_assistant",
+        "status": "initialized",
+        "active": true
+      }
+    }
+  },
+  "auth_and_dpdp": {
+    "register": {
+      "status": 201,
+      "latency_ms": 271.4
+    },
+    "login": {
+      "status": 200,
+      "has_token": true,
+      "latency_ms": 118.1
+    },
+    "me": {
+      "status": 200,
+      "email": "satya.e2e.1795612005@example.com"
+    },
+    "refresh": {
+      "status": 200,
+      "has_access_token": true
+    },
+    "unauth_rejected": 401,
+    "consents_get": {
+      "status": 200,
+      "body": {
+        "consents": [],
+        "active_count": 0,
+        "revoked_count": 0,
+        "dpdp_notice": "Technical controls for consent recording, revocation, and audit trails implemented pursuant to Section 6 of the Digital Personal Data Protection Act, 2023. Operational statutory compliance requires formal legal notice review and designated Data Protection Officer oversight."
+      }
+    },
+    "consents_post": {
+      "status": 201,
+      "body": {
+        "id": "8610d340-79e2-4c61-8a36-787272c139ef",
+        "user_id": "a09ac79f-c78e-4e2a-922d-8f7ef95034d9",
+        "consent_type": "dpdp",
+        "version": "1.0",
+        "purpose": "Preliminary legal triage and statutory analysis",
+        "action": "GRANTED",
+        "advocate_id": null,
+        "items_shared": null,
+        "is_revoked": false,
+        "revoked_at": null,
+        "ip_address": "127.0.0.1",
+        "user_agent": "Python-urllib/3.12",
+        "created_at": "2026-11-25T13:06:46"
+      }
+    },
+    "data_export": {
+      "status": 200,
+      "keys": [
+        "export_id",
+        "status",
+        "user_id",
+        "exported_at",
+        "download_url",
+        "retention_disclaimer",
+        "data"
+      ]
+    }
+  },
+  "core_workflow_modules": {
+    "dashboard_summary": {
+      "status": 200,
+      "body": {
+        "active_cases": 0,
+        "pending_cases": 0,
+        "completed_cases": 0,
+        "total_cases": 0,
+        "unread_messages": 0,
+        "pending_actions": 0,
+        "activeCases": 0,
+        "unreadMessages": 0,
+        "pendingActions": 0,
+        "recent_case": null,
+        "recentCase": null,
+        "next_deadline": null,
+        "upcoming_deadlines": [],
+        "deadlines": [],
+        "upcoming_appointment": null
+      }
+    },
+    "triage_assess": {
+      "status": 200,
+      "latency_ms": 39.5,
+      "body": {
+        "identified_category": "Cheque Bounce (Sec 138 NI Act)",
+        "summary_of_facts": "Matter titled 'Cheque Dishonour Section 138 Belagavi' categorized under Cheque Bounce (Sec 138 NI Act). Territorial nexus established in Belagavi, Karnataka. Statement of grievance: \"My cheque for Rs 120000 bounced due to insufficient funds 10 days ago in Belagavi. I need to send a notice.\"",
+        "missing_information": [
+          "Exact date or timeframe when the incident or dispute first occurred.",
+          "Cheque number, amount, and date of issuance.",
+          "Bank return memo with exact dishonour reason (e.g., Funds Insufficient).",
+          "Key supporting documents, witness names, or correspondence history."
+        ],
+        "possible_jurisdiction": "Court of Judicial Magistrate First Class (JMFC) / Metropolitan Magistrate, Belagavi, Karnataka",
+        "urgency_level": "STANDARD_30D",
+        "complexity": "MEDIUM",
+        "suggested_next_step": "ADVOCATE_CONSULTATION",
+        "advocate_assistance_appropriate": true,
+        "show_free_legal_aid": false,
+        "assessed_at": "2026-11-25T13:09:42.979816Z"
+      }
+    },
+    "case_create": {
+      "status": 201,
+      "latency_ms": 71.3,
+      "case_id": "0c4922d8-dccf-4091-8557-3c805f8c8087",
+      "ref": "NYA-2026-CS-5EFC"
+    },
+    "case_list": {
+      "status": 200,
+      "count": {
+        "total": 1,
+        "page": 1,
+        "limit": 20,
+        "items": [
+          {
+            "id": "0c4922d8-dccf-4091-8557-3c805f8c8087",
+            "case_reference": "NYA-2026-CS-5EFC",
+            "client_id": "a09ac79f-c78e-4e2a-922d-8f7ef95034d9",
+            "title": "Section 138 Cheque Bounce E2E Case",
+            "problem_description": "Dishonoured cheque Rs 1,20,000 returned with insufficient funds memo.",
+            "legal_issue_category": "Cheque Bounce",
+            "state": "Karnataka",
+            "district": "Belagavi",
+            "relevant_court": null,
+            "incident_date": null,
+            "preferred_language": "en",
+            "urgency": "standard-30d",
+            "supporting_info": null,
+            "adverse_parties": "Not specified",
+            "stage": "INTAKE",
+            "conflict_status": "CLEARANCE_PENDING",
+            "triage_result": {
+              "identified_category": "Cheque Bounce (Sec 138 NI Act)",
+              "summary_of_facts": "Matter titled 'Section 138 Cheque Bounce E2E Case' categorized under Cheque Bounce (Sec 138 NI Act). Territorial nexus established in Belagavi, Karnataka. Statement of grievance: \"Dishonoured cheque Rs 1,20,000 returned with insufficient funds memo.\"",
+              "missing_information": [
+                "Exact date or timeframe when the incident or dispute first occurred.",
+                "Cheque number, amount, and date of issuance.",
+                "Proof and dispatch date of statutory 15-day legal demand notice sent to drawer.",
+                "Key supporting documents, witness names, or correspondence history."
+              ],
+              "possible_jurisdiction": "Court of Judicial Magistrate First Class (JMFC) / Metropolitan Magistrate, Belagavi, Karnataka",
+              "urgency_level": "STANDARD_30D",
+              "complexity": "MEDIUM",
+              "suggested_next_step": "ADVOCATE_CONSULTATION",
+              "advocate_assistance_appropriate": true,
+              "show_free_legal_aid": false,
+              "assessed_at": "2026-11-25T13:09:43.006849Z"
+            },
+            "created_at": "2026-11-25T13:09:43",
+            "updated_at": "2026-11-25T13:09:43"
+          }
+        ]
+      }
+    },
+    "deadline_create": {
+      "status": 201,
+      "body": {
+        "id": "06ca38e6-4325-4e2a-82e1-f16b957984ae",
+        "case_id": "0c4922d8-dccf-4091-8557-3c805f8c8087",
+        "case_reference": "NYA-2026-CS-5EFC",
+        "title": "Send Section 138 Statutory Legal Notice",
+        "description": null,
+        "deadline_type": "STATUTORY_LIMITATION",
+        "source_basis": null,
+        "statutory_provision": null,
+        "due_date": "2026-12-15T10:00:00",
+        "priority": "HIGH",
+        "is_advocate_confirmed": false,
+        "confirmed_by_advocate_id": null,
+        "confirmed_at": null,
+        "is_completed": false,
+        "completed_at": null,
+        "reminders_json": {
+          "days_before": [
+            7,
+            3,
+            1
+          ],
+          "scheduled_alerts": [
+            {
+              "days_before": 7,
+              "scheduled_at": "2026-12-08T10:00:00+00:00",
+              "status": "PENDING"
+            },
+            {
+              "days_before": 3,
+              "scheduled_at": "2026-12-12T10:00:00+00:00",
+              "status": "PENDING"
+            },
+            {
+              "days_before": 1,
+              "scheduled_at": "2026-12-14T10:00:00+00:00",
+              "status": "PENDING"
+            }
+          ],
+          "history": []
+        },
+        "created_at": "2026-11-25T13:09:43",
+        "updated_at": "2026-11-25T13:09:43"
+      }
+    },
+    "deadline_list": {
+      "status": 200,
+      "count": {
+        "total": 1,
+        "items": [
+          {
+            "id": "06ca38e6-4325-4e2a-82e1-f16b957984ae",
+            "case_id": "0c4922d8-dccf-4091-8557-3c805f8c8087",
+            "case_reference": "NYA-2026-CS-5EFC",
+            "title": "Send Section 138 Statutory Legal Notice",
+            "description": null,
+            "deadline_type": "STATUTORY_LIMITATION",
+            "source_basis": null,
+            "statutory_provision": null,
+            "due_date": "2026-12-15T10:00:00",
+            "priority": "HIGH",
+            "is_advocate_confirmed": false,
+            "confirmed_by_advocate_id": null,
+            "confirmed_at": null,
+            "is_completed": false,
+            "completed_at": null,
+            "reminders_json": {
+              "days_before": [
+                7,
+                3,
+                1
+              ],
+              "scheduled_alerts": [
+                {
+                  "days_before": 7,
+                  "scheduled_at": "2026-12-08T10:00:00+00:00",
+                  "status": "PENDING"
+                },
+                {
+                  "days_before": 3,
+                  "scheduled_at": "2026-12-12T10:00:00+00:00",
+                  "status": "PENDING"
+                },
+                {
+                  "days_before": 1,
+                  "scheduled_at": "2026-12-14T10:00:00+00:00",
+                  "status": "PENDING"
+                }
+              ],
+              "history": []
+            },
+            "created_at": "2026-11-25T13:09:43",
+            "updated_at": "2026-11-25T13:09:43"
+          }
+        ]
+      }
+    },
+    "matching_advocates": {
+      "status": 200,
+      "count": {
+        "items": [],
+        "total": 0,
+        "page": 1,
+        "page_size": 20
+      }
+    },
+    "case_matching_advocates": {
+      "status": 200,
+      "body": {
+        "case_id": "0c4922d8-dccf-4091-8557-3c805f8c8087",
+        "case_reference": "NYA-2026-CS-5EFC",
+        "case_title": "Section 138 Cheque Bounce E2E Case",
+        "category": "Cheque Bounce",
+        "state": "Karnataka",
+        "district": "Belagavi",
+        "total_candidates_evaluated": 0,
+        "total_matches_returned": 0,
+        "matches": []
+      }
+    },
+    "appointments_list": {
+      "status": 200,
+      "count": {
+        "total": 0,
+        "page": 1,
+        "limit": 20,
+        "items": []
+      }
+    },
+    "conversations_list": {
+      "status": 200,
+      "count": {
+        "items": [],
+        "total": 0
+      }
+    }
+  },
+  "document_and_stream_and_voice": {
+    "ask_me_upload_context": {
+      "status": 200,
+      "latency_ms": 353.7,
+      "body": {
+        "file_name": "notice_138.pdf",
+        "extracted_text": "LEGAL DEMAND NOTICE UNDER SECTION 138 OF NI ACT 1881\nDate: 15 November 2026\nFrom: Ramesh Rao, Belagavi To: Suresh Kulkarni\nYour cheque No 445512 dated 01 November 2026 for Rs 150000\ndrawn on SBI Belagavi was dishonoured for insufficient funds.\nPay Rs 150000 within 15 days of receipt of this notice.",
+        "char_count": 299,
+        "page_count": 1,
+        "engine_name": "pdf_embedded"
+      }
+    },
+    "documents_scan": {
+      "status": 201,
+      "latency_ms": 318.8,
+      "doc_id": "05096e5b-868d-4ad8-983c-47fe102c4787",
+      "body": {
+        "document_id": "05096e5b-868d-4ad8-983c-47fe102c4787",
+        "status": "completed",
+        "text": "LEGAL DEMAND NOTICE UNDER SECTION 138 OF NI ACT 1881\nDate: 15 November 2026\nFrom: Ramesh Rao, Belagavi To: Suresh Kulkarni\nYour cheque No 445512 dated 01 November 2026 for Rs 150000\ndrawn on SBI Belagavi was dishonoured for insufficient funds.\nPay Rs 150000 within 15 days of receipt of this notice.",
+        "confidence": 0.98,
+        "low_confidence": false,
+        "ocr_engine": "pdf_embedded",
+        "file_name": "notice_138.pdf",
+        "file_size_bytes": 1030,
+        "mime_type": "application/pdf",
+        "processing_error": null,
+        "processed_at": "2026-11-25T13:09:43.930075"
+      }
+    },
+    "vault_case_upload": {
+      "status": 201,
+      "body": {
+        "id": "addf2e7b-645e-4889-8df4-25a65e68ee94",
+        "case_id": "0c4922d8-dccf-4091-8557-3c805f8c8087",
+        "uploader_id": "a09ac79f-c78e-4e2a-922d-8f7ef95034d9",
+        "file_name": "notice_vault.pdf",
+        "file_size_bytes": 1030,
+        "mime_type": "application/pdf",
+        "checksum_sha256": "e513de606f0b951e0e1ce25a15192c4671133ca10e5e0693bac4a4689aabdcc3",
+        "is_confidential": true,
+        "document_category": "LEGAL_NOTICE",
+        "storage_backend": "local",
+        "storage_key": "vault/cases/0c4922d8-dccf-4091-8557-3c805f8c8087/addf2e7b-645e-4889-8df4-25a65e68ee94_8ee1aa9c4bf3ae600d237c0e44feee08.pdf",
+        "processing_status": "uploaded",
+        "extracted_text": null,
+        "ocr_confidence": null,
+        "ocr_engine": null,
+        "processing_error": null,
+        "processed_at": null,
+        "metadata_json": {
+          "original_extension": ".pdf"
+        },
+        "created_at": "2026-11-25T13:09:44",
+        "updated_at": "2026-11-25T13:09:44"
+      }
+    },
+    "documents_explain": {
+      "status": 200,
+      "latency_ms": 5562.3,
+      "body": {
+        "document_id": "05096e5b-868d-4ad8-983c-47fe102c4787",
+        "document_type": "Legal Demand Notice",
+        "summary": "This is a legal demand notice issued under Section 138 of the Negotiable Instruments Act, 1881, regarding the dishonour of a cheque due to insufficient funds. The sender, Ramesh Rao, is demanding a payment of Rs 150000 from the recipient, Suresh Kulkarni, within 15 days of receiving the notice.",
+        "parties": [
+          "Ramesh Rao",
+          "Suresh Kulkarni"
+        ],
+        "dates": [
+          {
+            "label": "Notice Date",
+            "value": "15 November 2026"
+          },
+          {
+            "label": "Cheque Date",
+            "value": "01 November 2026"
+          },
+          {
+            "label": "Payment Deadline",
+            "value": "Within 15 days of receipt of this notice"
+          }
+        ],
+        "amounts": [
+          {
+            "label": "Cheque Amount",
+            "value": "Rs 150000"
+          },
+          {
+            "label": "Demand Amount",
+            "value": "Rs 150000"
+          }
+        ],
+        "obligations": [
+          "Pay the sum of Rs 150000 within 15 days of receiving the notice."
+        ],
+        "risks": [
+          "Failure to make the payment within 15 days of receiving the notice may result in criminal prosecution under Section 138 of the Negotiable Instruments Act, 1881, punishable with imprisonment for a term up to two years, a fine up to twice the amount of the cheque, or both."
+        ],
+        "citations": [
+          {
+            "source_title": "The Negotiable Instruments Act, 1881",
+            "source_type": "BARE_ACT",
+            "act_or_judgment_identifier": "Act No. 26 of 1881",
+            "section_or_paragraph": "Section 138",
+            "clause_heading": "Dishonour of cheque for insufficiency, etc., of funds in the account",
+            "official_source_url": "https://www.indiacode.nic.in/handle/123456789/2189",
+            "jurisdiction": "Union of India",
+            "document_version": "2026.1",
+            "relevant_text": "Where any cheque drawn by a person on an account maintained by him with a banker for payment of any amount of money to another person from out of that account for the discharge, in whole or in part, of any debt or other liability, is returned by the bank unpaid, either because of...",
+            "content_checksum": "f4ee33bf967090feebd40af3f8a3b70b6422374abe893a87392d625f355bb57f",
+            "is_verified_in_corpus": true,
+            "verification_status": "VERIFIED",
+            "legal_currency_status": "CURRENT",
+            "amendment_warning": null,
+            "source_repository_url": null,
+            "original_document_path": null
+          }
+        ],
+        "sources_found": true,
+        "disclaimer": "NyayaSetu provides an AI-assisted preliminary legal assessment and document explanation. It is not a law firm and does not provide legal advice. Submitting a document does not create an advocate-client relationship.",
+        "confidence": 0.95,
+        "extracted_text_snippet": "LEGAL DEMAND NOTICE UNDER SECTION 138 OF NI ACT 1881\nDate: 15 November 2026\nFrom: Ramesh Rao, Belagavi To: Suresh Kulkarni\nYour cheque No 445512 dated 01 November 2026 for Rs 150000\ndrawn on SBI Belagavi was dishonoured for insufficient funds.\nPay Rs 150000 within 15 days of receipt of this notice.",
+        "created_at": "2026-11-25T13:10:02.671937Z"
+      }
+    },
+    "ask_me_stream_via_proxy": {
+      "status": 200,
+      "latency_ms": 21662.2,
+      "events": [
+        "meta",
+        "delta",
+        "delta",
+        "delta",
+        "delta",
+        "delta",
+        "delta",
+        "delta",
+        "delta",
+        "delta"
+      ],
+      "total_events": 35
+    },
+    "speak": {
+      "status": 200,
+      "latency_ms": 4271.3,
+      "body_keys": "RIFF��\u0001\u0000WAVEfmt \u0010\u0000\u0000\u0000\u0001\u0000\u0001\u0000�]\u0000\u0000��\u0000\u0000\u0002\u0000\u0010\u0000data��\u0001\u0000`\u0000`\u0000c\u0000c\u0000h\u0000j\u0000j\u0000h\u0000i\u0000j\u0000f\u0000c\u0000l\u0000p\u0000j\u0000n\u0000j\u0000a\u0000d\u0000g\u0000d\u0000e\u0000i\u0000i\u0000a\u0000c\u0000e\u0000[\u0000Y\u0000\\\u0000]\u0000`\u0000a\u0000b\u0000`\u0000e\u0000k\u0000g\u0000a\u0000_\u0000^\u0000\\\u0000_\u0000a\u0000b\u0000^\u0000[\u0000b\u0000a\u0000[\u0000\\\u0000^\u0000\\\u0000W\u0000T\u0000Z\u0000_\u0000Z\u0000W\u0000Y\u0000T\u0000Q\u0000Q\u0000N\u0000O\u0000M\u0000J\u0000J\u0000P\u0000P\u0000J\u0000G\u0000G\u0000J\u0000H\u0000@\u0000D\u0000I\u0000"
+    },
+    "transcribe_empty_audio": {
+      "status": 400,
+      "body": {
+        "success": false,
+        "error": {
+          "code": "BAD_REQUEST",
+          "message": "Recorded audio file is empty.",
+          "details": {},
+          "path": "/api/v1/legal/ask-me/transcribe"
+        }
+      }
+    }
+  },
+  "post_fix_rag_retests": {
+    "citation_pairing": [
+      {
+        "label": "Bail judgment pairing (Jibangshu Paul)",
+        "status": 200,
+        "latency_ms": 6182.1,
+        "resp": {
+          "query": "When can bail earlier granted under IPC be cancelled if serious charges like UA(P)A are added, as in Jibangshu Paul vs NIA?",
+          "detected_language": "en",
+          "answer": "Based on the case of Jibangshu Paul vs National Investigation Agency provided in the context, when serious new charges under special laws like the Unlawful Activities (Prevention) Act (UA(P)A) are added to an existing case where bail was earlier granted under IPC sections, the earlier bail does not automatically extend to the new charges. The Gauhati High Court held that newly added serious UA(P) Act offences require separate consideration, and the Special Judge cannot continue prior bail orders granted solely under IPC sections. Consequently, fresh bail is required, and custody may be ordered.",
+          "sources_found": true,
+          "citations": [
+            {
+              "source_title": "Jibangshu Paul vs National Investigation Agency",
+              "source_type": "COURT_JUDGMENT",
+              "act_or_judgment_identifier": "Bail Judgment #0001 (case0001.PDF)",
+              "section_or_paragraph": "Judgment Summary",
+              "clause_heading": "Jibangshu Paul vs National Investigation Agency",
+              "official_source_url": null,
+              "jurisdiction": "Assam",
+              "document_version": "1.0",
+              "relevant_text": "Case Title: Jibangshu Paul vs National Investigation Agency\n\nCourt: Gauhati High Court | Date: 2011-07-27 | Region: Assam | Judge: Justice I. A. Ansari, Justice A. K. Goswami\n\nBail Type: Regular | Outcome: Rejected (Bail cancelled by Special NIA Court due to addition of UA(P) Act...",
+              "content_checksum": "31a0cf6cb3a4fc6d010c205225d402fbac92416e9fd2a28a8cc725e6f7f6b5b8",
+              "is_verified_in_corpus": true,
+              "verification_status": "PENDING_VERIFICATION",
+              "legal_currency_status": "HISTORICAL_PRECEDENT_CITES_IPC_CRPC",
+              "amendment_warning": "Historical bail order citing IPC/CrPC; for offences committed on or after 1 July 2024, verify corresponding BNS 2023 / BNSS 2023 provisions.",
+              "source_repository_url": "https://github.com/SnehaDeshmukh28/IndianBailJudgments-1200",
+              "original_document_path": "data/raw/court_judgments/indian_bail_judgments_1200/indian_bail_judgments.json"
+            },
+            {
+              "source_title": "The Bharatiya Nagarik Suraksha Sanhita, 2023",
+              "source_type": "BARE_ACT",
+              "act_or_judgment_identifier": "Act No. 46 of 2023",
+              "section_or_paragraph": "Section 482",
+              "clause_heading": "Direction for grant of bail to person apprehending arrest (Anticipatory Bail)",
+              "official_source_url": "https://www.mha.gov.in/en/acts",
+              "jurisdiction": "Union of India",
+              "document_version": "2026.1",
+              "relevant_text": "When any person has reason to believe that he may be arrested on an accusation of having committed a non-bailable offence, he may apply to the High Court or the Court of Session for a direction under this section that in the event of such arrest he shall be released on bail; and ...",
+              "content_checksum": "97af364396b423c32d9eaff1e7d9bbc6d7dbf08de06c0732409f9e8f139c8bf1",
+              "is_verified_in_corpus": true,
+              "verification_status": "VERIFIED",
+              "legal_currency_status": "CURRENT",
+              "amendment_warning": null,
+              "source_repository_url": null,
+              "original_document_path": null
+            },
+            {
+              "source_title": "The Bharatiya Nagarik Suraksha Sanhita, 2023",
+              "source_type": "BARE_ACT",
+              "act_or_judgment_identifier": "Act No. 46 of 2023",
+              "section_or_paragraph": "Section 479",
+              "clause_heading": "Maximum period for which an undertrial prisoner can be detained",
+              "official_source_url": "https://www.mha.gov.in/en/acts",
+              "jurisdiction": "Union of India",
+              "document_version": "2026.1",
+              "relevant_text": "Where a person has, during the period of investigation, inquiry or trial under this Sanhita of an offence under any law, undergone detention for a period extending up to one-half of the maximum period of imprisonment specified for that offence under that law, he shall be released...",
+              "content_checksum": "9ca4b67a957af2728f55b603b278a2ef3bcce798cd9d761cd24555a808c6059c",
+              "is_verified_in_corpus": true,
+              "verification_status": "VERIFIED",
+              "legal_currency_status": "CURRENT",
+              "amendment_warning": null,
+              "source_repository_url": null,
+              "original_document_path": null
+            },
+            {
+              "source_title": "Aslam Babalal Desai vs State Of Maharashtra",
+              "source_type": "COURT_JUDGMENT",
+              "act_or_judgment_identifier": "Bail Judgment #0009 (case0009.PDF)",
+              "section_or_paragraph": "Judgment Summary",
+              "clause_heading": "Aslam Babalal Desai vs State Of Maharashtra",
+              "official_source_url": null,
+              "jurisdiction": "Maharashtra",
+              "document_version": "1.0",
+              "relevant_text": "Case Title: Aslam Babalal Desai vs State Of Maharashtra\n\nCourt: Supreme Court of India | Date: 1992-09-15 | Region: Maharashtra | Judge: Justice A.M. Ahmadi, Justice M.M. Punchhi, Justice K. Ramaswamy\n\nBail Type: Regular | Outcome: Granted (Bail granted under Section 167(2) CrPC ...",
+              "content_checksum": "70eed470f862fc1b73230612045b9a6bc7ec53ffce6b3b95af7d7bc839fb41c3",
+              "is_verified_in_corpus": true,
+              "verification_status": "PENDING_VERIFICATION",
+              "legal_currency_status": "HISTORICAL_PRECEDENT_CITES_IPC_CRPC",
+              "amendment_warning": "Historical bail order citing IPC/CrPC; for offences committed on or after 1 July 2024, verify corresponding BNS 2023 / BNSS 2023 provisions.",
+              "source_repository_url": "https://github.com/SnehaDeshmukh28/IndianBailJudgments-1200",
+              "original_document_path": "data/raw/court_judgments/indian_bail_judgments_1200/indian_bail_judgments.json"
+            },
+            {
+              "source_title": "State By The Superintendent Of Police vs Mehboob Batcha And Others",
+              "source_type": "COURT_JUDGMENT",
+              "act_or_judgment_identifier": "Bail Judgment #0002 (case0002.PDF)",
+              "section_or_paragraph": "Judgment Summary",
+              "clause_heading": "State By The Superintendent Of Police vs Mehboob Batcha And Others",
+              "official_source_url": null,
+              "jurisdiction": "Tamil Nadu",
+              "document_version": "1.0",
+              "relevant_text": "Case Title: State By The Superintendent Of Police vs Mehboob Batcha And Others\n\nCourt: Madras High Court | Date: 1997-09-30 | Region: Tamil Nadu | Judge: Justice E. Padmanabhan\n\nBail Type: Regular | Outcome: Rejected (Bail granted earlier to A3, A6, A8, and A10 was cancelled; fre...",
+              "content_checksum": "b0317eb3fca68fd808878a553dafae53e1c7859f820a44f31b52617c54ce414a",
+              "is_verified_in_corpus": true,
+              "verification_status": "PENDING_VERIFICATION",
+              "legal_currency_status": "HISTORICAL_PRECEDENT_CITES_IPC_CRPC",
+              "amendment_warning": "Historical bail order citing IPC/CrPC; for offences committed on or after 1 July 2024, verify corresponding BNS 2023 / BNSS 2023 provisions.",
+              "source_repository_url": "https://github.com/SnehaDeshmukh28/IndianBailJudgments-1200",
+              "original_document_path": "data/raw/court_judgments/indian_bail_judgments_1200/indian_bail_judgments.json"
+            }
+          ],
+          "unverified_citations_detected": [],
+          "suggested_next_steps": [
+            "File a formal application for fresh bail addressing the newly added UA(P)A charges before the competent Special Court.",
+            "Preserve all relevant documentary evidence and records relating to the prior bail orders.",
+            "Consult an empanelled, verified advocate specializing in criminal law and special enactments like the NIA Act and UA(P)A for court representation."
+          ],
+          "disclaimer": "NyayaSetu AI Legal Assistant provides informational guidance derived strictly from official Indian Bare Acts and published judicial precedents. This information does not constitute formal legal advice or create an advocate-client relationship. Litigants should consult an empanelled, verified advocate for matter-specific representation.",
+          "retrieved_chunks_count": 5,
+          "assessed_at": "2026-11-25T13:11:00.823586Z"
+        }
+      },
+      {
+        "label": "RERA Section 18 pairing",
+        "status": 200,
+        "latency_ms": 109894.7,
+        "resp": {
+          "query": "What remedies does a homebuyer have under Section 18 of RERA 2016 if the builder delays flat possession?",
+          "detected_language": "en",
+          "answer": "Under **The Real Estate (Regulation and Development) Act, 2016**, **Section 18: Return of amount and compensation for delay in possession**, the law provides that: If the promoter fails to complete or is unable to give possession of an apartment, plot or building in accordance with the terms of the agreement for sale or duly completed by the date specified therein, the promoter shall be liable on demand to the allottees, in case the allottee wishes to withdraw from the project, to return the amount received by him in respect of that apartment, plot, building, with interest at such rate as may be prescribed in this behalf including compensation. If the allottee does not intend to withdraw from the project, he shall be paid, by the promoter, interest for every month of delay, till the handing over of t...\n\nUnder **The Protection of Women from Domestic Violence Act, 2005**, **Section 18: Protection orders**, the law provides that: The Magistrate may, after giving the aggrieved person and the respondent an opportunity of being heard and on being prima facie satisfied that domestic violence has taken place or is likely to take place, pass a protection order in favour of the aggrieved person and prohibit the respondent from committing any act of domestic violence, aiding or abetting acts of domestic violence, entering the place of employment of the aggrieved person, attempting to communicate in any form, alienating any assets or operating bank lockers without permission.",
+          "sources_found": true,
+          "citations": [
+            {
+              "source_title": "The Real Estate (Regulation and Development) Act, 2016",
+              "source_type": "BARE_ACT",
+              "act_or_judgment_identifier": "Act No. 16 of 2016",
+              "section_or_paragraph": "Section 18",
+              "clause_heading": "Return of amount and compensation for delay in possession",
+              "official_source_url": "https://www.indiacode.nic.in/handle/123456789/2158",
+              "jurisdiction": "Union of India",
+              "document_version": "2026.1",
+              "relevant_text": "If the promoter fails to complete or is unable to give possession of an apartment, plot or building in accordance with the terms of the agreement for sale or duly completed by the date specified therein, the promoter shall be liable on demand to the allottees, in case the allotte...",
+              "content_checksum": "fa714b17f00292ef0a5a854957d6c962775d8492556747347f8e1187e3477a0d",
+              "is_verified_in_corpus": true,
+              "verification_status": "VERIFIED",
+              "legal_currency_status": "CURRENT",
+              "amendment_warning": null,
+              "source_repository_url": null,
+              "original_document_path": null
+            },
+            {
+              "source_title": "The Protection of Women from Domestic Violence Act, 2005",
+              "source_type": "BARE_ACT",
+              "act_or_judgment_identifier": "Act No. 43 of 2005",
+              "section_or_paragraph": "Section 18",
+              "clause_heading": "Protection orders",
+              "official_source_url": "https://www.indiacode.nic.in/handle/123456789/2012",
+              "jurisdiction": "Union of India",
+              "document_version": "2026.1",
+              "relevant_text": "The Magistrate may, after giving the aggrieved person and the respondent an opportunity of being heard and on being prima facie satisfied that domestic violence has taken place or is likely to take place, pass a protection order in favour of the aggrieved person and prohibit the ...",
+              "content_checksum": "db33ad4a12707a66f3a00779809a2d50017ecf4a2ac77a1b60c99e85822cf41a",
+              "is_verified_in_corpus": true,
+              "verification_status": "VERIFIED",
+              "legal_currency_status": "CURRENT",
+              "amendment_warning": null,
+              "source_repository_url": null,
+              "original_document_path": null
+            }
+          ],
+          "unverified_citations_detected": [],
+          "suggested_next_steps": [
+            "File a complaint before the State Real Estate Regulatory Authority (RERA) seeking refund with interest or compensation.",
+            "Preserve builder-buyer agreement and payment receipts reflecting the agreed possession date.",
+            "Approach the nearest Protection Officer, Service Provider, or Judicial Magistrate to submit an application under Section 12.",
+            "Seek urgent interim protection orders (Section 18) or residence orders (Section 19) to safeguard against dispossession."
+          ],
+          "disclaimer": "NyayaSetu AI Legal Assistant provides informational guidance derived strictly from official Indian Bare Acts and published judicial precedents. This information does not constitute formal legal advice or create an advocate-client relationship. Litigants should consult an empanelled, verified advocate for matter-specific representation.",
+          "retrieved_chunks_count": 2,
+          "assessed_at": "2026-11-25T13:13:03.716341Z"
+        }
+      }
+    ],
+    "hallucination_guards": [
+      {
+        "label": "Non-existent BNS section 9999",
+        "status": 200,
+        "latency_ms": 836.8,
+        "sources_found": false,
+        "citations_count": 0,
+        "retrieved_chunks_count": 0,
+        "answer_preview": "No verified legal sources found in the knowledge base addressing this specific query. The available legal knowledge base does not contain sufficient verified statutory information to address this specific legal question reliably. Under platform safety rules, N"
+      },
+      {
+        "label": "Non-existent DPDP section 777",
+        "status": 200,
+        "latency_ms": 728.4,
+        "sources_found": false,
+        "citations_count": 0,
+        "retrieved_chunks_count": 0,
+        "answer_preview": "No verified legal sources found in the knowledge base addressing this specific query. The available legal knowledge base does not contain sufficient verified statutory information to address this specific legal question reliably. Under platform safety rules, N"
+      },
+      {
+        "label": "Missing Karnataka Rent Act",
+        "status": 200,
+        "latency_ms": 730.4,
+        "sources_found": false,
+        "citations_count": 0,
+        "retrieved_chunks_count": 0,
+        "answer_preview": "No verified legal sources found in the knowledge base addressing this specific query. The available legal knowledge base does not contain sufficient verified statutory information to address this specific legal question reliably. Under platform safety rules, N"
+      },
+      {
+        "label": "Unverified 2026 Citizenship Amendment",
+        "status": 200,
+        "latency_ms": 12907.0,
+        "sources_found": false,
+        "citations_count": 0,
+        "retrieved_chunks_count": 2,
+        "answer_preview": "No verified statutory provisions or amendments regarding a 2026 Amendment to the Citizenship Act, 1955 were found in the provided legal context."
+      },
+      {
+        "label": "Fake SC judgment citation",
+        "status": 200,
+        "latency_ms": 2824.8,
+        "sources_found": false,
+        "citations_count": 0,
+        "retrieved_chunks_count": 5,
+        "answer_preview": "No verified statutory provisions or case details addressing Sharma vs Moonbase Logistics (2025) 99 SCC 456 were found in the provided context."
+      },
+      {
+        "label": "Unsupported Maritime Space domain",
+        "status": 200,
+        "latency_ms": 854.1,
+        "sources_found": false,
+        "citations_count": 0,
+        "retrieved_chunks_count": 0,
+        "answer_preview": "No verified legal sources found in the knowledge base addressing this specific query. The available legal knowledge base does not contain sufficient verified statutory information to address this specific legal question reliably. Under platform safety rules, N"
+      }
+    ],
+    "sources_found_consistency": [
+      {
+        "label": "Kesavananda Bharati missing holding",
+        "status": 200,
+        "latency_ms": 3687.4,
+        "sources_found": false,
+        "citations_count": 0,
+        "answer_preview": "Based on the provided statutory context and court records of Kesavananda Bharati v. State of Kerala (Writ Petition (Civil) 135 of 1970, decided on 24/04/1973), the text details the background of the petitions challenging the Twenty-fourth, Twenty-fifth, and Twenty-ninth Constitutional Amendments, the referral to a larg"
+      },
+      {
+        "label": "IT Rules 2021 missing intermediary duties",
+        "status": 200,
+        "latency_ms": 6207.0,
+        "sources_found": false,
+        "citations_count": 0,
+        "answer_preview": "Based on the provided statutory context from the Information Technology Rules, 2021, specific definitions are provided regarding intermediaries, digital media, grievances, and Grievance Officers (such as the appointment of a Grievance Officer under Section 2(k) and definitions of online gaming intermediaries under Sect"
+      }
+    ],
+    "multilingual": [
+      {
+        "requested_lang": "hi",
+        "status": 200,
+        "latency_ms": 6297.0,
+        "detected_language": "hi",
+        "sources_found": true,
+        "citations": [
+          {
+            "source_title": "The Negotiable Instruments Act, 1881",
+            "source_type": "BARE_ACT",
+            "act_or_judgment_identifier": "Act No. 26 of 1881",
+            "section_or_paragraph": "Section 138",
+            "clause_heading": "Dishonour of cheque for insufficiency, etc., of funds in the account",
+            "official_source_url": "https://www.indiacode.nic.in/handle/123456789/2189",
+            "jurisdiction": "Union of India",
+            "document_version": "2026.1",
+            "relevant_text": "Where any cheque drawn by a person on an account maintained by him with a banker for payment of any amount of money to another person from out of that account for the discharge, in whole or in part, of any debt or other liability, is returned by the bank unpaid, either because of...",
+            "content_checksum": "f4ee33bf967090feebd40af3f8a3b70b6422374abe893a87392d625f355bb57f",
+            "is_verified_in_corpus": true,
+            "verification_status": "VERIFIED",
+            "legal_currency_status": "CURRENT",
+            "amendment_warning": null,
+            "source_repository_url": null,
+            "original_document_path": null
+          },
+          {
+            "source_title": "The Negotiable Instruments Act, 1881",
+            "source_type": "BARE_ACT",
+            "act_or_judgment_identifier": "Act No. 26 of 1881",
+            "section_or_paragraph": "Section 139",
+            "clause_heading": "Presumption in favour of holder",
+            "official_source_url": "https://www.indiacode.nic.in/handle/123456789/2189",
+            "jurisdiction": "Union of India",
+            "document_version": "2026.1",
+            "relevant_text": "It shall be presumed, unless the contrary is proved, that the holder of a cheque received the cheque of the nature referred to in section 138 for the discharge, in whole or in part, of any debt or other liability.",
+            "content_checksum": "882309608f1fa7348c91d50c6558506f8d80409ab8d066132f300f7346877993",
+            "is_verified_in_corpus": true,
+            "verification_status": "VERIFIED",
+            "legal_currency_status": "CURRENT",
+            "amendment_warning": null,
+            "source_repository_url": null,
+            "original_document_path": null
+          },
+          {
+            "source_title": "The Negotiable Instruments Act, 1881",
+            "source_type": "BARE_ACT",
+            "act_or_judgment_identifier": "Act No. 26 of 1881",
+            "section_or_paragraph": "Section 141",
+            "clause_heading": "Offences by companies",
+            "official_source_url": "https://www.indiacode.nic.in/handle/123456789/2189",
+            "jurisdiction": "Union of India",
+            "document_version": "2026.1",
+            "relevant_text": "If the person committing an offence under section 138 is a company, every person who, at the time the offence was committed, was in charge of, and was responsible to the company for the conduct of the business of the company, as well as the company, shall be deemed to be guilty o...",
+            "content_checksum": "c9d8a6043d2f20a29894b0235f8e24a20021c667d5cb4d55f5e9982c415b5d0c",
+            "is_verified_in_corpus": true,
+            "verification_status": "VERIFIED",
+            "legal_currency_status": "CURRENT",
+            "amendment_warning": null,
+            "source_repository_url": null,
+            "original_document_path": null
+          }
+        ],
+        "answer_preview": "(हिंदी सारांश) आधिकारिक भारतीय संविधि के अनुसार प्रासंगिक कानूनी प्रावधान निम्नलिखित हैं:\n\nUnder **The Negotiable Instruments Act, 1881**, **Section 138: Dishonour of cheque for insufficiency, etc., of funds in the account**, the law provides that: Where any cheque drawn by a person on an account maintained by him with a banker for payment of any a"
+      },
+      {
+        "requested_lang": "kn",
+        "status": 200,
+        "latency_ms": 9040.9,
+        "detected_language": "kn",
+        "sources_found": true,
+        "citations": [
+          {
+            "source_title": "The Negotiable Instruments Act, 1881",
+            "source_type": "BARE_ACT",
+            "act_or_judgment_identifier": "Act No. 26 of 1881",
+            "section_or_paragraph": "Section 138",
+            "clause_heading": "Dishonour of cheque for insufficiency, etc., of funds in the account",
+            "official_source_url": "https://www.indiacode.nic.in/handle/123456789/2189",
+            "jurisdiction": "Union of India",
+            "document_version": "2026.1",
+            "relevant_text": "Where any cheque drawn by a person on an account maintained by him with a banker for payment of any amount of money to another person from out of that account for the discharge, in whole or in part, of any debt or other liability, is returned by the bank unpaid, either because of...",
+            "content_checksum": "f4ee33bf967090feebd40af3f8a3b70b6422374abe893a87392d625f355bb57f",
+            "is_verified_in_corpus": true,
+            "verification_status": "VERIFIED",
+            "legal_currency_status": "CURRENT",
+            "amendment_warning": null,
+            "source_repository_url": null,
+            "original_document_path": null
+          },
+          {
+            "source_title": "The Negotiable Instruments Act, 1881",
+            "source_type": "BARE_ACT",
+            "act_or_judgment_identifier": "Act No. 26 of 1881",
+            "section_or_paragraph": "Section 139",
+            "clause_heading": "Presumption in favour of holder",
+            "official_source_url": "https://www.indiacode.nic.in/handle/123456789/2189",
+            "jurisdiction": "Union of India",
+            "document_version": "2026.1",
+            "relevant_text": "It shall be presumed, unless the contrary is proved, that the holder of a cheque received the cheque of the nature referred to in section 138 for the discharge, in whole or in part, of any debt or other liability.",
+            "content_checksum": "882309608f1fa7348c91d50c6558506f8d80409ab8d066132f300f7346877993",
+            "is_verified_in_corpus": true,
+            "verification_status": "VERIFIED",
+            "legal_currency_status": "CURRENT",
+            "amendment_warning": null,
+            "source_repository_url": null,
+            "original_document_path": null
+          },
+          {
+            "source_title": "The Negotiable Instruments Act, 1881",
+            "source_type": "BARE_ACT",
+            "act_or_judgment_identifier": "Act No. 26 of 1881",
+            "section_or_paragraph": "Section 141",
+            "clause_heading": "Offences by companies",
+            "official_source_url": "https://www.indiacode.nic.in/handle/123456789/2189",
+            "jurisdiction": "Union of India",
+            "document_version": "2026.1",
+            "relevant_text": "If the person committing an offence under section 138 is a company, every person who, at the time the offence was committed, was in charge of, and was responsible to the company for the conduct of the business of the company, as well as the company, shall be deemed to be guilty o...",
+            "content_checksum": "c9d8a6043d2f20a29894b0235f8e24a20021c667d5cb4d55f5e9982c415b5d0c",
+            "is_verified_in_corpus": true,
+            "verification_status": "VERIFIED",
+            "legal_currency_status": "CURRENT",
+            "amendment_warning": null,
+            "source_repository_url": null,
+            "original_document_path": null
+          }
+        ],
+        "answer_preview": "ನೆಗೋಸಿಯೇಬಲ್ ಇನ್ಸ್‌ಟ್ರುಮೆಂಟ್ಸ್ ಕಾಯ್ದೆಯ ಸೆಕ್ಷನ್ 138 ರ ಪ್ರಕಾರ, ಖಾತೆಯಲ್ಲಿ ಹಣವಿಲ್ಲದೆ ಚೆಕ್ ಬೌನ್ಸ್ ಆದರೆ ಅದು ಅಪರಾಧವಾಗುತ್ತದೆ. ಚೆಕ್ ನೀಡಿದ ವ್ಯಕ್ತಿಗೆ ಎರಡು ವರ್ಷಗಳವರೆಗೆ imprisonment (ಸೆರೆವಾಸ) ಅಥವಾ ಚೆಕ್ ಮೊತ್ತದ ಎರಡು ಪಟ್ಟು ವರೆಗೆ ದಂಡ, ಅಥವಾ ಎರಡೂ ವಿಧಿಸಬಹುದು. ಆದರೆ ಈ ಕಾನೂನು ಅನ್ವಯಿಸಲು ಕೆಲವು ನಿಯಮಗಳಿವೆ: (ಎ) ಚೆಕ್ ಅನ್ನು ಅದು ಬರೆದ ದಿನಾಂಕದಿಂದ ಮೂರು ತಿಂಗಳೊಳಗೆ ಬ್ಯಾಂಕಿಗೆ წარಸಬೇಕು; "
+      },
+      {
+        "requested_lang": "mr",
+        "status": 200,
+        "latency_ms": 15281.8,
+        "detected_language": "mr",
+        "sources_found": true,
+        "citations": [
+          {
+            "source_title": "The Negotiable Instruments Act, 1881",
+            "source_type": "BARE_ACT",
+            "act_or_judgment_identifier": "Act No. 26 of 1881",
+            "section_or_paragraph": "Section 138",
+            "clause_heading": "Dishonour of cheque for insufficiency, etc., of funds in the account",
+            "official_source_url": "https://www.indiacode.nic.in/handle/123456789/2189",
+            "jurisdiction": "Union of India",
+            "document_version": "2026.1",
+            "relevant_text": "Where any cheque drawn by a person on an account maintained by him with a banker for payment of any amount of money to another person from out of that account for the discharge, in whole or in part, of any debt or other liability, is returned by the bank unpaid, either because of...",
+            "content_checksum": "f4ee33bf967090feebd40af3f8a3b70b6422374abe893a87392d625f355bb57f",
+            "is_verified_in_corpus": true,
+            "verification_status": "VERIFIED",
+            "legal_currency_status": "CURRENT",
+            "amendment_warning": null,
+            "source_repository_url": null,
+            "original_document_path": null
+          },
+          {
+            "source_title": "The Negotiable Instruments Act, 1881",
+            "source_type": "BARE_ACT",
+            "act_or_judgment_identifier": "Act No. 26 of 1881",
+            "section_or_paragraph": "Section 139",
+            "clause_heading": "Presumption in favour of holder",
+            "official_source_url": "https://www.indiacode.nic.in/handle/123456789/2189",
+            "jurisdiction": "Union of India",
+            "document_version": "2026.1",
+            "relevant_text": "It shall be presumed, unless the contrary is proved, that the holder of a cheque received the cheque of the nature referred to in section 138 for the discharge, in whole or in part, of any debt or other liability.",
+            "content_checksum": "882309608f1fa7348c91d50c6558506f8d80409ab8d066132f300f7346877993",
+            "is_verified_in_corpus": true,
+            "verification_status": "VERIFIED",
+            "legal_currency_status": "CURRENT",
+            "amendment_warning": null,
+            "source_repository_url": null,
+            "original_document_path": null
+          },
+          {
+            "source_title": "The Negotiable Instruments Act, 1881",
+            "source_type": "BARE_ACT",
+            "act_or_judgment_identifier": "Act No. 26 of 1881",
+            "section_or_paragraph": "Section 141",
+            "clause_heading": "Offences by companies",
+            "official_source_url": "https://www.indiacode.nic.in/handle/123456789/2189",
+            "jurisdiction": "Union of India",
+            "document_version": "2026.1",
+            "relevant_text": "If the person committing an offence under section 138 is a company, every person who, at the time the offence was committed, was in charge of, and was responsible to the company for the conduct of the business of the company, as well as the company, shall be deemed to be guilty o...",
+            "content_checksum": "c9d8a6043d2f20a29894b0235f8e24a20021c667d5cb4d55f5e9982c415b5d0c",
+            "is_verified_in_corpus": true,
+            "verification_status": "VERIFIED",
+            "legal_currency_status": "CURRENT",
+            "amendment_warning": null,
+            "source_repository_url": null,
+            "original_document_path": null
+          }
+        ],
+        "answer_preview": "नेगोशिएबल इन्स्ट्रुमेंट्स कायदा, १८८१ च्या कलम १३८ नुसार, जर तुमचा चेक खात्यात अपुरा निधी असल्यामुळे बाऊन्स (परत) झाला असेल, तर तो एक गुन्हा मानला जातो. यासाठी दोन वर्षांपर्यंत कारावास, किंवा चेकच्या रकमेच्या दुप्पट रकमेपर्यंत दंड, किंवा दोन्ही शिक्षा होऊ शकतात. परंतु, ही कारवाई करण्यासाठी खालील अटी पूर्ण होणे आवश्यक आहे: (अ) चेक त्यावर नमूद केलेल्"
+      }
+    ],
+    "karnataka_belagavi": [
+      {
+        "label": "Belagavi Market PS HC",
+        "status": 200,
+        "latency_ms": 3139.9,
+        "sources_found": true,
+        "citations_count": 5,
+        "citations": [
+          {
+            "source_title": "CRL.P/101349/2022 of AFZAL S/O ABDUL RAHAMAN RAJAGOLI AND ORS, Vs THE STATE BY MARKET PS, BELAGAVI,",
+            "source_type": "COURT_JUDGMENT",
+            "act_or_judgment_identifier": "KAHC020056882022",
+            "section_or_paragraph": "Judgment Summary",
+            "clause_heading": "CRL.P/101349/2022 of AFZAL S/O ABDUL RAHAMAN RAJAGOLI AND ORS, Vs THE STATE BY MARKET PS, BELAGAVI,",
+            "official_source_url": "https://judgments.ecourts.gov.in/",
+            "jurisdiction": "Karnataka",
+            "document_version": "1.0",
+            "relevant_text": "Case Title: CRL.P/101349/2022 of AFZAL S/O ABDUL RAHAMAN RAJAGOLI AND ORS, Vs THE STATE BY MARKET PS, BELAGAVI,\nCourt: High Court of Karnataka | Judge: V.SRISHANANDA\nDecision Date: 2022-06-28 | CNR: KAHC020056882022\nCase Category: quash | Outcome / Disposal: DISMISSED\nStatutes In...",
+            "content_checksum": "b512a6644c8ae19e3fb2bc9dd56790ea97174c630618939fd1a419a6dd3162a3",
+            "is_verified_in_corpus": true,
+            "verification_status": "PENDING_VERIFICATION",
+            "legal_currency_status": "HISTORICAL_PRECEDENT_CITES_IPC_CRPC",
+            "amendment_warning": "References CrPC 1973 (replaced by Bharatiya Nagarik Suraksha Sanhita, 2023 w.e.f. 2024-07-01).",
+            "source_repository_url": "https://github.com/joyboseroy/imljd",
+            "original_document_path": "data/raw/court_judgments/imljd/hc_karnataka.csv"
+          },
+          {
+            "source_title": "CRL.P/100005/2023 of MEHABOOB SAB S/O HASHMPEER BELAVIGI Vs AHMED RAZA S/O MEHABOOB SAB BELAGAVI",
+            "source_type": "COURT_JUDGMENT",
+            "act_or_judgment_identifier": "KAHC020000162023",
+            "section_or_paragraph": "Judgment Summary",
+            "clause_heading": "CRL.P/100005/2023 of MEHABOOB SAB S/O HASHMPEER BELAVIGI Vs AHMED RAZA S/O MEHABOOB SAB BELAGAVI",
+            "official_source_url": "https://judgments.ecourts.gov.in/",
+            "jurisdiction": "Karnataka",
+            "document_version": "1.0",
+            "relevant_text": "Case Title: CRL.P/100005/2023 of MEHABOOB SAB S/O HASHMPEER BELAVIGI Vs AHMED RAZA S/O MEHABOOB SAB BELAGAVI\nCourt: High Court of Karnataka | Judge: MOHAMMAD NAWAZ\nDecision Date: 2023-01-19 | CNR: KAHC020000162023\nCase Category: quash | Outcome / Disposal: DISMISSED\nStatutes Invo...",
+            "content_checksum": "ebd283bb6195f71582882b1d3f293e55c6761c841b56df41fa754f8ea9182dad",
+            "is_verified_in_corpus": true,
+            "verification_status": "PENDING_VERIFICATION",
+            "legal_currency_status": "HISTORICAL_PRECEDENT_CITES_IPC_CRPC",
+            "amendment_warning": "References CrPC 1973 (replaced by Bharatiya Nagarik Suraksha Sanhita, 2023 w.e.f. 2024-07-01).",
+            "source_repository_url": "https://github.com/joyboseroy/imljd",
+            "original_document_path": "data/raw/court_judgments/imljd/hc_karnataka.csv"
+          },
+          {
+            "source_title": "CRL.P/100799/2019 of SRI.BASAVARAJ S/O SHARANAPPA YELIGAR Vs THE STATE OF KARNATAKA",
+            "source_type": "COURT_JUDGMENT",
+            "act_or_judgment_identifier": "KAHC020068942019",
+            "section_or_paragraph": "Judgment Summary",
+            "clause_heading": "CRL.P/100799/2019 of SRI.BASAVARAJ S/O SHARANAPPA YELIGAR Vs THE STATE OF KARNATAKA",
+            "official_source_url": "https://judgments.ecourts.gov.in/",
+            "jurisdiction": "Karnataka",
+            "document_version": "1.0",
+            "relevant_text": "Case Title: CRL.P/100799/2019 of SRI.BASAVARAJ S/O SHARANAPPA YELIGAR Vs THE STATE OF KARNATAKA\nCourt: High Court of Karnataka | Judge: ASHOK G NIJAGANNAVAR\nDecision Date: 2019-10-10 | CNR: KAHC020068942019\nCase Category: quash | Outcome / Disposal: DISMISSED\nStatutes Invoked: Cr...",
+            "content_checksum": "c6a0b5666bc58d625809d08b53ef657983b6ddacfff3010e2b82a44f6eb07613",
+            "is_verified_in_corpus": true,
+            "verification_status": "PENDING_VERIFICATION",
+            "legal_currency_status": "HISTORICAL_PRECEDENT_CITES_IPC_CRPC",
+            "amendment_warning": "References CrPC 1973 (replaced by Bharatiya Nagarik Suraksha Sanhita, 2023 w.e.f. 2024-07-01).",
+            "source_repository_url": "https://github.com/joyboseroy/imljd",
+            "original_document_path": "data/raw/court_judgments/imljd/hc_karnataka.csv"
+          },
+          {
+            "source_title": "CRL.P/100827/2017 of VENKATESH S/O VISHNU MAHAJAN Vs STATE OF KARNATAKA",
+            "source_type": "COURT_JUDGMENT",
+            "act_or_judgment_identifier": "KAHC020064542017",
+            "section_or_paragraph": "Judgment Summary",
+            "clause_heading": "CRL.P/100827/2017 of VENKATESH S/O VISHNU MAHAJAN Vs STATE OF KARNATAKA",
+            "official_source_url": "https://judgments.ecourts.gov.in/",
+            "jurisdiction": "Karnataka",
+            "document_version": "1.0",
+            "relevant_text": "Case Title: CRL.P/100827/2017 of VENKATESH S/O VISHNU MAHAJAN Vs STATE OF KARNATAKA\nCourt: High Court of Karnataka | Judge: K.N.PHANEENDRA\nDecision Date: 2018-04-05 | CNR: KAHC020064542017\nCase Category: quash | Outcome / Disposal: DISMISSED\nStatutes Invoked: CrPC 482\nArchive Ref...",
+            "content_checksum": "1ab69de3ab925edf30db3dbcd0cf8420015a3f14f5bfc15969255dc813ea90ed",
+            "is_verified_in_corpus": true,
+            "verification_status": "PENDING_VERIFICATION",
+            "legal_currency_status": "HISTORICAL_PRECEDENT_CITES_IPC_CRPC",
+            "amendment_warning": "References CrPC 1973 (replaced by Bharatiya Nagarik Suraksha Sanhita, 2023 w.e.f. 2024-07-01).",
+            "source_repository_url": "https://github.com/joyboseroy/imljd",
+            "original_document_path": "data/raw/court_judgments/imljd/hc_karnataka.csv"
+          },
+          {
+            "source_title": "CRL.P/101893/2017 of SHRIDHAR S/O VISHNU MAHAJAN Vs STATE OF KARNATAKA",
+            "source_type": "COURT_JUDGMENT",
+            "act_or_judgment_identifier": "KAHC020124382017",
+            "section_or_paragraph": "Judgment Summary",
+            "clause_heading": "CRL.P/101893/2017 of SHRIDHAR S/O VISHNU MAHAJAN Vs STATE OF KARNATAKA",
+            "official_source_url": "https://judgments.ecourts.gov.in/",
+            "jurisdiction": "Karnataka",
+            "document_version": "1.0",
+            "relevant_text": "Case Title: CRL.P/101893/2017 of SHRIDHAR S/O VISHNU MAHAJAN Vs STATE OF KARNATAKA\nCourt: High Court of Karnataka | Judge: K.N.PHANEENDRA\nDecision Date: 2018-04-05 | CNR: KAHC020124382017\nCase Category: quash | Outcome / Disposal: DISMISSED\nStatutes Invoked: CrPC 482\nArchive Refe...",
+            "content_checksum": "9ac7d1b4790d7d8ac318b0de64745a4f184811890dd1d4fd2ad28077eb0ed382",
+            "is_verified_in_corpus": true,
+            "verification_status": "PENDING_VERIFICATION",
+            "legal_currency_status": "HISTORICAL_PRECEDENT_CITES_IPC_CRPC",
+            "amendment_warning": "References CrPC 1973 (replaced by Bharatiya Nagarik Suraksha Sanhita, 2023 w.e.f. 2024-07-01).",
+            "source_repository_url": "https://github.com/joyboseroy/imljd",
+            "original_document_path": "data/raw/court_judgments/imljd/hc_karnataka.csv"
+          }
+        ],
+        "answer_preview": "Yes, court records related to Market PS, Belagavi and Belagavi are present in the provided High Court of Karnataka corpus. Specifically, Source 1 cites case CRL.P/101349/2022 titled 'AFZAL S/O ABDUL RAHAMAN RAJAGOLI AND ORS, Vs THE STATE BY MARKET PS, BELAGAVI', which was handled by the High Court of Karnataka (Judge V.SRISHANANDA) and dismissed un"
+      },
+      {
+        "label": "Karnataka Land Revenue Act Sec 27",
+        "status": 200,
+        "latency_ms": 746.9,
+        "sources_found": false,
+        "citations_count": 0,
+        "citations": [],
+        "answer_preview": "No verified legal sources found in the knowledge base addressing this specific query. The available legal knowledge base does not contain sufficient verified statutory information to address this specific legal question reliably. Under platform safety rules, NyayaSetu will not generate speculative or ungrounded legal statements without supporting B"
+      },
+      {
+        "label": "Karnataka Welfare Schemes",
+        "status": 200,
+        "latency_ms": 6811.6,
+        "sources_found": true,
+        "citations_count": 5,
+        "citations": [
+          {
+            "source_title": "Ganga Kalyana Scheme",
+            "source_type": "GOVERNMENT_SCHEME",
+            "act_or_judgment_identifier": "gks",
+            "section_or_paragraph": "Scheme: gks (1/2)",
+            "clause_heading": "Ganga Kalyana Scheme — Overview & Description & Eligibility Criteria & Ex",
+            "official_source_url": "https://www.myscheme.gov.in/schemes/gks",
+            "jurisdiction": "Karnataka",
+            "document_version": "2026.10",
+            "relevant_text": "Overview & Description:\nLevel: State / UT Government | Nodal Authority: Karnataka | Mode: Online\nTags: \n\nThis scheme is a fully subsidized scheme, bore wells, pumps and electrification are provided to minorities, and small farmers living in rural areas. The objective of the schem...",
+            "content_checksum": "efd70f7b9d2390b1630b8c78043d64c5796bd0d53c6fa8dc6c0c80310698050d",
+            "is_verified_in_corpus": true,
+            "verification_status": "SECONDARY_MIRROR_WITH_GOV_URLS",
+            "legal_currency_status": "SNAPSHOT_SUBJECT_TO_SCHEME_UPDATES",
+            "amendment_warning": "Scheme snapshot from 2026-10-07; verify active status and benefit norms on official MyScheme portal.",
+            "source_repository_url": "https://github.com/Aryan-Pardeshi/gov-myscheme-dataset",
+            "original_document_path": "data/raw/government_notifications_and_circulars/gov_myscheme/gov_myscheme_data.json"
+          },
+          {
+            "source_title": "Ganga Kalyana Scheme",
+            "source_type": "GOVERNMENT_SCHEME",
+            "act_or_judgment_identifier": "gks",
+            "section_or_paragraph": "Scheme: gks (2/2)",
+            "clause_heading": "Ganga Kalyana Scheme — Application Process & Required Documents & Frequen",
+            "official_source_url": "https://www.myscheme.gov.in/schemes/gks",
+            "jurisdiction": "Karnataka",
+            "document_version": "2026.10",
+            "relevant_text": "Application Process & Required Documents:\nMode: OnlineStep 01: The applicants can go to the official website to apply for the scheme.Step 02: Print the application form.Step 03: Submit this application form along with other relevant documents to the Selection Panel of your concer...",
+            "content_checksum": "1752e1ed1478883145af2d8170ef197b46517c5ca09e17a52c2b12100d8543df",
+            "is_verified_in_corpus": true,
+            "verification_status": "SECONDARY_MIRROR_WITH_GOV_URLS",
+            "legal_currency_status": "SNAPSHOT_SUBJECT_TO_SCHEME_UPDATES",
+            "amendment_warning": "Scheme snapshot from 2026-10-07; verify active status and benefit norms on official MyScheme portal.",
+            "source_repository_url": "https://github.com/Aryan-Pardeshi/gov-myscheme-dataset",
+            "original_document_path": "data/raw/government_notifications_and_circulars/gov_myscheme/gov_myscheme_data.json"
+          },
+          {
+            "source_title": "Bhagyalaxmi Scheme",
+            "source_type": "GOVERNMENT_SCHEME",
+            "act_or_judgment_identifier": "bys",
+            "section_or_paragraph": "Scheme: bys (1/3)",
+            "clause_heading": "Bhagyalaxmi Scheme — Overview & Description & Eligibility Criteria & Ex",
+            "official_source_url": "https://www.myscheme.gov.in/schemes/bys",
+            "jurisdiction": "Karnataka",
+            "document_version": "2026.10",
+            "relevant_text": "Overview & Description:\nLevel: State / UT Government | Nodal Authority: Karnataka | Mode: Online & Offline\nTags: Below, Poverty, Line, Bhagyalaxmi, Female, Children, Financial, Aid\n\nDetailThe Karnataka state government will give female children financial aid under the Karnataka B...",
+            "content_checksum": "6c17997780a6a310e7b39115f2622a5706c4d97e1a4409a19f78d7e6005fb944",
+            "is_verified_in_corpus": true,
+            "verification_status": "SECONDARY_MIRROR_WITH_GOV_URLS",
+            "legal_currency_status": "SNAPSHOT_SUBJECT_TO_SCHEME_UPDATES",
+            "amendment_warning": "Scheme snapshot from 2026-10-07; verify active status and benefit norms on official MyScheme portal.",
+            "source_repository_url": "https://github.com/Aryan-Pardeshi/gov-myscheme-dataset",
+            "original_document_path": "data/raw/government_notifications_and_circulars/gov_myscheme/gov_myscheme_data.json"
+          },
+          {
+            "source_title": "Bhagyalaxmi Scheme",
+            "source_type": "GOVERNMENT_SCHEME",
+            "act_or_judgment_identifier": "bys",
+            "section_or_paragraph": "Scheme: bys (3/3)",
+            "clause_heading": "Bhagyalaxmi Scheme — Frequently Asked Questions",
+            "official_source_url": "https://www.myscheme.gov.in/schemes/bys",
+            "jurisdiction": "Karnataka",
+            "document_version": "2026.10",
+            "relevant_text": "Frequently Asked Questions:\nQ: Who can apply for the Bhagya Laxmi scheme?\nA: The mother/father or the natural guardians of the girl child can apply for the Bhagya Laxmi scheme.\n\nQ: How much scholarship is offered to the girl child under the scheme?\nA: The scheme offers scholarshi...",
+            "content_checksum": "e1f11fe45760827d4d839bf415c244b6b5d96ad351dd6ffce5a26d353c7fa2fe",
+            "is_verified_in_corpus": true,
+            "verification_status": "SECONDARY_MIRROR_WITH_GOV_URLS",
+            "legal_currency_status": "SNAPSHOT_SUBJECT_TO_SCHEME_UPDATES",
+            "amendment_warning": "Scheme snapshot from 2026-10-07; verify active status and benefit norms on official MyScheme portal.",
+            "source_repository_url": "https://github.com/Aryan-Pardeshi/gov-myscheme-dataset",
+            "original_document_path": "data/raw/government_notifications_and_circulars/gov_myscheme/gov_myscheme_data.json"
+          },
+          {
+            "source_title": "Bhagyalaxmi Scheme",
+            "source_type": "GOVERNMENT_SCHEME",
+            "act_or_judgment_identifier": "bys",
+            "section_or_paragraph": "Scheme: bys (2/3)",
+            "clause_heading": "Bhagyalaxmi Scheme — Application Process & Required Documents",
+            "official_source_url": "https://www.myscheme.gov.in/schemes/bys",
+            "jurisdiction": "Karnataka",
+            "document_version": "2026.10",
+            "relevant_text": "Application Process & Required Documents:\nMode: Online & Offline Application ProcessFirst of all, go to the official website of Bhagya Laxmi Yojana Karnataka. The homepage of the website will open on the screen. Now click on the Bhagya Laxmi Yojana Application form link. The PDF ...",
+            "content_checksum": "b2051d1edb259ea65b3bee2e047a05adc1cc0a210a02e9238600fb9284ab8c1c",
+            "is_verified_in_corpus": true,
+            "verification_status": "SECONDARY_MIRROR_WITH_GOV_URLS",
+            "legal_currency_status": "SNAPSHOT_SUBJECT_TO_SCHEME_UPDATES",
+            "amendment_warning": "Scheme snapshot from 2026-10-07; verify active status and benefit norms on official MyScheme portal.",
+            "source_repository_url": "https://github.com/Aryan-Pardeshi/gov-myscheme-dataset",
+            "original_document_path": "data/raw/government_notifications_and_circulars/gov_myscheme/gov_myscheme_data.json"
+          }
+        ],
+        "answer_preview": "Under **Ganga Kalyana Scheme**, **Scheme: gks (1/2): Ganga Kalyana Scheme — Overview & Description & Eligibility Criteria & Ex**, the law provides that: Overview & Description: Level: State / UT Government | Nodal Authority: Karnataka | Mode: Online Tags: This scheme is a fully subsidized scheme, bore wells, pumps and electrification are provided t"
+      }
+    ],
+    "currency_amendments": [
+      {
+        "label": "IPC vs BNS 2023 currency",
+        "status": 200,
+        "latency_ms": 3295.7,
+        "sources_found": true,
+        "citations": [
+          {
+            "source_title": "Criminal Appeal 297 2024",
+            "source_type": "COURT_JUDGMENT",
+            "act_or_judgment_identifier": "criminal_appeal_297_2024",
+            "section_or_paragraph": "Part 1 of 17",
+            "clause_heading": "Criminal Appeal 297 2024",
+            "official_source_url": null,
+            "jurisdiction": "Union of India",
+            "document_version": "1.0",
+            "relevant_text": "2024 INSC 887\nCriminal Appeal No.297 of 20 24 Page 1 of 18 \n Reportable \nIN THE SUPREME COURT OF INDIA \nCRIMINAL APPELLATE JURISDICTION\n\nCRIMINAL APPEAL NO. 297 OF 20 24\n\nRANDEEP SINGH @ RANA & ANR. … APPELLANTS\n\nversus\n\nSTATE OF HARYANA & ORS. … RESPONDENTS\n\nJ U D G M E N T \nABH...",
+            "content_checksum": "0411287e92a43849c20fe678a18908c0b8396d0cdb356a6351469ccd7ce2526d",
+            "is_verified_in_corpus": true,
+            "verification_status": "UNVERIFIED_THIRD_PARTY_PDF",
+            "legal_currency_status": "CURRENT_PRECEDENT",
+            "amendment_warning": "Criminal Appeal 297 of 2024 judgment PDF.",
+            "source_repository_url": "https://github.com/Pratik45ro/AI-Law-Chatbot/tree/main/datasets",
+            "original_document_path": "data/raw/court_judgments/supreme_court_pdfs/criminal_appeal_297_2024.pdf"
+          },
+          {
+            "source_title": "The Indian Penal Code, 1860 (Repealed / Superseded by BNS 2023)",
+            "source_type": "BARE_ACT",
+            "act_or_judgment_identifier": "indian_penal_code_1860_SUPERSEDED",
+            "section_or_paragraph": "Section 2",
+            "clause_heading": "Punishment of offences committed within India. --Every person",
+            "official_source_url": null,
+            "jurisdiction": "Union of India",
+            "document_version": "1.0",
+            "relevant_text": "shall be liable to punishment under this Code and not otherwise for \nevery act or omission contrary to the provisions thereof, of which he \nshall be guilty within 5*[India] 6*** *.",
+            "content_checksum": "384812442aab324ec34b5331e92cb5fec755b6066d464cbc8b570137f84eb6c7",
+            "is_verified_in_corpus": true,
+            "verification_status": "UNVERIFIED_THIRD_PARTY_PDF",
+            "legal_currency_status": "REPEALED_SUPERSEDED_BY_BNS_2023",
+            "amendment_warning": "REPEALED w.e.f. 2024-07-01 by Bharatiya Nyaya Sanhita, 2023 (remains applicable only to pre-1 July 2024 offences).",
+            "source_repository_url": "https://github.com/Pratik45ro/AI-Law-Chatbot/tree/main/datasets",
+            "original_document_path": "data/raw/central_legislation/indian_penal_code_1860_SUPERSEDED.pdf"
+          },
+          {
+            "source_title": "The Indian Penal Code, 1860 (Repealed / Superseded by BNS 2023)",
+            "source_type": "BARE_ACT",
+            "act_or_judgment_identifier": "indian_penal_code_1860_SUPERSEDED",
+            "section_or_paragraph": "Section 3",
+            "clause_heading": "Punishment of offences committed beyond, but which by law may",
+            "official_source_url": null,
+            "jurisdiction": "Union of India",
+            "document_version": "1.0",
+            "relevant_text": "be tried within, India. --Any person liable, by any 7*[Indian law], \n\nto be tried for an offence committed beyond 5*[India] shall be \ndealt with according to the provisions of this Code for any act \ncommitted beyond 5*[India] in the same manner as if such act had \nbeen committed ...",
+            "content_checksum": "2ed60000cf3ff3b54d0173f6f8d0e771f8e8a1e3d670e203774567cd0be8abc0",
+            "is_verified_in_corpus": true,
+            "verification_status": "UNVERIFIED_THIRD_PARTY_PDF",
+            "legal_currency_status": "REPEALED_SUPERSEDED_BY_BNS_2023",
+            "amendment_warning": "REPEALED w.e.f. 2024-07-01 by Bharatiya Nyaya Sanhita, 2023 (remains applicable only to pre-1 July 2024 offences).",
+            "source_repository_url": "https://github.com/Pratik45ro/AI-Law-Chatbot/tree/main/datasets",
+            "original_document_path": "data/raw/central_legislation/indian_penal_code_1860_SUPERSEDED.pdf"
+          },
+          {
+            "source_title": "The Indian Penal Code, 1860 (Repealed / Superseded by BNS 2023)",
+            "source_type": "BARE_ACT",
+            "act_or_judgment_identifier": "indian_penal_code_1860_SUPERSEDED",
+            "section_or_paragraph": "Section 4",
+            "clause_heading": null,
+            "official_source_url": null,
+            "jurisdiction": "Union of India",
+            "document_version": "1.0",
+            "relevant_text": "Extension of Code to extra -territorial offences. \n\n\n8*[4. Extension of Code to extra -territorial offences. --The \nprovisions of this Code apply also to any offence committed by -- \n\n9*[(1) any citizen of India in any place without and \nbeyond India; \n\n(2) any person on any ship...",
+            "content_checksum": "c353566cdaecf5e113c1fd4793c1e4133e2fe320c63e84b409f8411394e3abd5",
+            "is_verified_in_corpus": true,
+            "verification_status": "UNVERIFIED_THIRD_PARTY_PDF",
+            "legal_currency_status": "REPEALED_SUPERSEDED_BY_BNS_2023",
+            "amendment_warning": "REPEALED w.e.f. 2024-07-01 by Bharatiya Nyaya Sanhita, 2023 (remains applicable only to pre-1 July 2024 offences).",
+            "source_repository_url": "https://github.com/Pratik45ro/AI-Law-Chatbot/tree/main/datasets",
+            "original_document_path": "data/raw/central_legislation/indian_penal_code_1860_SUPERSEDED.pdf"
+          },
+          {
+            "source_title": "The Indian Penal Code, 1860 (Repealed / Superseded by BNS 2023)",
+            "source_type": "BARE_ACT",
+            "act_or_judgment_identifier": "indian_penal_code_1860_SUPERSEDED",
+            "section_or_paragraph": "Section 1",
+            "clause_heading": "The Act has been amended in its application to Madras by",
+            "official_source_url": null,
+            "jurisdiction": "Union of India",
+            "document_version": "1.0",
+            "relevant_text": "Madras Act 25 of 1960, U. P. by U. P. Acts 31 of 1961, 29 of 1970 \nand 47 of 1975, Andhra Pradesh by Andhra Pradesh Act 16 of 1968, \nMaharashtra by Maharashtra Act 19 of 1971, Mysore by Mysore Act 8. of 1972, West Bengal by \nWest Bengal Act 42 of 1973. \nThe Act has been extended ...",
+            "content_checksum": "8fbd41a9e9d93fc0f5b7a3eafbae8f1fdb32f25f109eda9fb5f92a72a130f06f",
+            "is_verified_in_corpus": true,
+            "verification_status": "UNVERIFIED_THIRD_PARTY_PDF",
+            "legal_currency_status": "REPEALED_SUPERSEDED_BY_BNS_2023",
+            "amendment_warning": "REPEALED w.e.f. 2024-07-01 by Bharatiya Nyaya Sanhita, 2023 (remains applicable only to pre-1 July 2024 offences).",
+            "source_repository_url": "https://github.com/Pratik45ro/AI-Law-Chatbot/tree/main/datasets",
+            "original_document_path": "data/raw/central_legislation/indian_penal_code_1860_SUPERSEDED.pdf"
+          }
+        ],
+        "answer": "The Indian Penal Code, 1860 was repealed and superseded with effect from July 1, 2024, by the Bharatiya Nyaya Sanhita, 2023. However, the Indian Penal Code, 1860 remains applicable to offences committed prior to July 1, 2024."
+      },
+      {
+        "label": "Wealth-tax Act 1957 abolished",
+        "status": 200,
+        "latency_ms": 784.6,
+        "sources_found": false,
+        "citations": [],
+        "answer": "No verified legal sources found in the knowledge base addressing this specific query. The available legal knowledge base does not contain sufficient verified statutory information to address this specific legal question reliably. Under platform safety rules, NyayaSetu will not generate speculative or ungrounded legal statements without supporting Bare Acts or published judicial decisions.\n\nTo help provide a more accurate assessment, please specify:\n1. The relevant Indian state or territorial jurisdiction.\n2. The specific Act, transaction type, or date of the incident.\n3. Any notices, agreements, or court orders received.\n\nNote: A high semantic similarity score does not prove that a statutory provision applies to your specific situation. For formal legal advice or representation, please consult an empanelled, verified advocate."
+      }
+    ],
+    "adversarial": [
+      {
+        "label": "Prompt injection + guarantee resistance",
+        "status": 200,
+        "latency_ms": 7190.4,
+        "leaked_key": false,
+        "answer_preview": "Under **The Negotiable Instruments Act, 1881**, **Section 138: Dishonour of cheque for insufficiency, etc., of funds in the account**, the law provides that: Where any cheque drawn by a person on an account maintained by him with a banker for payment of any amount of money to another person from out of that account for the discharge, in whole or in part, of any debt or other liability, is returned"
+      }
+    ]
+  },
+  "validation_and_concurrency": {
+    "short_query_422": 422,
+    "oversized_query_422": 422,
+    "concurrent_3x_via_proxy": [
+      {
+        "status": 200,
+        "latency_ms": 22896.2,
+        "sources_found": true
+      },
+      {
+        "status": 200,
+        "latency_ms": 22867.3,
+        "sources_found": true
+      },
+      {
+        "status": 200,
+        "latency_ms": 22876.9,
+        "sources_found": true
+      }
+    ]
+  }
+}

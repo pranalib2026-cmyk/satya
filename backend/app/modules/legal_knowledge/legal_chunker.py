@@ -323,3 +323,175 @@ class LegalChunker:
             )
 
         return results
+
+    @classmethod
+    def chunk_judgment_text(
+        cls,
+        text: str,
+        case_title: str,
+        jurisdiction: str = "Union of India",
+        court: Optional[str] = None,
+        decision_date: Optional[str] = None,
+        citation: Optional[str] = None,
+        document_version: str = "1.0",
+        max_chars: int = 2400,
+    ) -> List[ParsedLegalChunk]:
+        """Split a judicial decision into paragraph-boundary-aware chunks preserving case lineage."""
+        if not text or not text.strip():
+            return []
+
+        paragraphs = [p.strip() for p in re.split(r"\n\s*\n+", text.strip()) if p.strip()]
+        if not paragraphs:
+            paragraphs = [text.strip()]
+
+        # Further split oversized single paragraphs along numbered sentences/lines
+        normalized_paras: List[str] = []
+        for para in paragraphs:
+            if len(para) <= max_chars:
+                normalized_paras.append(para)
+            else:
+                lines = [ln.strip() for ln in para.splitlines() if ln.strip()]
+                buf = ""
+                for ln in lines:
+                    if len(buf) + len(ln) + 1 > max_chars and buf:
+                        normalized_paras.append(buf)
+                        buf = ln
+                    else:
+                        buf = f"{buf}\n{ln}".strip() if buf else ln
+                if buf:
+                    if len(buf) <= max_chars:
+                        normalized_paras.append(buf)
+                    else:
+                        for i in range(0, len(buf), max_chars):
+                            normalized_paras.append(buf[i : i + max_chars].strip())
+
+        grouped_blocks: List[str] = []
+        current_buf = ""
+        for para in normalized_paras:
+            if len(current_buf) + len(para) + 2 > max_chars and current_buf:
+                grouped_blocks.append(current_buf)
+                current_buf = para
+            else:
+                current_buf = f"{current_buf}\n\n{para}".strip() if current_buf else para
+        if current_buf:
+            grouped_blocks.append(current_buf)
+
+        chunks: List[ParsedLegalChunk] = []
+        total = len(grouped_blocks)
+        for idx, block in enumerate(grouped_blocks, start=1):
+            if len(block) < 15:
+                continue
+            para_match = re.match(r"^(?:Para(?:graph)?\.?\s*)?(\d+)\.", block, re.IGNORECASE)
+            sec_label = f"Para {para_match.group(1)}" if para_match else (
+                "Judgment Summary" if total == 1 else f"Part {idx} of {total}"
+            )
+            token_est = int(len(re.findall(r"\w+", block)) * 1.3)
+            checksum = hashlib.sha256(block.encode("utf-8")).hexdigest()
+            chunks.append(
+                ParsedLegalChunk(
+                    section_number=sec_label,
+                    clause_heading=case_title[:255],
+                    chunk_text=block,
+                    chapter=court,
+                    subsections=[],
+                    token_count=token_est,
+                    content_checksum=checksum,
+                    metadata={
+                        "case_title": case_title,
+                        "jurisdiction": jurisdiction,
+                        "court": court,
+                        "decision_date": decision_date,
+                        "citation": citation,
+                        "document_version": document_version,
+                        "part_index": idx,
+                        "total_parts": total,
+                    },
+                )
+            )
+        return chunks
+
+    @classmethod
+    def chunk_policy_scheme(
+        cls,
+        scheme_name: str,
+        scheme_slug: str,
+        sections: List[Dict[str, str]],
+        jurisdiction: str = "Union of India",
+        ministry_or_state: Optional[str] = None,
+        official_url: Optional[str] = None,
+        document_version: str = "2026.1",
+        max_chars: int = 2800,
+    ) -> List[ParsedLegalChunk]:
+        """Chunk a government policy/scheme along logical sections (Overview, Eligibility, Benefits, Process)."""
+        # First normalize/sub-split any single section exceeding max_chars along paragraph boundaries
+        expanded_sections: List[Dict[str, str]] = []
+        for sec in sections:
+            label = (sec.get("label") or "").strip()
+            body = (sec.get("text") or "").strip()
+            if not body:
+                continue
+            if len(body) + len(label) + 4 <= max_chars:
+                expanded_sections.append({"label": label, "text": body})
+            else:
+                paras = [p.strip() for p in re.split(r"\n+", body) if p.strip()]
+                part_buf = ""
+                for p in paras:
+                    if len(part_buf) + len(p) + 1 > max_chars and part_buf:
+                        expanded_sections.append({"label": label, "text": part_buf})
+                        part_buf = p
+                    elif len(p) > max_chars:
+                        if part_buf:
+                            expanded_sections.append({"label": label, "text": part_buf})
+                            part_buf = ""
+                        for i in range(0, len(p), max_chars):
+                            expanded_sections.append({"label": label, "text": p[i : i + max_chars].strip()})
+                    else:
+                        part_buf = f"{part_buf}\n{p}".strip() if part_buf else p
+                if part_buf:
+                    expanded_sections.append({"label": label, "text": part_buf})
+
+        grouped: List[Dict[str, str]] = []
+        buf_label = ""
+        buf_text = ""
+
+        for sec in expanded_sections:
+            label = sec["label"]
+            body = sec["text"]
+            entry = f"{label}:\n{body}" if label else body
+            if len(buf_text) + len(entry) + 2 > max_chars and buf_text:
+                grouped.append({"label": buf_label or label, "text": buf_text})
+                buf_label = label
+                buf_text = entry
+            else:
+                buf_label = f"{buf_label} & {label}".strip(" &") if buf_label and label else (buf_label or label)
+                buf_text = f"{buf_text}\n\n{entry}".strip() if buf_text else entry
+
+        if buf_text:
+            grouped.append({"label": buf_label or "Scheme Details", "text": buf_text})
+
+        chunks: List[ParsedLegalChunk] = []
+        for idx, blk in enumerate(grouped, start=1):
+            text_body = blk["text"]
+            token_est = int(len(re.findall(r"\w+", text_body)) * 1.3)
+            checksum = hashlib.sha256(text_body.encode("utf-8")).hexdigest()
+            sec_num = f"Scheme: {scheme_slug}" if len(grouped) == 1 else f"Scheme: {scheme_slug} ({idx}/{len(grouped)})"
+            chunks.append(
+                ParsedLegalChunk(
+                    section_number=sec_num[:64],
+                    clause_heading=f"{scheme_name[:200]} — {blk['label'][:50]}"[:255],
+                    chunk_text=text_body,
+                    chapter=ministry_or_state,
+                    subsections=[],
+                    token_count=token_est,
+                    content_checksum=checksum,
+                    metadata={
+                        "scheme_name": scheme_name,
+                        "scheme_slug": scheme_slug,
+                        "jurisdiction": jurisdiction,
+                        "ministry_or_state": ministry_or_state,
+                        "official_url": official_url,
+                        "document_version": document_version,
+                    },
+                )
+            )
+        return chunks

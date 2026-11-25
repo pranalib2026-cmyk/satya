@@ -65,6 +65,7 @@ class DeterministicGroundedLLMProvider(BaseLLMProvider):
     LANGUAGE_DISCLAIMERS = {
         "en": "For individualized legal representation, please consult an empanelled advocate.",
         "hi": "व्यक्तिगत कानूनी सहायता के लिए कृपया किसी सत्यापित अधिवक्ता से परामर्श करें।",
+        "mr": "वैयक्तिक कायदेशीर मदतीसाठी कृपया प्रमाणित वकिलांचा सल्ला घ्या.",
         "kn": "ವೈಯಕ್ತಿಕ ಕಾನೂನು ನೆರವಿಗಾಗಿ ದಯವಿಟ್ಟು ಪರಿಶೀಲಿಸಿದ ವಕೀಲರನ್ನು ಸಂಪರ್ಕಿಸಿ.",
     }
 
@@ -137,7 +138,19 @@ class DeterministicGroundedLLMProvider(BaseLLMProvider):
             if len(clean_text) > 650:
                 clean_text = clean_text[:647] + "..."
 
-            para = f"Under **{source_title}**, **{ref_desc}**, the law provides that: {clean_text}"
+            currency_status = chunk.get("legal_currency_status") or "CURRENT"
+            ver_status = chunk.get("verification_status") or "VERIFIED"
+            amendment_note = chunk.get("amendment_notes")
+            warnings: List[str] = []
+            if any(tag in currency_status for tag in ("REPEALED", "ABOLISHED", "SUPERSEDED", "OUTDATED")):
+                warnings.append(f"[Statutory Status Notice: {currency_status}]")
+            if ver_status != "VERIFIED":
+                warnings.append(f"[Source Verification: {ver_status}]")
+            if amendment_note:
+                warnings.append(f"({amendment_note})")
+            warning_prefix = (" " + " ".join(warnings)) if warnings else ""
+
+            para = f"Under **{source_title}**, **{ref_desc}**, the law provides that: {clean_text}{warning_prefix}"
             answer_paragraphs.append(para)
 
             # Extract actionable next steps based on statutory context
@@ -209,6 +222,8 @@ class DeterministicGroundedLLMProvider(BaseLLMProvider):
         lang_note = ""
         if language == "hi":
             lang_note = "(हिंदी सारांश) आधिकारिक भारतीय संविधि के अनुसार प्रासंगिक कानूनी प्रावधान निम्नलिखित हैं:\n\n"
+        elif language == "mr":
+            lang_note = "(मराठी सारांश) अधिकृत भारतीय कायद्यांनुसार संबंधित कायदेशीर तरतुदी खालीलप्रमाणे आहेत:\n\n"
         elif language == "kn":
             lang_note = "(ಕನ್ನಡ ಸಾರಾಂಶ) ಅಧಿಕೃತ ಭಾರತೀಯ ಕಾಯ್ದೆಗಳ ಪ್ರಕಾರ ಸಂಬಂಧಿತ ಕಾನೂನು ನಿಬಂಧನೆಗಳು ಕೆಳಗಿನಂತಿವೆ:\n\n"
 
@@ -464,14 +479,28 @@ class GroundedLegalAnswerSchema(BaseModel):
     )
 
 
+class DocumentDateItem(BaseModel):
+    """Structured date entry compatible with Gemini Developer API JSON schema."""
+
+    label: str = Field(..., description="Label for the date (e.g. 'Notice Date', 'Due Date').")
+    value: str = Field(..., description="Date or deadline string stated in the document.")
+
+
+class DocumentAmountItem(BaseModel):
+    """Structured monetary amount entry compatible with Gemini Developer API JSON schema."""
+
+    label: str = Field(..., description="Description of the monetary amount (e.g. 'Cheque Amount').")
+    value: str = Field(..., description="Currency figure as stated in the document.")
+
+
 class GroundedDocumentExplanationSchema(BaseModel):
     """Pydantic schema enforcing structured, grounded legal explanation from Gemini."""
 
     document_type: str = Field(..., description="Document classification e.g. 'Legal Demand Notice', 'Tenancy Agreement', 'FIR', 'Court Summons'")
     summary: str = Field(..., description="Plain-language explanation of what this specific document says, based strictly on the text.")
     parties: List[str] = Field(default_factory=list, description="Names of parties extracted from the document text.")
-    dates: List[Dict[str, str]] = Field(default_factory=list, description="Key dates and limitation deadlines extracted from the document text.")
-    amounts: List[Dict[str, str]] = Field(default_factory=list, description="Monetary demands or figures stated in the document text.")
+    dates: List[DocumentDateItem] = Field(default_factory=list, description="Key dates and limitation deadlines extracted from the document text.")
+    amounts: List[DocumentAmountItem] = Field(default_factory=list, description="Monetary demands or figures stated in the document text.")
     obligations: List[str] = Field(default_factory=list, description="Specific actions or obligations required of the recipient.")
     risks: List[str] = Field(default_factory=list, description="Legal and procedural risks if not addressed.")
     cited_sections: List[str] = Field(default_factory=list, description="Sections cited from the retrieved statutory context.")
@@ -541,6 +570,8 @@ class GeminiLLMProvider(BaseLLMProvider):
         lang_directive = "English"
         if language == "hi":
             lang_directive = "Hindi (हिंदी)"
+        elif language == "mr":
+            lang_directive = "Marathi (मराठी)"
         elif language == "kn":
             lang_directive = "Kannada (ಕನ್ನಡ)"
 
@@ -671,6 +702,7 @@ class GeminiLLMProvider(BaseLLMProvider):
             sec_clean = re.sub(r"(?i)\bsection\s*", "", sec).strip().lower()
             heading = (chunk.get("clause_heading") or "").strip()
             title = (chunk.get("source_title") or "Indian Statute").strip()
+            source_type = (chunk.get("source_type") or "BARE_ACT").upper()
 
             is_cited = False
             if sec_clean and any(sec_clean == nc or nc in sec_clean for nc in normalized_cited):
@@ -679,6 +711,15 @@ class GeminiLLMProvider(BaseLLMProvider):
                 is_cited = True
             elif structured_data.sources_found and not structured_data.cited_sections:
                 is_cited = True
+            elif structured_data.sources_found and source_type in ("COURT_JUDGMENT", "GOVERNMENT_SCHEME", "POLICY_REPORT"):
+                # Judgments & schemes often have "Judgment Summary" in section_number while answer names parties/scheme
+                significant_title_tokens = [
+                    w.lower() for w in re.findall(r"\w+", title)
+                    if len(w) > 3 and w.lower() not in {"case", "order", "state", "union", "india", "scheme", "high", "court"}
+                ]
+                ans_lower = structured_data.answer.lower()
+                if title.lower() in ans_lower or any(tok in ans_lower for tok in significant_title_tokens[:4]):
+                    is_cited = True
 
             ref_key = f"{title}_{sec}"
             if is_cited and ref_key not in seen_keys:
@@ -757,10 +798,15 @@ class GeminiLLMProvider(BaseLLMProvider):
             heading = chunk.get("clause_heading") or ""
             title = chunk.get("source_title") or "Indian Statute"
             text = (chunk.get("chunk_text") or "").strip()
+            ver_status = chunk.get("verification_status") or "VERIFIED"
+            currency_status = chunk.get("legal_currency_status") or "CURRENT"
+            amendment_note = chunk.get("amendment_notes") or ""
             context_blocks.append(
                 f"[Source {idx}]: {title}\n"
                 f"Section/Provision: {sec} ({heading})\n"
-                f"Statutory Text: {text}\n"
+                f"Verification Status: {ver_status} | Statutory Currency: {currency_status}\n"
+                + (f"Amendment/Transition Note: {amendment_note}\n" if amendment_note else "")
+                + f"Statutory Text: {text}\n"
             )
         context_str = "\n---\n".join(context_blocks)
 
@@ -871,8 +917,8 @@ class GeminiLLMProvider(BaseLLMProvider):
                         "document_type": structured.document_type,
                         "summary": structured.summary,
                         "parties": structured.parties or ["Parties not explicitly itemized in text"],
-                        "dates": structured.dates,
-                        "amounts": structured.amounts,
+                        "dates": [d.model_dump() for d in structured.dates],
+                        "amounts": [a.model_dump() for a in structured.amounts],
                         "obligations": structured.obligations,
                         "risks": structured.risks,
                         "citations": claimed_refs,

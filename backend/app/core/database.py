@@ -53,15 +53,22 @@ class TimestampMixin:
     )
 
 
-# Asynchronous PostgreSQL Engine configured with Psycopg 3 driver
-engine = create_async_engine(
-    settings.DATABASE_URL,
-    echo=settings.DB_ECHO,
-    pool_size=settings.DB_POOL_SIZE,
-    max_overflow=settings.DB_MAX_OVERFLOW,
-    pool_timeout=settings.DB_POOL_TIMEOUT,
-    pool_pre_ping=True,
-)
+# Asynchronous Engine configured for PostgreSQL (Psycopg 3) or local SQLite dev fallback
+_is_sqlite = settings.DATABASE_URL.startswith("sqlite")
+if _is_sqlite:
+    engine = create_async_engine(
+        settings.DATABASE_URL,
+        echo=settings.DB_ECHO,
+    )
+else:
+    engine = create_async_engine(
+        settings.DATABASE_URL,
+        echo=settings.DB_ECHO,
+        pool_size=settings.DB_POOL_SIZE,
+        max_overflow=settings.DB_MAX_OVERFLOW,
+        pool_timeout=settings.DB_POOL_TIMEOUT,
+        pool_pre_ping=True,
+    )
 
 # Centralized session factory
 AsyncSessionLocal = async_sessionmaker(
@@ -124,18 +131,26 @@ async def check_db_health() -> Dict[str, Any]:
             health_status["status"] = "connected"
             health_status["latency_ms"] = round(latency, 2)
 
-            # 2. Check for required extensions (PostGIS, pgvector, uuid-ossp)
-            ext_query = text(
-                "SELECT extname, extversion FROM pg_extension "
-                "WHERE extname IN ('postgis', 'vector', 'uuid-ossp');"
-            )
-            result = await session.execute(ext_query)
-            ext_map = {row[0]: row[1] for row in result.fetchall()}
-            health_status["extensions"] = {
-                "postgis": ext_map.get("postgis", "not_installed"),
-                "vector": ext_map.get("vector", "not_installed"),
-                "uuid-ossp": ext_map.get("uuid-ossp", "not_installed"),
-            }
+            if _is_sqlite:
+                health_status["dialect"] = "sqlite+aiosqlite"
+                health_status["extensions"] = {
+                    "postgis": "sqlite_fallback",
+                    "vector": "sqlite_json_fallback",
+                    "uuid-ossp": "sqlite_uuid_fallback",
+                }
+            else:
+                # 2. Check for required extensions (PostGIS, pgvector, uuid-ossp)
+                ext_query = text(
+                    "SELECT extname, extversion FROM pg_extension "
+                    "WHERE extname IN ('postgis', 'vector', 'uuid-ossp');"
+                )
+                result = await session.execute(ext_query)
+                ext_map = {row[0]: row[1] for row in result.fetchall()}
+                health_status["extensions"] = {
+                    "postgis": ext_map.get("postgis", "not_installed"),
+                    "vector": ext_map.get("vector", "not_installed"),
+                    "uuid-ossp": ext_map.get("uuid-ossp", "not_installed"),
+                }
     except OperationalError as op_err:
         health_status["status"] = "unreachable"
         health_status["error"] = "Connection refused or host unreachable"

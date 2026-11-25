@@ -27,6 +27,7 @@ if str(backend_dir) not in sys.path:
     sys.path.insert(0, str(backend_dir))
 
 from app.core.database import get_db_context
+import app.core.models  # noqa: F401  # Register all ORM models before mapper configuration
 from app.core.logging import logger
 from app.modules.legal_knowledge.ingestion import LegalIngestionService
 from app.modules.legal_knowledge.ingestion_pipeline import LegalDocumentIngestionPipeline
@@ -48,6 +49,23 @@ async def handle_reembed():
         count = await LegalIngestionService.reembed_all_chunks(session)
         logger.info(f"Re-embedding completed. Total chunks re-embedded: {count}")
         print(f"✅ Successfully re-embedded {count} legal chunks.")
+
+
+async def handle_ingest_processed(
+    chunks_file: str,
+    datasets: list[str] | None,
+    limit: int | None,
+):
+    """Ingest preprocessed RAG chunks JSONL into PostgreSQL/pgvector."""
+    logger.info(f"Starting processed corpus ingestion from {chunks_file}...")
+    async with get_db_context() as session:
+        summary = await LegalIngestionService.ingest_processed_corpus(
+            db=session,
+            chunks_jsonl_path=chunks_file,
+            dataset_filter=datasets,
+            max_documents=limit,
+        )
+        print(f"✅ Processed corpus ingestion complete: {summary}")
 
 
 async def handle_ingest_file(
@@ -121,6 +139,15 @@ def main():
     parser = argparse.ArgumentParser(description="NyayaSetu Legal Document Ingestion CLI")
     parser.add_argument("--seed", action="store_true", help="Seed curated 20-statute baseline legal corpus")
     parser.add_argument("--reembed", action="store_true", help="Re-embed all chunks with active provider")
+    parser.add_argument("--ingest-processed", action="store_true", help="Ingest preprocessed data/processed/chunked/rag_chunks.jsonl")
+    parser.add_argument(
+        "--chunks-file",
+        type=str,
+        default=str(backend_dir.parent / "data" / "processed" / "chunked" / "rag_chunks.jsonl"),
+        help="Path to preprocessed rag_chunks.jsonl",
+    )
+    parser.add_argument("--dataset", action="append", default=None, help="Filter by source_dataset (repeatable)")
+    parser.add_argument("--limit", type=int, default=None, help="Maximum documents to ingest")
     parser.add_argument("--file", type=str, help="Path to legal document file (PDF, HTML, TXT, JSON)")
     parser.add_argument("--title", type=str, help="Official title of the statute or judgment")
     parser.add_argument("--short-code", type=str, default=None, help="Statutory short code (e.g., BNS, NI_ACT)")
@@ -136,6 +163,8 @@ def main():
         asyncio.run(handle_seed())
     elif args.reembed:
         asyncio.run(handle_reembed())
+    elif args.ingest_processed:
+        asyncio.run(handle_ingest_processed(args.chunks_file, args.dataset, args.limit))
     elif args.file:
         if not args.title:
             parser.error("--title is required when specifying --file")

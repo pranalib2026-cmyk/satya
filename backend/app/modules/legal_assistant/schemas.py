@@ -30,6 +30,11 @@ class CitationItem(BaseModel):
     relevant_text: Optional[str] = Field(None, description="Verbatim statutory text snippet extracted from source chunk")
     content_checksum: Optional[str] = Field(None, description="SHA-256 checksum of verified source chunk")
     is_verified_in_corpus: bool = Field(True, description="Strictly verified against retrieved knowledge base records")
+    verification_status: Optional[str] = Field("VERIFIED", description="VERIFIED | PENDING_VERIFICATION | UNVERIFIED_THIRD_PARTY_PDF | SECONDARY_MIRROR_WITH_GOV_URLS")
+    legal_currency_status: Optional[str] = Field("CURRENT", description="CURRENT | HISTORICAL_PRECEDENT_CITES_IPC_CRPC | REPEALED_* | OUTDATED_*")
+    amendment_warning: Optional[str] = Field(None, description="Explicit warning if repealed, superseded, outdated, or unverified")
+    source_repository_url: Optional[str] = Field(None, description="Original external dataset repository URL when sourced from collected corpora")
+    original_document_path: Optional[str] = Field(None, description="Original raw dataset file path for end-to-end traceability")
 
     model_config = ConfigDict(from_attributes=True)
 

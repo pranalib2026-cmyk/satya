@@ -31,6 +31,8 @@ class CitationValidator:
         authentic_sections: Set[str] = set()
         authentic_titles: Set[str] = set()
         chunk_map: Dict[str, Dict[str, Any]] = {}
+        title_map: Dict[str, Dict[str, Any]] = {}
+        pair_map: Dict[tuple, Dict[str, Any]] = {}
 
         for chunk in retrieved_chunks:
             sec = (chunk.get("section_number") or "").strip().lower()
@@ -38,10 +40,12 @@ class CitationValidator:
             chunk_body = (chunk.get("chunk_text") or "").lower()
             if sec:
                 authentic_sections.add(sec)
-                chunk_map[sec] = chunk
+                chunk_map.setdefault(sec, chunk)
             if title:
                 authentic_titles.add(title)
-                chunk_map[title] = chunk
+                title_map.setdefault(title, chunk)
+            if title or sec:
+                pair_map.setdefault((title, sec), chunk)
 
             # Also register authentic statutory cross-references appearing in the verified Bare Act chunk text
             for cross_ref in re.findall(r"\bsection\s+(\d+[a-z]?)\b", chunk_body):
@@ -66,7 +70,12 @@ class CitationValidator:
                 cit_key = f"{title}_{sec}"
                 if cit_key not in seen_citations:
                     seen_citations.add(cit_key)
-                    matching_chunk = chunk_map.get(sec_lower) or chunk_map.get(title_lower) or {}
+                    matching_chunk = (
+                        pair_map.get((title_lower, sec_lower))
+                        or title_map.get(title_lower)
+                        or chunk_map.get(sec_lower)
+                        or {}
+                    )
                     raw_text_snippet = matching_chunk.get("relevant_text") or (
                         matching_chunk.get("chunk_text")[:280] + "..."
                         if matching_chunk.get("chunk_text") and len(matching_chunk.get("chunk_text")) > 280
@@ -86,6 +95,11 @@ class CitationValidator:
                             relevant_text=raw_text_snippet,
                             content_checksum=ref.get("content_checksum") or matching_chunk.get("content_checksum"),
                             is_verified_in_corpus=True,
+                            verification_status=matching_chunk.get("verification_status", "VERIFIED"),
+                            legal_currency_status=matching_chunk.get("legal_currency_status", "CURRENT"),
+                            amendment_warning=matching_chunk.get("amendment_notes"),
+                            source_repository_url=matching_chunk.get("original_repo_url"),
+                            original_document_path=matching_chunk.get("local_raw_path"),
                         )
                     )
             else:

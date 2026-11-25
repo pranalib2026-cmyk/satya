@@ -1,0 +1,51 @@
+{
+  "generated_at": "2026-11-25T10:19:16.591797+00:00",
+  "note": "Verified Indian statutory transitions & repeals used to tag historical judgments and older datasets.",
+  "transitions": [
+    {
+      "repealed_act": "Indian Penal Code, 1860 (IPC)",
+      "repealed_short_code": "IPC_1860",
+      "replaced_by": "Bharatiya Nyaya Sanhita, 2023 (BNS)",
+      "replaced_short_code": "BNS_2023",
+      "effective_date": "2024-07-01",
+      "status": "REPEALED_FOR_NEW_OFFENCES",
+      "notes": "IPC 1860 continues to govern offences committed prior to 1 July 2024."
+    },
+    {
+      "repealed_act": "Code of Criminal Procedure, 1973 (CrPC)",
+      "repealed_short_code": "CrPC_1973",
+      "replaced_by": "Bharatiya Nagarik Suraksha Sanhita, 2023 (BNSS)",
+      "replaced_short_code": "BNSS_2023",
+      "effective_date": "2024-07-01",
+      "status": "REPEALED_FOR_NEW_PROCEEDINGS",
+      "notes": "CrPC 1973 Section 482 inherent powers correspond to BNSS 2023 Section 528."
+    },
+    {
+      "repealed_act": "Indian Evidence Act, 1872 (IEA)",
+      "repealed_short_code": "IEA_1872",
+      "replaced_by": "Bharatiya Sakshya Adhiniyam, 2023 (BSA)",
+      "replaced_short_code": "BSA_2023",
+      "effective_date": "2024-07-01",
+      "status": "REPEALED_FOR_NEW_PROCEEDINGS",
+      "notes": "Replaced by BSA 2023 w.e.f. 1 July 2024."
+    },
+    {
+      "repealed_act": "Wealth-tax Act, 1957",
+      "repealed_short_code": "WEALTH_TAX_1957",
+      "replaced_by": null,
+      "replaced_short_code": null,
+      "effective_date": "2016-04-01",
+      "status": "ABOLISHED",
+      "notes": "Abolished by Finance Act, 2015 w.e.f. Assessment Year 2016-17."
+    },
+    {
+      "repealed_act": "Information Technology Act, 2000 - Section 43A",
+      "repealed_short_code": "IT_ACT_2000_S43A",
+      "replaced_by": "Digital Personal Data Protection Act, 2023 (Section 44(2) omission)",
+      "replaced_short_code": "DPDPA_2023",
+      "effective_date": "Subject to Central Govt enforcement notification",
+      "status": "TRANSITIONING_OMISSION",
+      "notes": "DPDPA 2023 Section 44(2) omits Section 43A IT Act upon commencement notification."
+    }
+  ]
+}
