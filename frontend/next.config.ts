@@ -4,6 +4,9 @@ const nextConfig: NextConfig = {
   cacheComponents: true,
   partialPrefetching: true,
   images: {
+    // Remote photo hosts are reachable from the visitor's browser, while the
+    // local Next.js server may not have outbound network access to optimize them.
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: "https",

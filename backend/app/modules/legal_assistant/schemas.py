@@ -1,7 +1,7 @@
 """Pydantic v2 schemas for the Legal AI Assistant (RAG)."""
 
 from datetime import date, datetime
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Literal, Optional
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -103,3 +103,101 @@ class LegalSourceResponse(BaseModel):
     updated_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class AskMeProvision(BaseModel):
+    """Verified Indian statutory Section or Constitutional Article."""
+
+    citation_index: int = 1
+    act_name: str
+    section_or_article: str
+    source_type: str = "BARE_ACT"
+    heading: Optional[str] = None
+    brief: str
+    identifier: Optional[str] = None
+    official_source_url: Optional[str] = None
+    content_checksum: Optional[str] = None
+    is_verified_in_corpus: bool = True
+
+
+class AskMeAdvocateContact(BaseModel):
+    """Verified advocate contact & qualification details for serious matters."""
+
+    id: str
+    name: str
+    phone: str
+    qualifications: str
+    bar_council_id: str
+    bar_council_name: str
+    primary_practice: str
+    courts: List[str] = Field(default_factory=list)
+    experience_years: int
+    city: str
+    languages: List[str] = Field(default_factory=list)
+
+
+class AskMeHistoryTurn(BaseModel):
+    """Single conversational turn in an Ask Me session."""
+
+    role: Literal["user", "assistant"]
+    content: str = Field(..., min_length=1, max_length=4000)
+
+
+class AskMeRequest(BaseModel):
+    """Payload for the Ask Me citizen legal assistant."""
+
+    query: str = Field(..., min_length=3, max_length=2000, description="User's legal problem (typed or transcribed from speech)")
+    preferred_language: str = Field("en", description="Target language code: 'en', 'hi', 'kn'")
+    jurisdiction: Optional[str] = Field(None, description="Optional jurisdiction filter")
+    history: List[AskMeHistoryTurn] = Field(default_factory=list, max_length=20, description="Previous conversation turns for multi-turn context")
+    attachment_text: Optional[str] = Field(None, max_length=6000, description="Extracted text from an attached notice, memo, or agreement")
+    attachment_name: Optional[str] = Field(None, max_length=255, description="Original filename of the attached document")
+
+
+class AskMeAttachmentResponse(BaseModel):
+    """Extracted text metadata from an uploaded notice or image in Ask Me chat."""
+
+    file_name: str
+    extracted_text: str
+    char_count: int
+    page_count: int
+    engine_name: str
+
+
+class AskMeTranscribeResponse(BaseModel):
+    """Speech-to-Text transcription result from Gemini."""
+
+    transcript: str
+    language: str
+    provider: str
+
+
+class AskMeSpeakRequest(BaseModel):
+    """Payload for Text-to-Speech synthesis via Gemini."""
+
+    text: str = Field(..., min_length=1, max_length=2500)
+    language: str = Field("en", description="Target language code: 'en', 'hi', 'kn'")
+
+
+class AskMeResponse(BaseModel):
+    """Structured Ask Me response with grounded provisions, simpler explanation, solutions, and advocate escalation."""
+
+    query: str
+    detected_language: str
+    brief_answer: str
+    simplified_answer: str
+    spoken_summary: str = ""
+    applicable_provisions: List[AskMeProvision] = Field(default_factory=list)
+    sources_found: bool
+    solutions: List[str] = Field(default_factory=list)
+    follow_up_questions: List[str] = Field(default_factory=list)
+    is_serious: bool
+    seriousness_reason: Optional[str] = None
+    advocate_contacts: List[AskMeAdvocateContact] = Field(default_factory=list)
+    disclaimer: str = Field(
+        default=(
+            "NyayaSetu provides an AI-assisted preliminary legal assessment and advocate-discovery platform. "
+            "It is not a law firm and does not provide legal advice. Submitting an inquiry does not create an advocate-client relationship."
+        )
+    )
+    assessed_at: datetime

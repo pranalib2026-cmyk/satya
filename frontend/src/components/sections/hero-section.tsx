@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { Container } from "@/components/layout/container";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, MessageSquareText } from "lucide-react";
 import { motion } from "framer-motion";
 import { LadyJusticeLoader } from "@/components/3d/lady-justice-canvas";
 
@@ -131,26 +131,42 @@ export function HeroSection() {
                 AI-assisted preliminary case assessment and Bar Council-verified advocates. We simplify complex Indian acts into clear steps, document checklists, and transparent consultations.
               </p>
 
-              <div className="flex flex-wrap items-center gap-3 pt-1">
-                {/* Compound Primary Button: Get Legal Help */}
+              <div className="flex flex-col items-start gap-2.5 pt-1">
+                <div className="flex flex-wrap items-center gap-3">
+                  {/* Compound Primary Button: Get Legal Help */}
+                  <Link
+                    href="/login"
+                    className="group inline-flex items-center bg-[#2a1c12] text-[#fffaf2] hover:bg-[#9a6a35] transition-colors rounded-[2px] overflow-hidden shadow-xs"
+                  >
+                    <span className="px-4.5 py-2.5 sm:px-5 sm:py-3 text-[14px] font-semibold tracking-tight">
+                      Get Legal Help
+                    </span>
+                    <span className="flex items-center justify-center w-9 sm:w-10 h-full py-2.5 sm:py-3 border-l border-white/20 bg-[#fffaf2]/10 group-hover:bg-[#fffaf2]/20 transition-colors">
+                      <ArrowRight className="h-4 w-4" />
+                    </span>
+                  </Link>
+
+                  {/* Ghost Secondary Button: Explore Legal Topics */}
+                  <Link
+                    href="/practices"
+                    className="inline-flex items-center px-5 py-2.5 sm:px-5.5 sm:py-3 border-[1.5px] border-[#2a1c12] text-[#2a1c12] hover:bg-[#2a1c12] hover:text-[#fffaf2] transition-colors text-[14px] font-semibold rounded-[2px]"
+                  >
+                    Explore Legal Topics
+                  </Link>
+                </div>
+
+                {/* Ask Me Button: Directly below Get Legal Help */}
                 <Link
-                  href="/login"
-                  className="group inline-flex items-center bg-[#2a1c12] text-[#fffaf2] hover:bg-[#9a6a35] transition-colors rounded-[2px] overflow-hidden shadow-xs"
+                  href="/ask-me"
+                  className="group inline-flex items-center bg-[#fffaf2] border-[1.5px] border-[#9a6a35] text-[#2a1c12] hover:bg-[#9a6a35] hover:text-[#fffaf2] transition-colors rounded-[2px] overflow-hidden shadow-xs"
                 >
-                  <span className="px-4.5 py-2.5 sm:px-5 sm:py-3 text-[14px] font-semibold tracking-tight">
-                    Get Legal Help
+                  <span className="flex items-center gap-2 px-4.5 py-2.5 sm:px-5 sm:py-2.5 text-[14px] font-semibold tracking-tight">
+                    <MessageSquareText className="h-4 w-4 text-[#9a6a35] group-hover:text-[#fffaf2] transition-colors" />
+                    Ask Me
                   </span>
-                  <span className="flex items-center justify-center w-9 sm:w-10 h-full py-2.5 sm:py-3 border-l border-white/20 bg-[#fffaf2]/10 group-hover:bg-[#fffaf2]/20 transition-colors">
+                  <span className="flex items-center justify-center w-9 sm:w-10 h-full py-2.5 border-l border-[#e2d5c1] group-hover:border-white/20 bg-[#f4efe6]/70 group-hover:bg-[#fffaf2]/15 transition-colors">
                     <ArrowRight className="h-4 w-4" />
                   </span>
-                </Link>
-
-                {/* Ghost Secondary Button: Explore Legal Topics */}
-                <Link
-                  href="/practices"
-                  className="inline-flex items-center px-5 py-2.5 sm:px-5.5 sm:py-3 border-[1.5px] border-[#2a1c12] text-[#2a1c12] hover:bg-[#2a1c12] hover:text-[#fffaf2] transition-colors text-[14px] font-semibold rounded-[2px]"
-                >
-                  Explore Legal Topics
                 </Link>
               </div>
             </motion.div>

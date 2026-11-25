@@ -3,14 +3,22 @@
 import uuid
 from typing import List, Optional
 
-from fastapi import APIRouter, Depends, Query, Request, status
+from fastapi import APIRouter, Depends, File, Form, Query, Request, UploadFile, status
+from fastapi.responses import Response, StreamingResponse
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
+from app.core.errors import BadRequestException
 from app.core.security import decode_jwt
 from app.modules.auth.dependencies import oauth2_scheme, require_roles
+from app.modules.documents.ocr import DocumentOCREngine
 from app.modules.legal_assistant.schemas import (
+    AskMeAttachmentResponse,
+    AskMeRequest,
+    AskMeResponse,
+    AskMeSpeakRequest,
+    AskMeTranscribeResponse,
     LegalAskRequest,
     LegalAskResponse,
     LegalChunkCreate,
@@ -86,6 +94,142 @@ async def ask_legal_assistant(
         ip_address=ip_address,
         user_agent=user_agent,
     )
+
+
+@router.post(
+    "/ask-me",
+    response_model=AskMeResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Ask Me: Grounded Section Lookup, Simplification, Solutions & Escalation",
+    description=(
+        "Accepts typed or speech-transcribed citizen queries, returns strictly verified Indian statutory "
+        "Sections/Articles with references, a plain-language simplified explanation, actionable solutions, "
+        "and verified advocate contact & qualification details for serious matters."
+    ),
+)
+async def ask_me_assistant(
+    payload: AskMeRequest,
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+    current_user: Optional[User] = Depends(get_optional_user),
+):
+    ip_address = request.client.host if request.client else None
+    user_agent = request.headers.get("user-agent")
+
+    return await LegalAssistantService.ask_me(
+        db=db,
+        payload=payload,
+        current_user=current_user,
+        ip_address=ip_address,
+        user_agent=user_agent,
+    )
+
+
+@router.post(
+    "/ask-me/stream",
+    status_code=status.HTTP_200_OK,
+    summary="Ask Me: Streaming SSE Conversational Endpoint",
+    description="Streams verified legal metadata followed by token-by-token grounded answer chunks.",
+)
+async def ask_me_stream(
+    payload: AskMeRequest,
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+    current_user: Optional[User] = Depends(get_optional_user),
+):
+    ip_address = request.client.host if request.client else None
+    user_agent = request.headers.get("user-agent")
+
+    return StreamingResponse(
+        LegalAssistantService.stream_ask_me(
+            db=db,
+            payload=payload,
+            current_user=current_user,
+            ip_address=ip_address,
+            user_agent=user_agent,
+        ),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+        },
+    )
+
+
+@router.post(
+    "/ask-me/upload-context",
+    response_model=AskMeAttachmentResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Ask Me: Extract Text from Notice, Memo, or Photo",
+    description="Extracts readable text from PDF, JPEG, or PNG attachments for Ask Me chat context.",
+)
+async def ask_me_upload_context(
+    file: UploadFile = File(...),
+):
+    content = await file.read()
+    if not content:
+        raise BadRequestException(message="Uploaded file is empty.")
+    if len(content) > 10 * 1024 * 1024:
+        raise BadRequestException(message="File exceeds the 10 MB limit for Ask Me chat attachments.")
+
+    file_name = file.filename or "attachment"
+    mime_type = file.content_type or "application/octet-stream"
+    ocr_result = DocumentOCREngine.process_document(
+        content=content,
+        file_name=file_name,
+        mime_type=mime_type,
+    )
+    return AskMeAttachmentResponse(
+        file_name=file_name,
+        extracted_text=ocr_result.text[:6000],
+        char_count=ocr_result.char_count,
+        page_count=ocr_result.page_count,
+        engine_name=ocr_result.engine_name,
+    )
+
+
+@router.post(
+    "/ask-me/transcribe",
+    response_model=AskMeTranscribeResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Ask Me: Gemini Speech-to-Text Transcription",
+    description="Transcribes recorded user speech audio using Google Gemini.",
+)
+async def ask_me_transcribe(
+    file: UploadFile = File(...),
+    language: str = Form("en"),
+):
+    audio_bytes = await file.read()
+    if not audio_bytes:
+        raise BadRequestException(message="Recorded audio file is empty.")
+    if len(audio_bytes) > 10 * 1024 * 1024:
+        raise BadRequestException(message="Audio exceeds the 10 MB limit.")
+
+    mime_type = file.content_type or "audio/webm"
+    transcript = LegalAssistantService.transcribe_audio_gemini(
+        audio_bytes=audio_bytes,
+        mime_type=mime_type,
+        language=language,
+    )
+    return AskMeTranscribeResponse(
+        transcript=transcript,
+        language=language,
+        provider="gemini",
+    )
+
+
+@router.post(
+    "/ask-me/speak",
+    status_code=status.HTTP_200_OK,
+    summary="Ask Me: Gemini Text-to-Speech Audio",
+    description="Synthesizes spoken audio for Ask Me replies using Google Gemini TTS.",
+)
+async def ask_me_speak(payload: AskMeSpeakRequest):
+    audio_bytes, mime_type = LegalAssistantService.synthesize_speech_gemini(
+        text=payload.text,
+        language=payload.language,
+    )
+    return Response(content=audio_bytes, media_type=mime_type)
 
 
 # ──────────────────────────────────────────────────────────────

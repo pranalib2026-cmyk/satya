@@ -352,3 +352,141 @@ async def test_audit_log_recorded_for_legal_ai_queries(async_client: AsyncClient
     assert audit is not None
     assert "undertrial" in audit.payload_snapshot["query"].lower()
     assert audit.payload_snapshot["sources_found"] is True
+
+
+@pytest.mark.asyncio
+async def test_ask_me_grounded_provisions_simplify_solutions_and_escalation(
+    async_client: AsyncClient, db_session: AsyncSession
+):
+    """Verify /api/v1/legal/ask-me returns grounded sections, simplified text, solutions, and advocate contacts."""
+    await LegalIngestionService.seed_curated_corpus(db_session)
+
+    res = await async_client.post(
+        "/api/v1/legal/ask-me",
+        json={
+            "query": "My cheque of 50000 bounced due to insufficient funds and I received a bank return memo",
+            "preferred_language": "en",
+        },
+    )
+    assert res.status_code == 200
+    data = res.json()
+
+    assert data["sources_found"] is True
+    assert len(data["applicable_provisions"]) >= 1
+    assert data["applicable_provisions"][0]["citation_index"] == 1
+    assert "[1]" in data["brief_answer"]
+    assert data["spoken_summary"]
+    assert "[1]" not in data["spoken_summary"]
+    assert any("138" in (p["section_or_article"] or "") for p in data["applicable_provisions"])
+    assert data["simplified_answer"].startswith("In simple words:")
+    assert len(data["solutions"]) >= 1
+    assert data["is_serious"] is True
+    assert len(data["advocate_contacts"]) >= 1
+    first_adv = data["advocate_contacts"][0]
+    assert first_adv["phone"]
+    assert first_adv["qualifications"]
+    assert first_adv["bar_council_id"]
+
+
+@pytest.mark.asyncio
+async def test_ask_me_no_false_law_on_unknown_topic(
+    async_client: AsyncClient, db_session: AsyncSession
+):
+    """Ensure Ask Me never fabricates a section or article when no verified source matches."""
+    await LegalIngestionService.seed_curated_corpus(db_session)
+
+    res = await async_client.post(
+        "/api/v1/legal/ask-me",
+        json={"query": "Can I register a lunar mining colony under Mars municipal bylaws?"},
+    )
+    assert res.status_code == 200
+    data = res.json()
+
+    assert data["sources_found"] is False
+    assert data["applicable_provisions"] == []
+    assert "not" in data["simplified_answer"].lower()
+
+
+@pytest.mark.asyncio
+async def test_ask_me_multi_turn_history_and_follow_ups(
+    async_client: AsyncClient, db_session: AsyncSession
+):
+    """Verify multi-turn history carries prior statutory context and returns smart follow-up questions."""
+    await LegalIngestionService.seed_curated_corpus(db_session)
+
+    res = await async_client.post(
+        "/api/v1/legal/ask-me",
+        json={
+            "query": "What if 30 days already passed since the bank return memo?",
+            "preferred_language": "en",
+            "history": [
+                {
+                    "role": "user",
+                    "content": "My cheque of 120000 bounced due to insufficient funds.",
+                },
+                {
+                    "role": "assistant",
+                    "content": "Under Section 138 of the Negotiable Instruments Act, 1881, you must send notice within 30 days.",
+                },
+            ],
+        },
+    )
+    assert res.status_code == 200
+    data = res.json()
+    assert data["sources_found"] is True
+    assert len(data["follow_up_questions"]) >= 2
+
+
+@pytest.mark.asyncio
+async def test_ask_me_stream_sse_events(
+    async_client: AsyncClient, db_session: AsyncSession
+):
+    """Verify /api/v1/legal/ask-me/stream emits meta, delta, and done SSE events."""
+    await LegalIngestionService.seed_curated_corpus(db_session)
+
+    res = await async_client.post(
+        "/api/v1/legal/ask-me/stream",
+        json={"query": "My cheque bounced for insufficient funds"},
+    )
+    assert res.status_code == 200
+    assert "text/event-stream" in res.headers.get("content-type", "")
+    body = res.text
+    assert "event: meta" in body
+    assert "event: delta" in body
+    assert "event: done" in body
+
+
+@pytest.mark.asyncio
+async def test_ask_me_gemini_stt_and_tts_endpoints(
+    async_client: AsyncClient, monkeypatch
+):
+    """Verify /api/v1/legal/ask-me/transcribe and /speak endpoints."""
+    from app.modules.legal_assistant.service import LegalAssistantService
+
+    monkeypatch.setattr(
+        LegalAssistantService,
+        "transcribe_audio_gemini",
+        classmethod(lambda cls, audio_bytes, mime_type, language="en": "My cheque bounced yesterday"),
+    )
+    monkeypatch.setattr(
+        LegalAssistantService,
+        "synthesize_speech_gemini",
+        classmethod(lambda cls, text, language="en": (b"RIFF....WAVEfmt ", "audio/wav")),
+    )
+
+    stt_res = await async_client.post(
+        "/api/v1/legal/ask-me/transcribe",
+        files={"file": ("voice.webm", b"fake-audio-bytes", "audio/webm")},
+        data={"language": "en"},
+    )
+    assert stt_res.status_code == 200
+    assert stt_res.json()["transcript"] == "My cheque bounced yesterday"
+    assert stt_res.json()["provider"] == "gemini"
+
+    tts_res = await async_client.post(
+        "/api/v1/legal/ask-me/speak",
+        json={"text": "Under Section 138 of the Negotiable Instruments Act.", "language": "en"},
+    )
+    assert tts_res.status_code == 200
+    assert tts_res.headers["content-type"].startswith("audio/wav")
+    assert tts_res.content.startswith(b"RIFF")
